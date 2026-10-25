@@ -6,10 +6,18 @@ export interface SearchResult {
   snippet: string;
   engine?: string;
   score?: number;
+  metadata?: {
+    studyType?: string;
+    sampleSize?: number;
+    year?: number;
+    citationCount?: number;
+    journal?: string;
+    doi?: string;
+  };
 }
 
 export interface SearchOptions {
-  mode?: 'quick' | 'live' | 'deep';
+  mode?: 'quick' | 'live' | 'deep' | 'academic';
   categories?: string[];
   timeRange?: 'day' | 'week' | 'month' | 'year';
   engines?: string[];
@@ -36,6 +44,8 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<Sea
 
   if (options.categories?.length) {
     url.searchParams.set('categories', options.categories.join(','));
+  } else if (options.mode === 'academic') {
+    url.searchParams.set('categories', 'science,academic');
   } else if (options.mode === 'live') {
     url.searchParams.set('categories', 'news,general');
     url.searchParams.set('time_range', options.timeRange || 'day');
@@ -74,7 +84,8 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<Sea
 }
 
 async function searchTinyFish(query: string, options: SearchOptions): Promise<SearchResult[]> {
-  const apiKey = process.env['TINY' + 'FISH_API_KEY'];
+  const p = globalThis.process;
+  const apiKey = p ? p.env.TINYFISH_API_KEY : undefined;
   if (!apiKey) {
     throw new Error('TINYFISH_API_KEY is not configured in environment');
   }
@@ -111,9 +122,103 @@ async function searchTinyFish(query: string, options: SearchOptions): Promise<Se
   }));
 }
 
+async function searchConsensus(query: string, options: SearchOptions): Promise<SearchResult[]> {
+  const p = globalThis.process;
+  const apiKey = p ? p.env.CONSENSUS_API_KEY : undefined;
+  if (!apiKey) {
+    throw new Error('CONSENSUS_API_KEY is not configured in environment');
+  }
+
+  const config = loadConfig();
+  const providerCfg = config.search?.providers?.consensus || {};
+  const baseUrl = providerCfg.url || 'https://api.consensus.app/v1/search';
+  const timeoutMs = providerCfg.timeoutMs || 7000;
+
+  const url = new URL(baseUrl);
+  url.searchParams.set('query', query);
+
+  const res = await fetch(url.toString(), {
+    signal: AbortSignal.timeout(timeoutMs),
+    headers: {
+      'x-api-key': apiKey,
+      'Accept': 'application/json',
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Consensus HTTP ${res.status}: ${res.statusText}`);
+  }
+
+  const data = await res.json() as {
+    results?: Array<{
+      title?: string;
+      url?: string;
+      doi?: string;
+      abstract?: string;
+      takeaway?: string;
+      study_type?: string;
+      sample_size?: number;
+      publish_year?: number;
+      citation_count?: number;
+      journal_name?: string;
+    }>;
+  };
+
+  if (!Array.isArray(data.results)) return [];
+
+  const max = options.limit || 10;
+  return data.results.slice(0, max).map(r => {
+    // Rich scientific snippet
+    const parts: string[] = [];
+    if (r.takeaway) parts.push(r.takeaway);
+    else if (r.abstract) parts.push(r.abstract);
+
+    const metaParts: string[] = [];
+    if (r.study_type) metaParts.push(r.study_type.toUpperCase());
+    if (r.sample_size) metaParts.push(`n=${r.sample_size}`);
+    if (r.publish_year) metaParts.push(String(r.publish_year));
+    if (r.citation_count) metaParts.push(`${r.citation_count} citations`);
+
+    const snippetText = parts.join(' ') + (metaParts.length ? ` [${metaParts.join(', ')}]` : '');
+    const paperUrl = r.doi ? `https://doi.org/${r.doi}` : (r.url || '');
+
+    return {
+      title: r.title || 'Untitled Research Paper',
+      url: paperUrl,
+      snippet: snippetText,
+      engine: 'consensus',
+      score: r.citation_count,
+      metadata: {
+        studyType: r.study_type,
+        sampleSize: r.sample_size,
+        year: r.publish_year,
+        citationCount: r.citation_count,
+        journal: r.journal_name,
+        doi: r.doi,
+      },
+    };
+  });
+}
+
 export async function executeSearch(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
   const config = loadConfig();
-  const pipeline = options.provider ? [options.provider] : config.search.pipeline;
+
+  // Determine pipeline:
+  // If explicitly academic or science categories, use Consensus -> SearXNG
+  const isAcademic =
+    options.mode === 'academic' ||
+    options.categories?.some(c => ['science', 'academic', 'papers'].includes(c.toLowerCase())) ||
+    options.provider === 'consensus';
+
+  let pipeline: string[];
+  if (options.provider) {
+    pipeline = [options.provider];
+  } else if (isAcademic) {
+    pipeline = ['consensus', 'searxng'];
+  } else {
+    pipeline = config.search.pipeline;
+  }
+
   const errors: string[] = [];
 
   for (const provider of pipeline) {
@@ -123,6 +228,8 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
         results = await searchSearxng(query, options);
       } else if (provider === 'tinyfish') {
         results = await searchTinyFish(query, options);
+      } else if (provider === 'consensus') {
+        results = await searchConsensus(query, options);
       } else {
         throw new Error(`Unknown search provider: ${provider}`);
       }
