@@ -4,12 +4,17 @@
     "port": 8890
   },
   "search": {
-    "pipeline": ["searxng", "tinyfish"],
+    "pipeline": [
+      "searxng",
+      "tinyfish"
+    ],
     "providers": {
       "searxng": {
         "url": "http://127.0.0.1:8888",
-        "timeoutMs": 4500,
-        "defaultCategories": ["general"]
+        "timeoutMs": 9000,
+        "defaultCategories": [
+          "general"
+        ]
       },
       "tinyfish": {
         "url": "https://api.search.tinyfish.ai",
@@ -18,7 +23,11 @@
     }
   },
   "fetch": {
-    "pipeline": ["plain", "crawl4ai", "tinyfish"],
+    "pipeline": [
+      "plain",
+      "crawl4ai",
+      "tinyfish"
+    ],
     "providers": {
       "plain": {
         "timeoutMs": 4000,
