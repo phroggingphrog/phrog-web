@@ -1,0 +1,122 @@
+{
+  "name": "@companion-ai/feynman",
+  "version": "0.5.24",
+  "description": "Research-first CLI agent built on Pi and alphaXiv",
+  "license": "MIT",
+  "type": "module",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "bin": {
+    "feynman": "bin/feynman.js"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "metadata/",
+    ".feynman/agents/",
+    ".feynman/config/",
+    ".feynman/settings.json",
+    ".feynman/SYSTEM.md",
+    ".feynman/themes/",
+    "extensions/",
+    "prompts/",
+    "logo.mjs",
+    "logo.d.mts",
+    "scripts/check-node-version.mjs",
+    "scripts/check-pi-rpc.mjs",
+    "scripts/install/",
+    "skills/",
+    ".nvmrc",
+    "AGENTS.md",
+    "CONTRIBUTING.md",
+    "RELEASES.md",
+    "README.md",
+    "THIRD-PARTY-NOTICES.md",
+    ".env.example"
+  ],
+  "scripts": {
+    "preinstall": "node ./scripts/check-node-version.mjs",
+    "build": "tsc -p tsconfig.build.json",
+    "build:native-bundle": "node ./scripts/build-native-bundle.mjs",
+    "dev": "tsx src/index.ts",
+    "prepack": "node ./scripts/clean-publish-artifacts.mjs && npm run build",
+    "start": "tsx src/index.ts",
+    "start:dist": "node ./bin/feynman.js",
+    "test": "node --import tsx --import ./tests/isolate-tmpdir.ts --test --test-concurrency=1 tests/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "architecture:check": "node ./scripts/check-architecture.mjs"
+  },
+  "keywords": [
+    "pi-package",
+    "research-agent",
+    "literature-review",
+    "experiments"
+  ],
+  "feynmanReleaseBudget": {
+    "maxTarballBytes": 2097152,
+    "maxUnpackedBytes": 8388608,
+    "maxFileCount": 1000
+  },
+  "pi": {
+    "extensions": [
+      "./extensions/research-tools.ts"
+    ],
+    "prompts": [
+      "./prompts"
+    ],
+    "skills": [
+      "./skills"
+    ],
+    "themes": [
+      "./.feynman/themes"
+    ],
+    "subagents": {
+      "agents": [
+        "./.feynman/agents"
+      ]
+    }
+  },
+  "dependencies": {
+    "@clack/prompts": "^1.8.1",
+    "@companion-ai/alpha-hub": "0.1.6",
+    "@modelcontextprotocol/sdk": "1.32.1",
+    "fast-xml-parser": "5.11.1",
+    "pi-btw": "0.7.1",
+    "pi-docparser": "4.0.0",
+    "pi-subagents": "0.75.0",
+    "pi-web-access": "0.35.0",
+    "posthog-node": "^5.53.0",
+    "yaml": "2.9.1"
+  },
+  "overrides": {
+    "@modelcontextprotocol/sdk": "1.32.1"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "1.3.0",
+    "@earendil-works/pi-coding-agent": "1.3.0",
+    "@earendil-works/pi-tui": "1.3.0",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.2",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Companion-Inc/feynman.git"
+  },
+  "homepage": "https://github.com/Companion-Inc/feynman#readme",
+  "bugs": {
+    "url": "https://github.com/Companion-Inc/feynman/issues"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "author": "Advait Paliwal",
+  "publishConfig": {
+    "access": "public"
+  }
+}

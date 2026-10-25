@@ -1,0 +1,214 @@
+---
+import Layout from "@/layouts/main.astro"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+
+const workflows = [
+  { command: "/deepresearch", description: "Tiered source investigation with a reusable vault, checkpoints, and citation checks" },
+  { command: "/lit", description: "Literature review from primary sources with consensus mapping" },
+  { command: "/review", description: "Internal research critique with severity scores and a revision plan" },
+  { command: "/audit", description: "Paper-to-code mismatch audit for reproducibility claims" },
+  { command: "/replicate", description: "Replication plan with environment choice before any execution" },
+  { command: "/recipe", description: "Ranked ML training recipes grounded in papers, datasets, docs, and code" },
+  { command: "/compare", description: "Side-by-side source comparison with agreement and conflict matrix" },
+  { command: "/draft", description: "Polished paper-style draft with inline citations from findings" },
+  { command: "/autoresearch", description: "Bounded loop: hypothesize, experiment, measure, repeat" },
+]
+
+const sources = [
+  { name: "Literature databases", description: "Semantic Scholar, OpenAlex, arXiv, PubMed, Europe PMC, bioRxiv/medRxiv, and Crossref with stable identifiers" },
+  { name: "alphaXiv", description: "Paper search, Q&A, code reading, and annotations", href: "https://www.alphaxiv.org/" },
+  { name: "Hugging Face Hub", description: "Dataset schema, repo file, and small text-file inspection" },
+  { name: "Web research", description: "Search, page fetching, and PDF extraction; Exa works without a key" },
+  { name: "Documents", description: "Local PDF and office-document parsing, search, and page screenshots" },
+]
+
+const installCommands = [
+  { label: "curl", command: "curl -fsSL https://feynman.is/install | bash" },
+  { label: "PowerShell", command: "irm https://feynman.is/install.ps1 | iex" },
+  { label: "npm", command: "npm install -g @companion-ai/feynman" },
+]
+---
+
+<Layout title="Feynman — The open source AI research agent" active="home">
+  <div class="mx-auto max-w-5xl px-6">
+
+    <section class="flex flex-col items-center gap-8 pb-16 pt-20 text-center">
+      <div class="flex max-w-3xl flex-col gap-4">
+        <h1 class="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
+          The open source AI <br />research agent
+        </h1>
+        <p class="mx-auto max-w-2xl text-lg text-muted-foreground">
+          Reads papers, searches the web, writes research drafts, plans experiments, and cites research claims.
+        </p>
+        <p class="text-sm text-muted-foreground">
+          Made by{" "}
+          <a href="https://companion.ai" target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">
+            Companion
+          </a>
+        </p>
+      </div>
+
+      <div class="flex w-full max-w-3xl flex-col items-center gap-4">
+        <div class="flex w-full max-w-full flex-col">
+          <div class="flex max-w-full self-start overflow-x-auto">
+            {installCommands.map((entry, i) => (
+              <button
+                class:list={[
+                  "install-toggle shrink-0 px-4 py-2 text-sm font-medium transition-colors cursor-pointer",
+                  i === 0 ? "rounded-tl-lg" : "",
+                  i === installCommands.length - 1 ? "rounded-tr-lg" : "",
+                  entry.label === installCommands[0].label
+                    ? "bg-muted text-foreground"
+                    : "bg-muted/30 text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                ]}
+                data-command={entry.command}
+                aria-label={`Show ${entry.label} install command`}
+              >
+                {entry.label}
+              </button>
+            ))}
+          </div>
+          <button
+            id="install-cmd"
+            class="group flex w-full min-w-0 max-w-full items-start justify-between gap-3 rounded-b-lg rounded-tr-lg bg-muted px-4 py-3 text-left font-mono text-xs transition-colors hover:bg-muted/80 cursor-pointer sm:items-center sm:text-sm"
+            data-command={installCommands[0].command}
+            aria-label="Copy install command"
+          >
+            <span id="install-command" class="flex-1 min-w-0 break-all whitespace-normal leading-relaxed sm:overflow-hidden sm:text-ellipsis sm:whitespace-nowrap">{installCommands[0].command}</span>
+            <svg id="install-copy" class="mt-0.5 size-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            <svg id="install-check" class="mt-0.5 hidden size-4 shrink-0 text-primary sm:mt-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+          </button>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-center gap-3">
+          <a href="/docs/getting-started/installation">
+            <Button client:load size="lg">Get Started</Button>
+          </a>
+          <a href="https://github.com/Companion-Inc/feynman" target="_blank" rel="noopener noreferrer" class="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-input bg-background px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent hover:text-accent-foreground">
+            GitHub
+          </a>
+        </div>
+
+        <p class="text-sm text-muted-foreground">
+          curl and PowerShell install a standalone bundle with its own Node.js; npm uses your local Node.js.
+        </p>
+
+        <p class="text-sm text-muted-foreground">
+          Need just the skills? <a href="/docs/getting-started/installation#skills-only" class="text-primary hover:underline">Install the skills-only bundle</a>.
+        </p>
+      </div>
+
+      <img src="/hero.png" class="w-full" alt="Feynman CLI" />
+    </section>
+
+    <section class="py-16">
+      <div class="flex flex-col items-center gap-8 text-center">
+        <div class="flex flex-col gap-2">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Workflows</h2>
+          <p class="text-muted-foreground">Run as slash commands in the REPL or as <code>feynman &lt;workflow&gt;</code> from your shell.</p>
+        </div>
+        <div class="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {workflows.map((wf) => (
+            <Card client:load size="sm">
+              <CardHeader client:load>
+                <CardTitle client:load className="font-mono text-sm text-primary">{wf.command}</CardTitle>
+                <CardDescription client:load>{wf.description}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="py-16">
+      <div class="flex flex-col items-center gap-8 text-center">
+        <div class="flex flex-col gap-2">
+          <h2 class="text-2xl font-bold tracking-tight sm:text-3xl">Sources</h2>
+          <p class="text-muted-foreground">Where Feynman looks for evidence.</p>
+        </div>
+        <div class="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {sources.map((source) => (
+            <Card client:load size="sm" className="text-center">
+              <CardHeader client:load className="items-center">
+                <CardTitle client:load>
+                  {source.href ? (
+                    <a href={source.href} target="_blank" rel="noopener noreferrer" class="text-primary hover:underline">
+                      {source.name}
+                    </a>
+                  ) : (
+                    source.name
+                  )}
+                </CardTitle>
+                <CardDescription client:load>{source.description}</CardDescription>
+              </CardHeader>
+            </Card>
+          ))}
+        </div>
+      </div>
+    </section>
+
+    <section class="flex flex-col items-center gap-6 py-20 text-center">
+      <p class="text-muted-foreground">
+        Built on <a href="https://github.com/earendil-works/pi" class="text-primary hover:underline">Pi</a> and <a href="https://www.alphaxiv.org/" class="text-primary hover:underline">alphaXiv</a>. Research claims link to their sources.
+      </p>
+      <div class="flex flex-wrap items-center justify-center gap-3">
+        <a href="/docs/getting-started/installation">
+          <Button client:load size="lg">Get Started</Button>
+        </a>
+        <a href="https://github.com/Companion-Inc/feynman" target="_blank" rel="noopener noreferrer">
+          <Button client:load variant="outline" size="lg">View on GitHub</Button>
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <script is:inline>
+    (function () {
+      function init() {
+        var toggles = Array.from(document.querySelectorAll(".install-toggle"))
+        var btn = document.getElementById("install-cmd")
+        var text = document.getElementById("install-command")
+        var copyIcon = document.getElementById("install-copy")
+        var checkIcon = document.getElementById("install-check")
+        if (!btn || !text || !copyIcon || !checkIcon) return
+
+        toggles.forEach(function (toggle) {
+          if (toggle._b) return
+          toggle._b = true
+          toggle.addEventListener("click", function () {
+            var cmd = toggle.getAttribute("data-command")
+            if (!cmd) return
+            btn.setAttribute("data-command", cmd)
+            text.textContent = cmd
+            toggles.forEach(function (t) {
+              t.classList.remove("bg-muted", "text-foreground")
+              t.classList.add("bg-muted/30", "text-muted-foreground", "hover:text-foreground", "hover:bg-muted/50")
+            })
+            toggle.classList.remove("bg-muted/30", "text-muted-foreground", "hover:text-foreground", "hover:bg-muted/50")
+            toggle.classList.add("bg-muted", "text-foreground")
+          })
+        })
+
+        if (!btn._b) {
+          btn._b = true
+          btn.addEventListener("click", function () {
+            var cmd = btn.getAttribute("data-command")
+            if (!cmd) return
+            navigator.clipboard.writeText(cmd).then(function () {
+              copyIcon.classList.add("hidden")
+              checkIcon.classList.remove("hidden")
+              setTimeout(function () {
+                copyIcon.classList.remove("hidden")
+                checkIcon.classList.add("hidden")
+              }, 2000)
+            })
+          })
+        }
+      }
+      init()
+      document.addEventListener("astro:after-swap", init)
+    })()
+  </script>
+</Layout>
