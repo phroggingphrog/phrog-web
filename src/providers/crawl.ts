@@ -52,10 +52,10 @@ async function validatePublicUrl(value: string): Promise<string> {
 
 const sha = (s: string) => createHash('sha256').update(s, 'utf8').digest('hex');
 
-async function crawlOne(url: string, maxChars: number, mode: string): Promise<Args> {
+async function crawlOne(url: string, maxChars: number, mode: string, extra: Args = {}): Promise<Args> {
   const provider = mode === 'plain' ? 'plain' : mode === 'browser' ? 'crawl4ai' : undefined;
   try {
-    const r = await executeFetch(url, { provider, maxChars: MAX_MARKDOWN_CHARS });
+    const r = await executeFetch(url, { provider, maxChars: MAX_MARKDOWN_CHARS, ...extra });
     const content = r.markdown || '';
     const returned = content.slice(0, maxChars);
     return {
@@ -80,7 +80,7 @@ export async function webCrawl(args: Args): Promise<Args> {
   if (urls.length > MAX_URLS) throw new Error(`at most ${MAX_URLS} URLs may be crawled per call`);
   const clean: string[] = [];
   for (const u of urls) { const c = await validatePublicUrl(u); if (!clean.includes(c)) clean.push(c); }
-  const results = await Promise.all(clean.map((u) => crawlOne(u, maxChars, mode)));
+  const results = await Promise.all(clean.map((u) => crawlOne(u, maxChars, mode, { actions: args.actions, stealth: args.stealth })));
   return { success: results.some((r) => r.success), results, count: results.length, primary_error: null };
 }
 
@@ -165,8 +165,8 @@ export async function webMap(args: Args): Promise<Args> {
 // ---- background jobs ----
 
 interface Job {
-  id: string; kind: 'batch'; status: 'queued' | 'running' | 'completed' | 'failed';
-  completed: number; total: number | null; created: string; updated: string;
+  id: string; kind: 'batch' | 'crawl'; status: 'queued' | 'running' | 'completed' | 'failed';
+  completed: number; total: number | null; stopped?: string | null; skipped?: Args[]; created: string; updated: string;
   error: string | null; results: Args[];
 }
 const jobs = new Map<string, Job>();
@@ -227,10 +227,87 @@ export async function webBatchStart(args: Args): Promise<Args> {
 export function webCrawlStatus(jobId: string, includeResults = false, offset = 0, limit = 10): Args {
   const job = jobs.get(jobId);
   if (!job) return { job_id: jobId, status: 'unknown', error: 'no such job' };
-  const out: Args = { job_id: job.id, kind: job.kind, status: job.status, completed: job.completed, total: job.total, error: job.error, count: job.results.length, stopped: job.status === 'completed' ? 'done' : null };
+  const out: Args = { job_id: job.id, kind: job.kind, status: job.status, completed: job.completed, total: job.total, error: job.error, count: job.results.length, stopped: job.stopped ?? (job.status === 'completed' ? 'done' : null) };
   if (includeResults) {
     out.offset = offset;
     out.results = job.results.slice(offset, offset + Math.max(1, Math.min(limit, 50)));
   }
   return out;
+}
+
+// ---- site crawl job (port of sitecrawl.crawl_site) ----
+
+async function robotsRules(url: string): Promise<string[]> {
+  const p = new URL(url);
+  try {
+    const r = await httpGet(`${p.protocol}//${p.host}/robots.txt`, 10000);
+    if (r.status !== 200) return [];
+    const rules: string[] = [];
+    let applies = false;
+    for (const raw of r.body.split(/\r?\n/)) {
+      const line = raw.split('#')[0].trim();
+      const m = line.match(/^([a-z-]+)\s*:\s*(.*)$/i);
+      if (!m) continue;
+      const k = m[1].toLowerCase();
+      if (k === 'user-agent') applies = m[2].trim() === '*';
+      else if (k === 'disallow' && applies && m[2].trim()) rules.push(m[2].trim());
+    }
+    return rules;
+  } catch { return []; }
+}
+
+export async function webCrawlStart(args: Args): Promise<Args> {
+  const start = await validatePublicUrl(args.url ?? args.start);
+  const maxPages = Math.max(1, Math.min(Number(pick(args, 'max_pages', 'maxPages', 20)), 200));
+  const maxDepth = Math.max(0, Math.min(Number(pick(args, 'max_depth', 'maxDepth', 2)), 6));
+  const inc = (args.include ?? []).map((x: string) => new RegExp(x));
+  const exc = (args.exclude ?? []).map((x: string) => new RegExp(x));
+  const subs = Boolean(pick(args, 'include_subdomains', 'includeSubdomains', false));
+  const respect = Boolean(pick(args, 'respect_robots', 'respectRobots', true));
+  const maxChars = Math.max(500, Math.min(Number(pick(args, 'max_chars', 'maxChars', 8000)), MAX_MARKDOWN_CHARS));
+  const mode = args.mode ?? 'auto';
+  if (!['auto', 'plain', 'browser'].includes(mode)) throw new Error('mode must be auto, plain, or browser');
+  const stealth = Boolean(args.stealth);
+  prune();
+  const now = () => new Date().toISOString();
+  const job: Job = { id: randomUUID(), kind: 'crawl', status: 'queued', completed: 0, total: null, created: now(), updated: now(), error: null, results: [], skipped: [], stopped: null };
+  jobs.set(job.id, job);
+  queue.push(async () => {
+    job.status = 'running'; job.updated = now();
+    try {
+      const rules = respect ? await robotsRules(start) : [];
+      const deadline = Date.now() + 300_000;
+      const q: Array<[string, number]> = [[start, 0]];
+      const norm = (u: string) => u.replace(/\/$/, '');
+      const seen = new Set([norm(start)]);
+      while (q.length && job.results.length < maxPages && Date.now() < deadline) {
+        const [url, depth] = q.shift()!;
+        if (rules.some((r) => new URL(url).pathname.startsWith(r))) { job.skipped!.push({ url, reason: 'robots.txt' }); continue; }
+        let links: string[] = [];
+        try {
+          const r = await httpGet(url);
+          if (/html/i.test(r.body.slice(0, 2000)) || r.body.includes('<a ')) links = linksOf(r.final, r.body);
+        } catch { /* content fetch below reports the failure */ }
+        const page = await crawlOne(url, maxChars, mode, { stealth });
+        job.results.push({ ...page, depth });
+        job.completed = job.results.length; job.total = job.results.length + q.length; job.updated = now();
+        if (depth < maxDepth) {
+          for (const link of links) {
+            if (seen.has(norm(link)) || !sameSite(link, start, subs)) continue;
+            if ((inc.length && !inc.some((r: RegExp) => r.test(link))) || exc.some((r: RegExp) => r.test(link))) continue;
+            seen.add(norm(link)); q.push([link, depth + 1]);
+          }
+        }
+        await new Promise((r) => setTimeout(r, 200));
+      }
+      job.stopped = job.results.length >= maxPages ? 'max_pages' : q.length ? 'budget' : 'done';
+      job.status = 'completed';
+    } catch (err) {
+      job.status = 'failed';
+      job.error = `${err instanceof Error ? err.name : 'Error'}: ${(err instanceof Error ? err.message : String(err)).slice(0, 300)}`;
+    }
+    job.updated = now();
+  });
+  pump();
+  return { job_id: job.id, status: job.status, runs_in: 'this process (ends with the session)' };
 }

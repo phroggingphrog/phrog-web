@@ -1,4 +1,5 @@
 import { loadConfig } from '../config.js';
+import { documentKind, convertDocument } from './document.js';
 
 export interface FetchResult {
   url: string;
@@ -13,6 +14,8 @@ export interface FetchOptions {
   provider?: string;
   mode?: 'plain' | 'browser' | 'auto';
   maxChars?: number;
+  actions?: Array<Record<string, any>>;
+  stealth?: boolean;
 }
 
 function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } {
@@ -50,7 +53,7 @@ function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } 
 async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResult> {
   const config = loadConfig();
   const providerCfg = config.fetch.providers.plain || {};
-  const timeoutMs = providerCfg.timeoutMs || 5000;
+  const timeoutMs = Math.max(providerCfg.timeoutMs || 5000, 20000);
   const maxChars = options.maxChars || providerCfg.maxChars || 50000;
 
   const res = await fetch(url, {
@@ -65,6 +68,13 @@ async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResu
     throw new Error(`Plain fetch HTTP ${res.status}: ${res.statusText}`);
   }
 
+  const ctype = res.headers.get('content-type') || '';
+  const docExt = documentKind(res.url || url, ctype);
+  if (docExt) {
+    const doc = await convertDocument(docExt, Buffer.from(await res.arrayBuffer()));
+    const cut = doc.markdown.slice(0, maxChars);
+    return { url, title: doc.title, markdown: cut, length: cut.length, provider_used: `plain:${docExt.slice(1)}`, statusCode: res.status };
+  }
   const html = await res.text();
   const { title, markdown } = cleanHtmlToMarkdown(html);
 
@@ -84,12 +94,81 @@ async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResu
   };
 }
 
+
+const MAX_ACTIONS = 20;
+const ACTION_TYPES = ['click', 'type', 'press', 'scroll', 'wait', 'wait_for'];
+const STEALTH_BROWSER = { type: 'BrowserConfig', params: { enable_stealth: true, user_agent_mode: 'random' } };
+const CRAWLER_CONFIG = {
+  type: 'CrawlerRunConfig',
+  params: {
+    markdown_generator: {
+      type: 'DefaultMarkdownGenerator',
+      params: {
+        content_filter: { type: 'PruningContentFilter', params: { threshold: 0.48, threshold_type: 'dynamic' } },
+        options: { ignore_images: true },
+      },
+    },
+    excluded_tags: ['nav', 'header', 'footer', 'aside', 'form'],
+    remove_overlay_elements: true,
+  },
+};
+
+// Port of compile_actions (service.py): page actions to /execute_js scripts, or run-config options for scroll/wait.
+function compileActions(actions: Array<Record<string, any>>): { scripts: string[] | null; extra: Record<string, any> } {
+  if (!Array.isArray(actions) || actions.length > MAX_ACTIONS) throw new Error(`actions must be a list of at most ${MAX_ACTIONS} steps`);
+  const q = JSON.stringify;
+  const scripts: string[] = [];
+  const extra: Record<string, any> = {};
+  let interactive = false;
+  for (const step of actions) {
+    const kind = step?.type;
+    if (!ACTION_TYPES.includes(kind)) throw new Error(`action type must be one of ${ACTION_TYPES.join(', ')}`);
+    const sel = step.selector;
+    if (['click', 'type', 'wait_for'].includes(kind) && (typeof sel !== 'string' || !sel || sel.length > 200)) throw new Error(`${kind} needs a CSS selector (max 200 chars)`);
+    let body: string;
+    if (kind === 'click') { interactive = true; body = `const e=document.querySelector(${q(sel)});if(!e)return 'no match: '+${q(sel)};e.click();return 'clicked';`; }
+    else if (kind === 'type') {
+      interactive = true;
+      body = `const e=document.querySelector(${q(sel)});if(!e)return 'no match: '+${q(sel)};e.focus();e.value=${q(String(step.text ?? '').slice(0, 2000))};e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'typed';`;
+    } else if (kind === 'press') {
+      interactive = true;
+      const key = String(step.key ?? 'Enter').slice(0, 20);
+      body = `const e=document.querySelector(${q(sel || 'body')})||document.body;e.dispatchEvent(new KeyboardEvent('keydown',{key:${q(key)},bubbles:true}));if(${q(key)}==='Enter'&&e.form){e.form.requestSubmit?e.form.requestSubmit():e.form.submit();}return 'pressed';`;
+    } else if (kind === 'scroll') {
+      const to = step.to ?? 'bottom';
+      if (to === 'bottom') { extra.scan_full_page = true; body = "let last=-1;for(let i=0;i<30&&document.body.scrollHeight!==last;i++){last=document.body.scrollHeight;window.scrollTo(0,last);await new Promise(r=>setTimeout(r,700));}return 'scrolled';"; }
+      else if (to === 'top') body = "window.scrollTo(0,0);return 'top';";
+      else body = `window.scrollTo(0,${Math.trunc(Number(to)) || 0});return 'scrolled';`;
+    } else if (kind === 'wait') {
+      const ms = Math.max(0, Math.min(Math.trunc(Number(step.ms ?? 500)), 10000));
+      extra.delay_before_return_html = Math.max(extra.delay_before_return_html ?? 0, ms / 1000);
+      body = `await new Promise(r=>setTimeout(r,${ms}));return 'waited';`;
+    } else {
+      extra.wait_for = `css:${sel}`;
+      body = `for(let i=0;i<40;i++){if(document.querySelector(${q(sel)}))return 'found';await new Promise(r=>setTimeout(r,250));}return 'timeout';`;
+    }
+    scripts.push(`(async()=>{${body}})()`);
+  }
+  const settle = "(async()=>{for(let i=0;i<20&&document.readyState!=='complete';i++)await new Promise(r=>setTimeout(r,250));await new Promise(r=>setTimeout(r,1200));return 'settled';})()";
+  return { scripts: interactive ? [settle, ...scripts] : null, extra };
+}
+
+function crawl4aiRequest(url: string, options: FetchOptions): { path: string; body: any } {
+  const { scripts, extra } = options.actions?.length ? compileActions(options.actions) : { scripts: null, extra: {} as Record<string, any> };
+  if (options.stealth) Object.assign(extra, { delay_before_return_html: Math.max(extra.delay_before_return_html ?? 0, 1.5), scan_full_page: true });
+  if (scripts) return { path: '/execute_js', body: { url, scripts } };
+  const cfg = Object.keys(extra).length ? { ...CRAWLER_CONFIG, params: { ...CRAWLER_CONFIG.params, ...extra } } : CRAWLER_CONFIG;
+  const body: any = { urls: [url], priority: 10, crawler_config: cfg };
+  if (options.stealth) body.browser_config = STEALTH_BROWSER;
+  return { path: '/crawl', body };
+}
+
 async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchResult> {
   const config = loadConfig();
   const providerCfg = config.fetch.providers.crawl4ai || {};
   const primaryUrl = providerCfg.primaryUrl || 'http://127.0.0.1:11235';
   const fallbackUrl = providerCfg.fallbackUrl || 'http://127.0.0.1:11236';
-  const timeoutMs = providerCfg.timeoutMs || 20000;
+  const timeoutMs = options.actions?.length || options.stealth ? 60000 : (providerCfg.timeoutMs || 20000);
   const maxChars = options.maxChars || 60000;
   const token = process.env.CRAWL4AI_API_TOKEN || '';
 
@@ -98,7 +177,8 @@ async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchR
 
   for (const cUrl of urlsToTry) {
     try {
-      const endpoint = new URL('/crawl', cUrl);
+      const req = crawl4aiRequest(url, options);
+      const endpoint = new URL(req.path, cUrl);
       const res = await fetch(endpoint.toString(), {
         method: 'POST',
         signal: AbortSignal.timeout(timeoutMs),
@@ -106,10 +186,7 @@ async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchR
           'Content-Type': 'application/json',
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify({
-          urls: [url],
-          priority: 10,
-        }),
+        body: JSON.stringify(req.body),
       });
 
       if (!res.ok) {
@@ -118,7 +195,8 @@ async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchR
 
       const data = await res.json() as any;
       const resultObj = Array.isArray(data.results) ? data.results[0] : (data.result || data);
-      const markdown = resultObj?.markdown?.raw_markdown || resultObj?.markdown || resultObj?.text || '';
+      const md = resultObj?.markdown;
+      const markdown = (typeof md === 'string' ? md : (md?.fit_markdown || md?.raw_markdown)) || resultObj?.text || '';
       const title = resultObj?.metadata?.title || resultObj?.title || '';
 
       if (!markdown || markdown.trim().length === 0) {
