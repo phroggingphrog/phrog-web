@@ -16,6 +16,11 @@ papers/
 *.env
 !*.env.example
 
+# Database & Index Caches
+*.db
+*.sqlite
+.index.db
+
 # Logs & Temp
 *.log
 .DS_Store

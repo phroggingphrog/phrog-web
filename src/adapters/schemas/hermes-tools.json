@@ -188,5 +188,64 @@
         ]
       }
     }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "wiki_save",
+      "description": "Save notes, articles, or research findings into the agnostic LLM Wiki vault with automatic frontmatter and vector embedding.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title of the note (slugified to filename)"
+          },
+          "content": {
+            "type": "string",
+            "description": "Markdown text with key takeaways, sections, and references"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Tags for categorization"
+          },
+          "source": {
+            "type": "string",
+            "description": "Source URL or attribution"
+          }
+        },
+        "required": [
+          "title",
+          "content"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "wiki_search",
+      "description": "Semantic vector search across all notes in the LLM Wiki vault using cosine similarity.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Natural language concept or query"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 5,
+            "description": "Maximum notes to return"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
   }
 ]

@@ -6,6 +6,7 @@ import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
 import { searchGithubRepos } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
+import { saveToWiki, searchWiki } from './wiki/vault.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
@@ -171,6 +172,48 @@ fastify.get('/api/deepwiki/structure', async (req, reply) => {
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// 7. Agnostic LLM Wiki API (Karpathy Personal Knowledge Vault)
+fastify.post('/api/wiki/save', async (req, reply) => {
+  const { title, content, tags, source } = req.body as {
+    title?: string;
+    content?: string;
+    tags?: string[];
+    source?: string;
+  };
+  if (!title || !content) {
+    return reply.status(400).send({ error: 'Both "title" and "content" are required' });
+  }
+  try {
+    const note = await saveToWiki(title, content, { tags, source });
+    return {
+      message: 'Note saved to wiki and vector-indexed',
+      note,
+    };
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(500).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/wiki/search', async (req, reply) => {
+  const { q, query, limit } = req.query as { q?: string; query?: string; limit?: string };
+  const target = q || query;
+  if (!target) {
+    return reply.status(400).send({ error: 'Query parameter "q" or "query" is required' });
+  }
+  try {
+    const results = await searchWiki(target, limit ? parseInt(limit, 10) : 5);
+    return {
+      query: target,
+      results,
+      total: results.length,
+    };
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(500).send({ error: err instanceof Error ? err.message : String(err) });
   }
 });
 

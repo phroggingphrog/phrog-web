@@ -6,6 +6,7 @@ import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
 import { searchGithubRepos } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
+import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
 const server = new McpServer({
   name: 'phrog-web',
@@ -228,6 +229,47 @@ server.tool(
     try {
       const res = await getDeepWikiStructure(repo);
       return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 12. Save to LLM Wiki (Karpathy Agnostic Knowledge Vault)
+server.tool(
+  'wiki_save',
+  'Distill and save research findings or notes into the LLM Wiki (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
+  {
+    title: z.string().describe('Note title (becomes filename slug)'),
+    content: z.string().describe('Markdown note content with sections, summaries, and citations'),
+    tags: z.array(z.string()).optional().describe('Categorization tags'),
+    source: z.string().optional().describe('Source URL or attribution'),
+  },
+  async ({ title, content, tags, source }) => {
+    try {
+      const note = await saveToWiki(title, content, { tags, source });
+      return text({
+        message: 'Note saved and vector-indexed in wiki vault',
+        note,
+      });
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 13. Semantic Search LLM Wiki
+server.tool(
+  'wiki_search',
+  'Perform semantic vector search across all notes in the LLM Wiki vault using cosine similarity.',
+  {
+    query: z.string().describe('Natural language search query or concept'),
+    limit: z.number().int().min(1).max(20).optional().describe('Maximum notes to return'),
+  },
+  async ({ query, limit }) => {
+    try {
+      const results = await searchWiki(query, limit);
+      return text({ query, results, total: results.length });
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
