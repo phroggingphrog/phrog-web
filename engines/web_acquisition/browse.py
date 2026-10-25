@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 JEV_DIR = Path(os.getenv("JEV_DIR", "~/apps/jev-ultrafast")).expanduser()
-RUNNER = Path(__file__).resolve().parents[2] / "scripts" / "jev_run.py"
+RUNNER = Path(__file__).resolve().parents[1] / "jev_run.py"
 
 
 class BrowseError(RuntimeError):

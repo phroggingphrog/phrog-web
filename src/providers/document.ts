@@ -2,6 +2,7 @@
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { homedir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 const OFFICE: Record<string, string> = {
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '.docx',
@@ -36,7 +37,7 @@ export function run(cmd: string, args: string[], input: Buffer, timeoutMs = 6000
 }
 
 export const pyPath = () =>
-  process.env.PHROG_WEB_PYTHON || `${homedir()}/workspace/self-hosted-web-mcp/.venv/bin/python`;
+  process.env.PHROG_WEB_PYTHON || fileURLToPath(new URL("../../engines/.venv/bin/python", import.meta.url));
 
 export async function convertDocument(ext: string, body: Buffer): Promise<{ title: string; markdown: string }> {
   if (ext === '.pdf') {

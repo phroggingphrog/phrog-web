@@ -24,7 +24,7 @@ from typing import Any, Sequence
 
 import anyio
 
-from web_acquisition_mcp.web_agent_server import WebAgentClient, WebAgentError
+from web_acquisition.web_agent_server import WebAgentClient, WebAgentError
 
 DEFAULT_OUT_DIR = "~/data/web-agent/batches"
 # One chunk carries up to six URLs plus the task; six thousand characters is
