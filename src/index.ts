@@ -4,6 +4,8 @@ import { loadConfig } from './config.js';
 import { executeSearch, SearchOptions } from './providers/search.js';
 import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
+import { searchGithubRepos } from './providers/github.js';
+import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
@@ -125,6 +127,51 @@ fastify.get('/api/research/:jobId', async (req, reply) => {
     return reply.status(404).send({ error: `Research job "${jobId}" not found` });
   }
   return job;
+});
+
+// 5. GitHub Repository Search API
+fastify.get('/api/github/search', async (req, reply) => {
+  const { q, query, limit } = req.query as { q?: string; query?: string; limit?: string };
+  const target = q || query;
+  if (!target) {
+    return reply.status(400).send({ error: 'Query parameter "q" or "query" is required' });
+  }
+  try {
+    const res = await searchGithubRepos(target, limit ? parseInt(limit, 10) : 10);
+    return res;
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// 6. DeepWiki AI Documentation API
+fastify.post('/api/deepwiki/ask', async (req, reply) => {
+  const { repo, question } = req.body as { repo?: string; question?: string };
+  if (!repo || !question) {
+    return reply.status(400).send({ error: 'Both "repo" (e.g. owner/repo) and "question" are required' });
+  }
+  try {
+    const res = await askDeepWiki(repo, question);
+    return res;
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/deepwiki/structure', async (req, reply) => {
+  const { repo } = req.query as { repo?: string };
+  if (!repo) {
+    return reply.status(400).send({ error: 'Query parameter "repo" (e.g. owner/repo) is required' });
+  }
+  try {
+    const res = await getDeepWikiStructure(repo);
+    return res;
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
 });
 
 // Start Server

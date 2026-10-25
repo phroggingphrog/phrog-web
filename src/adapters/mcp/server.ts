@@ -4,6 +4,8 @@ import { z } from 'zod';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
+import { searchGithubRepos } from '../../providers/github.js';
+import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 
 const server = new McpServer({
   name: 'phrog-web',
@@ -176,6 +178,59 @@ server.tool(
       return { isError: true, content: [{ type: 'text', text: `Research job "${jobId}" not found` }] };
     }
     return text(job);
+  }
+);
+
+// 9. GitHub Repository Search
+server.tool(
+  'github_search',
+  'Search public GitHub repositories for codebases, packages, stars, and licensing information.',
+  {
+    query: z.string().describe('Repository keywords or topics'),
+    limit: z.number().int().min(1).max(25).optional().describe('Maximum repositories to return'),
+  },
+  async ({ query, limit }) => {
+    try {
+      const res = await searchGithubRepos(query, limit);
+      return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 10. DeepWiki Q&A
+server.tool(
+  'deepwiki_ask',
+  'Query AI-generated codebase documentation for any public GitHub repository (deepwiki.com) with grounded inline citations.',
+  {
+    repo: z.string().describe('GitHub repository name in "owner/repo" format (e.g. "facebook/react" or "fastify/fastify")'),
+    question: z.string().describe('Question about the architecture, APIs, or internals of the repository'),
+  },
+  async ({ repo, question }) => {
+    try {
+      const res = await askDeepWiki(repo, question);
+      return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 11. DeepWiki Table of Contents
+server.tool(
+  'deepwiki_structure',
+  'Retrieve the section outline and documentation table of contents for any public GitHub repo indexed by DeepWiki.',
+  {
+    repo: z.string().describe('GitHub repository name in "owner/repo" format (e.g. "facebook/react")'),
+  },
+  async ({ repo }) => {
+    try {
+      const res = await getDeepWikiStructure(repo);
+      return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
   }
 );
 

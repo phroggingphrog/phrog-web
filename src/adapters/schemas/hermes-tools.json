@@ -19,7 +19,7 @@
               "deep",
               "academic"
             ],
-            "description": "Search mode: quick (default), live (news/recent), deep (code/tech), academic (Consensus + arXiv)"
+            "description": "Search mode: quick (default), live (news/recent), deep (multi-engine), academic (Consensus + arXiv)"
           },
           "limit": {
             "type": "integer",
@@ -53,6 +53,54 @@
         },
         "required": [
           "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "github_search",
+      "description": "Search public GitHub repositories for codebases, packages, stars, and licensing information.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Repository keywords or package names"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "description": "Maximum repositories to return"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "deepwiki_ask",
+      "description": "Query AI-generated codebase documentation for any public GitHub repository (deepwiki.com) with grounded inline citations.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "GitHub repository in 'owner/repo' format (e.g. 'fastify/fastify')"
+          },
+          "question": {
+            "type": "string",
+            "description": "Question about repository architecture, APIs, or internal logic"
+          }
+        },
+        "required": [
+          "repo",
+          "question"
         ]
       }
     }
@@ -103,6 +151,17 @@
             "type": "string",
             "description": "Question or research topic"
           },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "web",
+              "academic",
+              "discussions",
+              "all"
+            ],
+            "default": "web",
+            "description": "Domain target: web, academic (peer-reviewed papers), discussions"
+          },
           "workflow": {
             "type": "string",
             "enum": [
@@ -117,7 +176,7 @@
               "summarize"
             ],
             "default": "quick",
-            "description": "quick (Vane 4s synthesis) or Feynman workflow (lit: literature review, compare: cross-paper matrix, audit: code vs paper, review: peer review)"
+            "description": "quick (Vane 4s synthesis) or Feynman workflow (lit: literature review, compare: cross-paper matrix, audit: code vs paper)"
           },
           "callback_url": {
             "type": "string",
@@ -126,29 +185,6 @@
         },
         "required": [
           "question"
-        ]
-      }
-    }
-  },
-  {
-    "type": "function",
-    "function": {
-      "name": "literature_review",
-      "description": "Launch an autonomous academic literature review (Feynman lit workflow) analyzing papers, methodologies, and citation graphs in background.",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "topic": {
-            "type": "string",
-            "description": "Academic topic or hypothesis to review"
-          },
-          "callback_url": {
-            "type": "string",
-            "description": "Optional webhook URL to receive completed literature review"
-          }
-        },
-        "required": [
-          "topic"
         ]
       }
     }
