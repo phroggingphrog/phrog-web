@@ -102,3 +102,10 @@ export function loadConfig(): AppConfig {
 
   return cachedConfig!;
 }
+
+/** External Jev runner locations (single place for defaults). Override with JEV_DIR / JEV_RUNNER. */
+export function jevPaths(): { jevDir: string; runner: string } {
+  const jevDir = process.env.JEV_DIR || resolve(homedir(), 'apps/jev-ultrafast');
+  const runner = process.env.JEV_RUNNER || resolve(homedir(), 'workspace/self-hosted-web-mcp/scripts/jev_run.py');
+  return { jevDir, runner };
+}
