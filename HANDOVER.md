@@ -195,3 +195,9 @@ Remaining gaps:
 - Plain fetch now uses Trafilatura (`extractMain` in document.ts, per-call subprocess in the same Python venv, 10s timeout, falls back to the regex cleaner). Office conversion verified on real .docx/.xlsx.
 - `web_map` (links fallback) and `web_crawl_start` add Crawl4AI rendered `links` when plain HTML has fewer than 4 (map) / 3 (crawl) same-site links (`renderedLinks`); skipped in crawl mode `plain`.
 - Not ported: daemon-persisted jobs, Python-style crawl job disk state.
+
+## Deep Agents web agent (self-contained)
+- Code: `engines/web_acquisition` (package `web_acquisition`), deps pinned in `engines/pyproject.toml`, venv `engines/.venv` (gitignored).
+- Rebuild venv: `cd engines && uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r pyproject.toml`
+- Launch: `bin/web-agent-a2a` (A2A + OpenAI-compatible API). Host/port via `WEB_AGENT_A2A_HOST` / `WEB_AGENT_A2A_PORT` (default 127.0.0.1:42619); env file loaded by systemd (`~/.config/self-hosted-web-mcp.env`); token file `~/.config/web-agent-deep/a2a-token`.
+- Overrides: `PHROG_WEB_PYTHON` (python for launcher, Trafilatura, MarkItDown), `JEV_DIR` (default `~/apps/jev-ultrafast`), `JEV_RUNNER` (default `engines/jev_run.py`).

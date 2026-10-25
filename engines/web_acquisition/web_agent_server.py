@@ -162,12 +162,12 @@ async def research(question: str, mode: str = "web") -> dict[str, Any]:
     fields as JSON) | social (Reddit, Lemmy, Mastodon, YouTube). Use deep_research_start for a long report.
     """
     if mode == "web":
-        from web_acquisition_mcp import vane
+        from web_acquisition import vane
 
         return await vane.research(question)
     if mode not in {"extract", "social"}:
         raise ValueError("mode must be web, extract, or social")
-    from web_acquisition_mcp import deep_agent  # heavy imports only when used
+    from web_acquisition import deep_agent  # heavy imports only when used
 
     return await anyio.to_thread.run_sync(lambda: deep_agent.ask(question, mode))
 
@@ -179,7 +179,7 @@ async def extract(urls: list[str], schema: dict, instructions: str = "") -> dict
     Re-asks the model up to twice with the validation errors. `valid` says whether the final data passed;
     missing facts come back as null, never invented. `sources` lists the pages actually read.
     """
-    from web_acquisition_mcp import extract as extract_mod
+    from web_acquisition import extract as extract_mod
 
     return await anyio.to_thread.run_sync(lambda: extract_mod.extract_structured(urls, schema, instructions))
 
@@ -202,14 +202,14 @@ async def save_to_wiki(
     For a completed deep-research job, give its job_id to file the original cited report without rewriting it.
     Provide either job_id or urls/text/question. The file lands in ~/brain/wiki/inbox/ as a proposal.
     """
-    from web_acquisition_mcp import wiki
+    from web_acquisition import wiki
 
     if job_id.strip():
         if urls or text.strip() or question.strip():
             raise ValueError("provide job_id or urls/text/question, not both")
 
         def save_job_report() -> dict[str, Any]:
-            from web_acquisition_mcp import sitecrawl
+            from web_acquisition import sitecrawl
 
             job = sitecrawl.job_status(job_id.strip())
             if job.get("kind") != "deep":
@@ -245,7 +245,7 @@ async def parse_pages(urls: list[str], task: str, chunk_size: int = 4, concurren
     possibly truncated copy is returned inline. Prefer ``research`` when you
     need to find the URLs first.
     """
-    from web_acquisition_mcp.web_agent_batch import run_batch  # local import avoids an import cycle
+    from web_acquisition.web_agent_batch import run_batch  # local import avoids an import cycle
 
     return await run_batch(urls, task, client=_client, chunk_size=chunk_size, concurrency=concurrency)
 

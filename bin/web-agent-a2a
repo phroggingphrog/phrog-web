@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Deep Agents web agent: A2A server + OpenAI-compatible API. Port: WEB_AGENT_A2A_PORT (default 42619), host: WEB_AGENT_A2A_HOST.
+set -euo pipefail
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+export PYTHONPATH="$ROOT/engines${PYTHONPATH:+:$PYTHONPATH}"
+exec "${PHROG_WEB_PYTHON:-$ROOT/engines/.venv/bin/python}" -m web_acquisition.a2a_server "$@"

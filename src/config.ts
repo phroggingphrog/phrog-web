@@ -1,6 +1,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { homedir } from 'node:os';
+import { fileURLToPath } from 'node:url';
 
 export interface ProviderConfig {
   url?: string;
@@ -104,6 +105,6 @@ export function loadConfig(): AppConfig {
 /** External Jev runner locations (single place for defaults). Override with JEV_DIR / JEV_RUNNER. */
 export function jevPaths(): { jevDir: string; runner: string } {
   const jevDir = process.env.JEV_DIR || resolve(homedir(), 'apps/jev-ultrafast');
-  const runner = process.env.JEV_RUNNER || resolve(homedir(), 'workspace/self-hosted-web-mcp/scripts/jev_run.py');
+  const runner = process.env.JEV_RUNNER || fileURLToPath(new URL('../engines/jev_run.py', import.meta.url));
   return { jevDir, runner };
 }
