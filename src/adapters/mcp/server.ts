@@ -148,7 +148,7 @@ server.tool(
           workflow: job.workflow,
           domain,
           status: job.status,
-          pollInstruction: `Call research_status with jobId "${job.jobId}" to inspect progress.`,
+          pollInstruction: `Call research_status with jobId "${job.jobId}" in about 60s, then follow its poll_after_s. Do not start a second research job for the same question.`,
         });
       }
     } catch (err) {
@@ -189,6 +189,11 @@ server.tool(
     const job = getResearchJob(jobId);
     if (!job) {
       return { isError: true, content: [{ type: 'text', text: `Research job "${jobId}" not found` }] };
+    }
+    if (job.status === 'running') {
+      const elapsed = Math.round((Date.now() - Date.parse(job.startedAt)) / 1000);
+      const poll_after_s = elapsed < 120 ? 60 : elapsed < 900 ? 180 : 300;
+      return text({ ...job, elapsed_s: elapsed, poll_after_s, hint: `Feynman research usually takes 5-60 minutes. Do not poll again for ${poll_after_s}s; continue other work and check back later.` });
     }
     return text(job);
   }
@@ -438,7 +443,7 @@ server.tool('research_search', 'Free key-less research APIs queried in parallel.
   limit: z.number().int().default(3), stackexchange_site: z.string().default('stackoverflow'),
 }, safe(researchSearch));
 
-server.tool('deep_research_start', 'Start SLOW, staged deep research in Feynman. Returns a job_id for status polling. workflow: deepresearch | lit | compare | review | audit | summarize | recipe | draft. Poll with deep_research_status.', {
+server.tool('deep_research_start', 'Start SLOW, staged deep research in Feynman. Returns a job_id for status polling. workflow: deepresearch | lit | compare | review | audit | summarize | recipe | draft. Poll with deep_research_status no more often than its poll_after_s (minutes, not seconds). Do not also start `research` for the same question.', {
   topic: z.string(), workflow: z.string().default('deepresearch'), profile: z.string().default('full'), tier: z.string().default('pending'),
   budget_usd: z.number().nullable().default(null), register: z.string().nullable().default(null),
   inference_depth: z.string().nullable().default(null), domain_notes: z.string().nullable().default(null),
