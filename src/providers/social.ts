@@ -10,6 +10,7 @@ export interface SocialPost {
   score?: number;
   comments?: number;
   created_at?: string;
+  instance?: string;
 }
 
 export interface SocialOptions {
@@ -29,7 +30,6 @@ const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Geck
 const TIMEOUT_MS = 8000;
 const REDDIT_TIMEOUT_MS = 25000;
 const SEARXNG = 'http://127.0.0.1:8888';
-const CRAWL4AI = process.env.REDDIT_CRAWL4AI_URL || 'http://127.0.0.1:11236';
 
 const SEARX_ENGINES: Record<string, string> = {
   lemmy: 'lemmy posts',
@@ -49,44 +49,85 @@ async function getJson(url: string, init: RequestInit = {}, timeoutMs = TIMEOUT_
 
 const iso = (sec?: number) => (sec ? new Date(sec * 1000).toISOString() : undefined);
 
-async function redditJson(url: string): Promise<any> {
-  try {
-    return await getJson(url, {}, REDDIT_TIMEOUT_MS);
-  } catch (directErr) {
-    // Reddit blocks plain clients; same fallback as engines/web_acquisition/reddit.py (Crawl4AI renders the .json page).
-    const token = process.env.CRAWL4AI_API_TOKEN;
-    if (!token) throw directErr;
-    const res = await fetch(`${CRAWL4AI}/crawl`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ urls: [url], priority: 10 }),
-      signal: AbortSignal.timeout(REDDIT_TIMEOUT_MS),
+const decodeHtml = (s: string) =>
+  s.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&bull;/g, '*').replace(/&amp;/g, '&').trim();
+
+function parseRedlib(html: string, base: string): SocialPost[] {
+  const posts: SocialPost[] = [];
+  for (const chunk of html.split('<div class="post" id="').slice(1)) {
+    const href = /class="post_title">[\s\S]*?<a href="([^"]+)">([\s\S]*?)<\/a>/.exec(chunk);
+    if (!href) continue;
+    const sub = /class="post_subreddit" href="[^"]*">([^<]+)</.exec(chunk)?.[1];
+    const author = /class="post_author[^"]*" href="[^"]*">u\/([^<]+)</.exec(chunk)?.[1];
+    const score = /class="post_score" title="(-?\d+)"/.exec(chunk)?.[1];
+    const comments = /class="post_comments" title="(\d+) comments?"/.exec(chunk)?.[1];
+    const created = /class="created" title="([^"]+)"/.exec(chunk)?.[1];
+    const body = /<div class="md">([\s\S]*?)<\/div><!-- SC_ON -->/.exec(chunk)?.[1];
+    const title = decodeHtml(href[2]);
+    const path = decodeHtml(href[1]);
+    const ts = created ? Date.parse(created.replace(' UTC', 'Z').replace(/^(\w+ \d+ \d+), /, '$1 ')) : NaN;
+    posts.push({
+      source: 'reddit',
+      title,
+      text: body ? decodeHtml(body) : title,
+      url: path.startsWith('/') ? 'https://www.reddit.com' + path : path,
+      author,
+      community: sub ? decodeHtml(sub) : undefined,
+      score: score ? Number(score) : undefined,
+      comments: comments ? Number(comments) : undefined,
+      created_at: Number.isNaN(ts) ? undefined : new Date(ts).toISOString(),
+      instance: base,
     });
-    if (!res.ok) throw new Error(`reddit direct failed, crawl4ai HTTP ${res.status}`);
-    const payload: any = await res.json();
-    const r = payload?.results?.[0];
-    const m = /<pre[^>]*>([\s\S]*?)<\/pre>/.exec(String(r?.html || ''));
-    if (!r?.success || !m) throw new Error('reddit blocked (no JSON via crawl4ai)');
-    const unescaped = m[1]
-      .replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
-    return JSON.parse(unescaped);
   }
+  return posts;
 }
 
-async function reddit(q: string, limit: number, t: string): Promise<SocialPost[]> {
-  const url = `https://www.reddit.com/search.json?q=${encodeURIComponent(q)}&sort=relevance&t=${t}&limit=${limit}&type=link&raw_json=1`;
-  const data = await redditJson(url);
-  return (data?.data?.children || []).map((c: any) => c.data).map((d: any): SocialPost => ({
-    source: 'reddit',
-    title: d.title,
-    text: d.selftext || d.title || '',
-    url: 'https://www.reddit.com' + d.permalink,
-    author: d.author,
-    community: d.subreddit_name_prefixed,
-    score: d.score,
-    comments: d.num_comments,
-    created_at: iso(d.created_utc),
-  }));
+async function reddit(q: string, limit: number, t?: string): Promise<SocialPost[]> {
+  const bases = (process.env.REDLIB_URLS || 'http://127.0.0.1:18095,https://safereddit.com')
+    .split(',').map((b) => b.trim().replace(/\/$/, '')).filter(Boolean);
+  const errs: string[] = [];
+  for (const base of bases) {
+    const local = /^https?:\/\/(127\.0\.0\.1|localhost)/.test(base);
+    try {
+      const res = await fetch(`${base}/search?q=${encodeURIComponent(q)}&type=link${t ? `&t=${t}` : ''}`, {
+        headers: { 'User-Agent': 'phrog-web/1.0', Accept: 'text/html' }, // browser UAs trigger Anubis challenges on public Redlib instances
+        signal: AbortSignal.timeout(local ? 3000 : REDDIT_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const posts = parseRedlib(await res.text(), base).slice(0, limit);
+      if (posts.length) return posts;
+      throw new Error('no posts parsed');
+    } catch (e: any) {
+      errs.push(`${base}: ${e?.cause?.code || e?.message}`);
+    }
+  }
+  throw new Error(`redlib failed (${errs.join('; ')})`);
+}
+
+async function xSearch(q: string, limit: number): Promise<SocialPost[]> {
+  const token = process.env.X_BEARER_TOKEN;
+  if (!token) {
+    if (process.env.X_AUTH_TOKEN && process.env.X_CT0) throw new Error('cookie login not implemented yet');
+    throw new Error('not configured');
+  }
+  const max = Math.min(100, Math.max(10, limit));
+  const data = await getJson(
+    `https://api.x.com/2/tweets/search/recent?query=${encodeURIComponent(q)}&max_results=${max}&tweet.fields=created_at,public_metrics,author_id&expansions=author_id&user.fields=username`,
+    { headers: { Authorization: `Bearer ${token}` } },
+  );
+  const users = new Map<string, string>((data.includes?.users || []).map((u: any) => [u.id, u.username]));
+  return (data.data || []).slice(0, limit).map((tw: any): SocialPost => {
+    const user = users.get(tw.author_id);
+    return {
+      source: 'x',
+      text: tw.text || '',
+      url: `https://x.com/${user || 'i'}/status/${tw.id}`,
+      author: user,
+      score: tw.public_metrics?.like_count,
+      comments: tw.public_metrics?.reply_count,
+      created_at: tw.created_at,
+    };
+  });
 }
 
 async function hackernews(q: string, limit: number, range?: string): Promise<SocialPost[]> {
@@ -140,14 +181,16 @@ export async function searchSocial(query: string, opts: SocialOptions = {}): Pro
   const limit = opts.limit ?? 10;
   const range = opts.timeRange;
   const all: Record<string, () => Promise<SocialPost[]>> = {
-    reddit: () => reddit(query, limit, range || 'year'),
+    reddit: () => reddit(query, limit, range),
     hackernews: () => hackernews(query, limit, range),
     bluesky: () => bluesky(query, limit),
     lemmy: () => searx('lemmy', query, limit, range),
     mastodon: () => searx('mastodon', query, limit, range),
     youtube: () => searx('youtube', query, limit, range),
   };
-  const names = (opts.sources?.length ? opts.sources : Object.keys(all)).filter((s) => all[s]);
+  const defaults = Object.keys(all);
+  all.x = () => xSearch(query, limit);
+  const names = (opts.sources?.length ? opts.sources : defaults).filter((s) => all[s]);
   const settled = await Promise.allSettled(names.map((s) => all[s]()));
 
   const results: SocialPost[] = [];

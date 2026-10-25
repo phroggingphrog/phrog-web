@@ -7,7 +7,8 @@ import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './pr
 import { searchGithubRepos } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
-import { searchBooks } from './providers/books.js';
+import { setupDone } from './setup.js';
+import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
@@ -177,6 +178,18 @@ fastify.get('/api/books', async (req, reply) => {
   }
 });
 
+fastify.post('/api/books/download', async (req, reply) => {
+  const b = (req.body || {}) as { ref?: string; md5?: string; id?: string; source?: BookSource };
+  const ref = b.ref || b.md5 || b.id;
+  if (!ref) return reply.status(400).send({ error: 'Provide ref (from /api/books), md5 or id' });
+  try {
+    return await downloadBook(String(ref), { source: b.source });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 fastify.get('/api/social', async (req, reply) => {
   const { q, sources, limit, time_range } = req.query as { q?: string; sources?: string; limit?: string; time_range?: string };
   if (!q) {
@@ -285,6 +298,7 @@ const host = config.server.host || '127.0.0.1';
 try {
   await fastify.listen({ port, host });
   console.log(`Phrog Web Gateway listening on http://${host}:${port}`);
+  if (!setupDone()) console.log('Run `pnpm setup` to enable books, ratings and X');
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);

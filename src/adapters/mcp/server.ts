@@ -7,7 +7,7 @@ import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../.
 import { searchGithubRepos } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
-import { searchBooks } from '../../providers/books.js';
+import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
@@ -299,14 +299,31 @@ server.tool(
 
 server.tool(
   'book_availability',
-  'Search-only book availability lookup (Annas Archive, Z-Library); returns links, never downloads.',
+  'Search books on Z-Library and Anna\'s Archive (needs credentials from `pnpm setup`); rows include a ref for book_download.',
   {
     query: z.string().describe('Book title or author'),
     limit: z.number().int().min(1).max(50).optional().describe('Maximum results'),
+    sources: z.array(z.enum(['zlibrary', 'annas', 'libgen'])).optional().describe('Sources to search (default zlibrary + annas)'),
   },
   async (args) => {
     try {
-      return text(await searchBooks(args.query, { limit: args.limit }));
+      return text(await searchBooks(args.query, { limit: args.limit, sources: args.sources }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'book_download',
+  'Download a book to the gateway downloads folder; returns the saved file path. Use a ref from book_availability, or an md5/id plus source.',
+  {
+    ref: z.string().describe('Row ref from book_availability, or md5/id'),
+    source: z.enum(['zlibrary', 'annas', 'libgen']).optional().describe('Source (needed for md5/id)'),
+  },
+  async (args) => {
+    try {
+      return text(await downloadBook(args.ref, { source: args.source }));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }

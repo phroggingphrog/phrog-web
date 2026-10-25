@@ -1,0 +1,115 @@
+# Node/TypeScript
+# No trailing slash: a worktree may carry node_modules as a symlink to the main
+# checkout, and `node_modules/` matches only a real directory.
+node_modules
+
+# Husky's generated hook shims. Husky writes these on `npm install`; only the
+# hook sources in .husky/ itself are source.
+.husky/_/
+coverage/
+dist/
+build/
+
+# Build artifacts in source (tsc outputs to dist/, not src/)
+src/**/*.js
+src/**/*.js.map
+src/**/*.egg-info/
+*.tsbuildinfo
+*.js.map
+*.d.ts.map
+.npm
+.eslintcache
+.node_repl_history
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE/Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+.history/
+
+# Project specific
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Keep these if needed for your project
+# package-lock.json # Decide whether to commit this based on project type
+requirements.txt
+__mocks__/env-paths.js
+__mocks__/@modelcontextprotocol/sdk.js
+__mocks__/@modelcontextprotocol/server.js
+__tests__/index.test.d.ts
+__tests__/python-bridge.test.d.ts
+__tests__/venv-manager.test.d.ts
+__tests__/zlibrary-api.test.d.ts
+
+# Ignore generated RAG output
+processed_rag_output/
+
+# Ignore temporary test/download outputs
+test_dl/
+test_downloads/
+test_out/
+test_output/
+
+# Ignore MagicMock outputs
+MagicMock/
+# Log files
+logs/
+*.mcp.json
+.mcp.json
+.venv/
+
+# Serena MCP memories (session-specific, not checked in)
+.serena/
+
+# Agent worktrees. Claude Code creates isolated worktrees here; they are live
+# checkouts of other branches, so leaving them untracked made `git status`
+# permanently dirty and hid real uncommitted work.
+.claude/worktrees/
+
+# Test output files
+test_strikethrough_findings.json
+test_specific_pages_findings.json
+test_files/formatting_extraction_results.json
+test_files/heidegger_line_analysis.json
+test_files/margins_line_analysis.json
+test_files/heidegger_pymupdf_strikethrough.json
+test_files/margins_pymupdf_strikethrough.json
+test_files/tesseract_comparison_data.json
+test_files/test_run_output.txt
+test_files/tesseract_comparison_report.txt
+test_files/VISUAL_COMPARISON.txt
+
+# Test visualization outputs
+test_files/*_visualization.png

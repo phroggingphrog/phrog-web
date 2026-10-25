@@ -1,4 +1,9 @@
-// Book metadata search only (Anna's Archive). Never downloads book files.
+// Books: thin MCP client bridge to engines/zlibrary-mcp (Z-Library, Anna's Archive, LibGen).
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { mkdirSync, existsSync } from 'node:fs';
+import { Client } from '@modelcontextprotocol/sdk/client/index.js';
+import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { loadConfig } from '../config.js';
 
 export interface BookHit {
@@ -8,7 +13,8 @@ export interface BookHit {
   language?: string;
   format?: string;
   size?: string;
-  url: string;
+  ref?: string;
+  url?: string;
   source: string;
 }
 
@@ -19,104 +25,120 @@ export interface BooksResult {
   sources_failed: { source: string; error: string }[];
 }
 
-const ANNAS_MIRRORS = ['annas-archive.gl', 'annas-archive.pk', 'annas-archive.gd', 'annas-archive.li'];
+export type BookSource = 'zlibrary' | 'annas' | 'libgen';
+const ALL_SOURCES: BookSource[] = ['zlibrary', 'annas'];
+const CALL_TIMEOUT_MS = 12000;
+const DOWNLOAD_TIMEOUT_MS = 180000;
 
-async function crawlHtml(url: string): Promise<{ html: string; status: number }> {
+const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const ENGINE_DIR = resolve(REPO_ROOT, 'engines/zlibrary-mcp');
+
+export function downloadsDir(): string {
   loadConfig();
-  const token = process.env.CRAWL4AI_API_TOKEN || '';
-  let last: Error = new Error('Crawl4AI unreachable');
-  for (const base of ['http://127.0.0.1:11235', 'http://127.0.0.1:11236']) {
-    try {
-      const res = await fetch(new URL('/crawl', base), {
-        method: 'POST',
-        signal: AbortSignal.timeout(90000),
-        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({
-          urls: [url],
-          browser_config: { type: 'BrowserConfig', params: { headless: true } },
-          crawler_config: { type: 'CrawlerRunConfig', params: { wait_until: 'networkidle', delay_before_return_html: 6, page_timeout: 60000 } },
-        }),
-      });
-      if (!res.ok) throw new Error(`Crawl4AI HTTP ${res.status} from ${base}`);
-      const data = (await res.json()) as any;
-      const r = data.results?.[0];
-      return { html: r?.html || '', status: r?.status_code || 0 };
-    } catch (e) {
-      last = e instanceof Error ? e : new Error(String(e));
+  const dir = process.env.PHROG_WEB_DOWNLOADS || resolve(REPO_ROOT, 'downloads');
+  mkdirSync(dir, { recursive: true });
+  return dir;
+}
+
+let client: Client | null = null;
+let connecting: Promise<Client> | null = null;
+
+async function getClient(): Promise<Client> {
+  if (client) return client;
+  if (connecting) return connecting;
+  connecting = (async () => {
+    if (!existsSync(resolve(ENGINE_DIR, 'dist/index.js'))) {
+      throw new Error('engines/zlibrary-mcp is not built (run `npm install && npm run build` and `uv sync --no-dev` inside it)');
     }
-  }
-  throw last;
-}
-
-const strip = (s: string) => s.replace(/<[^>]*>/g, ' ').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
-
-// Best-effort parser: Anna's result blocks hold an /md5/<hash> link, a title,
-// an author line and a "English [en], epub, 1.2MB, ..." metadata line.
-// NOTE: not verified against live HTML (all mirrors blocked by DDoS-Guard from this VPS).
-export function parseAnnas(html: string, host: string): BookHit[] {
-  const hits: BookHit[] = [];
-  const seen = new Set<string>();
-  const parts = html.split(/(?=<a[^>]+href="\/md5\/[0-9a-f]{32})/i).slice(1);
-  for (const part of parts) {
-    const md5 = part.match(/\/md5\/([0-9a-f]{32})/i)?.[1];
-    if (!md5 || seen.has(md5)) continue;
-    seen.add(md5);
-    const text = strip(part.slice(0, 3000));
-    const meta = text.match(/([A-Za-z ]+\[[a-z]{2,3}\](?:, [A-Za-z ]+\[[a-z]{2,3}\])*)?,?\s*(epub|pdf|mobi|azw3|fb2|djvu|cbz|cbr|txt)\b,?\s*([\d.]+\s?[KMG]B)?/i);
-    const year = text.match(/\b(1[5-9]\d\d|20\d\d)\b/)?.[1];
-    const title = strip((part.match(/<h3[^>]*>([\s\S]*?)<\/h3>/i) || part.match(/>([^<]{3,})</))?.[1] || '');
-    if (!title) continue;
-    hits.push({
-      title,
-      year,
-      language: meta?.[1]?.trim(),
-      format: meta?.[2]?.toLowerCase(),
-      size: meta?.[3],
-      url: `https://${host}/md5/${md5}`,
-      source: 'annas-archive',
-    });
-  }
-  return hits;
-}
-
-async function searchAnnas(query: string): Promise<BookHit[]> {
-  const errors: string[] = [];
-  for (const host of ANNAS_MIRRORS) {
-    try {
-      const { html, status } = await crawlHtml(`https://${host}/search?q=${encodeURIComponent(query)}`);
-      const hits = parseAnnas(html, host);
-      if (hits.length) return hits;
-      const why = /ddos-guard/i.test(html) ? 'DDoS-Guard JS challenge' : /may be for sale/i.test(html) ? 'domain parked' : 'no /md5/ results';
-      errors.push(`${host}: ${why} (HTTP ${status})`);
-    } catch (e) {
-      errors.push(`${host}: ${e instanceof Error ? e.message : e}`);
+    loadConfig();
+    const env: Record<string, string> = { PATH: process.env.PATH || '', HOME: process.env.HOME || '' };
+    for (const k of ['ZLIBRARY_EMAIL', 'ZLIBRARY_PASSWORD', 'ZLIBRARY_EAPI_DOMAIN', 'ANNAS_SECRET_KEY', 'ANNAS_BASE_URL']) {
+      if (process.env[k]) env[k] = process.env[k]!;
     }
+    env.ZLIBRARY_OUTPUT_ROOT = downloadsDir();
+    const transport = new StdioClientTransport({ command: 'node', args: ['dist/index.js'], cwd: ENGINE_DIR, env, stderr: 'ignore' });
+    const c = new Client({ name: 'phrog-web', version: '0.1.0' });
+    transport.onclose = () => { client = null; };
+    await c.connect(transport);
+    client = c;
+    return c;
+  })();
+  try {
+    return await connecting;
+  } finally {
+    connecting = null;
   }
-  throw new Error(errors.join('; '));
 }
 
-async function searchZlib(_query: string): Promise<BookHit[]> {
-  throw new Error('Z-Library search requires an account login (heartleo/zlib needs `zlib login`); SearXNG z-library engine inactive upstream (#3610); no account created');
+function errText(sc: any, fallback: string): string {
+  const e = sc?.error;
+  if (!e) return fallback;
+  const att = (e.attempts || []).map((a: any) => `${a.source}:${a.code || a.outcome}${a.reason ? `(${a.reason})` : ''}`).join(', ');
+  return `${e.code}: ${e.message}${att ? ` [${att}]` : ''}`;
 }
 
-export async function searchBooks(query: string, opts: { limit?: number } = {}): Promise<BooksResult> {
+async function call(name: string, args: Record<string, unknown>, timeout = CALL_TIMEOUT_MS): Promise<any> {
+  const c = await getClient();
+  const res: any = await c.callTool({ name, arguments: args }, undefined, { timeout });
+  const sc = res.structuredContent ?? (() => { try { return JSON.parse(res.content?.[0]?.text || ''); } catch { return null; } })();
+  if (res.isError) throw new Error(errText(sc, String(res.content?.[0]?.text || 'MCP error')));
+  return sc;
+}
+
+const toHit = (r: any, source: string): BookHit => ({
+  title: r.title,
+  authors: r.author,
+  year: r.year != null ? String(r.year) : undefined,
+  language: r.language,
+  format: r.format,
+  size: r.size_mb != null ? `${r.size_mb}MB` : undefined,
+  ref: r.ref,
+  source,
+});
+
+export async function searchBooks(query: string, opts: { limit?: number; sources?: BookSource[] } = {}): Promise<BooksResult> {
   const limit = opts.limit ?? 20;
   const out: BooksResult = { query, results: [], sources_used: [], sources_failed: [] };
-  const sources: [string, (q: string) => Promise<BookHit[]>][] = [
-    ['annas-archive', searchAnnas],
-    ['z-library', searchZlib],
-  ];
   await Promise.all(
-    sources.map(async ([name, fn]) => {
+    (opts.sources?.length ? opts.sources : ALL_SOURCES).map(async (source) => {
       try {
-        const hits = await fn(query);
-        out.sources_used.push(name);
-        out.results.push(...hits);
+        const sc = await call('search', { query, sources: [source], limit: Math.min(limit, 50) });
+        out.sources_used.push(source);
+        out.results.push(...(sc?.rows || []).map((r: any) => toHit(r, source)));
       } catch (e) {
-        out.sources_failed.push({ source: name, error: e instanceof Error ? e.message : String(e) });
+        const msg = e instanceof Error ? e.message : String(e);
+        out.sources_failed.push({
+          source,
+          error: /credentials_missing/.test(msg) ? `not configured: set credentials via \`pnpm setup\` (${msg})` : msg,
+        });
       }
     }),
   );
   out.results = out.results.slice(0, limit);
   return out;
+}
+
+const MD5 = /^[0-9a-f]{32}$/i;
+
+// ref = opaque ref from a current searchBooks row; an md5/id is resolved by searching the source first.
+export async function downloadBook(ref: string, opts: { source?: BookSource } = {}): Promise<{ path: string; bytes?: number; source?: string }> {
+  let useRef = ref;
+  if (MD5.test(ref) || /^\d+$/.test(ref)) {
+    const source = opts.source || 'annas';
+    const sc = await call('search', { query: ref, sources: [source], limit: 1 });
+    useRef = sc?.rows?.[0]?.ref;
+    if (!useRef) throw new Error(`no ${source} result for id ${ref}`);
+  }
+  const sc = await call('download', { ref: useRef, output_dir: downloadsDir() }, DOWNLOAD_TIMEOUT_MS);
+  return { path: sc.path, bytes: sc.bytes, source: opts.source };
+}
+
+// Local capability report (no network); used by setup --check.
+export async function bookLimits(): Promise<any> {
+  return call('get_limits', {});
+}
+
+export async function closeBooks(): Promise<void> {
+  await client?.close().catch(() => {});
+  client = null;
 }

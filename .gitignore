@@ -24,3 +24,7 @@ papers/
 # Logs & Temp
 *.log
 .DS_Store
+
+# Downloads
+downloads/
+engines/zlibrary-mcp/downloads/
