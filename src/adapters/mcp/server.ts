@@ -6,6 +6,10 @@ import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
 import { searchGithubRepos } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
+import { searchMedia } from '../../providers/media.js';
+import { searchBooks } from '../../providers/books.js';
+import { searchSocial } from '../../providers/social.js';
+import { getTranscript } from '../../providers/transcript.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
 const server = new McpServer({
@@ -270,6 +274,74 @@ server.tool(
     try {
       const results = await searchWiki(query, limit);
       return text({ query, results, total: results.length });
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'media_search',
+  'Search books, films or music metadata with ratings from public sources.',
+  {
+    query: z.string().describe('Title or keywords'),
+    type: z.enum(['book', 'film', 'music']).describe('Media type'),
+    limit: z.number().int().min(1).max(50).optional().describe('Maximum results'),
+  },
+  async (args) => {
+    try {
+      return text(await searchMedia(args.query, args.type, { limit: args.limit }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'book_availability',
+  'Search-only book availability lookup (Annas Archive, Z-Library); returns links, never downloads.',
+  {
+    query: z.string().describe('Book title or author'),
+    limit: z.number().int().min(1).max(50).optional().describe('Maximum results'),
+  },
+  async (args) => {
+    try {
+      return text(await searchBooks(args.query, { limit: args.limit }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'social_search',
+  'Search public social sources (reddit, hackernews, bluesky, lemmy, mastodon, youtube).',
+  {
+    query: z.string().describe('Search query'),
+    sources: z.array(z.string()).optional().describe('Subset of sources'),
+    limit: z.number().int().min(1).max(50).optional().describe('Maximum posts per source'),
+    timeRange: z.enum(['day', 'week', 'month', 'year']).optional().describe('Time window'),
+  },
+  async (args) => {
+    try {
+      return text(await searchSocial(args.query, { sources: args.sources, limit: args.limit, timeRange: args.timeRange }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'youtube_transcript',
+  'Fetch the transcript of a YouTube video (manual or auto captions).',
+  {
+    url: z.string().describe('YouTube video URL'),
+    lang: z.string().optional().describe('Caption language, default en'),
+    maxChars: z.number().int().min(100).optional().describe('Truncate text to this many characters'),
+  },
+  async (args) => {
+    try {
+      return text(await getTranscript(args.url, { lang: args.lang, maxChars: args.maxChars }));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }

@@ -6,6 +6,10 @@ import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
 import { searchGithubRepos } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
+import { searchMedia, MediaType } from './providers/media.js';
+import { searchBooks } from './providers/books.js';
+import { searchSocial } from './providers/social.js';
+import { getTranscript } from './providers/transcript.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 
 const config = loadConfig();
@@ -140,6 +144,63 @@ fastify.get('/api/github/search', async (req, reply) => {
   try {
     const res = await searchGithubRepos(target, limit ? parseInt(limit, 10) : 10);
     return res;
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Media, books, social, transcripts
+fastify.get('/api/media', async (req, reply) => {
+  const { q, type, limit } = req.query as { q?: string; type?: string; limit?: string };
+  if (!q || !type || !['book', 'film', 'music'].includes(type)) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/media' });
+  }
+  try {
+    return await searchMedia(q, type as MediaType, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/books', async (req, reply) => {
+  const { q, limit } = req.query as { q?: string; limit?: string };
+  if (!q) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/books' });
+  }
+  try {
+    return await searchBooks(q, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/social', async (req, reply) => {
+  const { q, sources, limit, time_range } = req.query as { q?: string; sources?: string; limit?: string; time_range?: string };
+  if (!q) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/social' });
+  }
+  try {
+    return await searchSocial(q, {
+      sources: sources ? sources.split(',').map(x => x.trim()).filter(Boolean) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      timeRange: time_range as 'day' | 'week' | 'month' | 'year' | undefined,
+    });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/transcript', async (req, reply) => {
+  const { url, lang, max_chars } = (req.body || {}) as { url?: string; lang?: string; max_chars?: number };
+  if (!url) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/transcript' });
+  }
+  try {
+    return await getTranscript(url, { lang, maxChars: max_chars });
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });

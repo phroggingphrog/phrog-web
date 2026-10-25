@@ -54,6 +54,17 @@ Searches GitHub repositories via local SearXNG GitHub engine with fallback to Gi
 curl "http://127.0.0.1:8890/api/github/search?q=fastify&limit=2"
 ```
 
+### C2. Media, Books, Social, Transcripts
+```bash
+curl "http://127.0.0.1:8890/api/media?q=dune&type=book&limit=5"        # type=book|film|music
+curl "http://127.0.0.1:8890/api/books?q=dune&limit=5"                  # search-only availability
+curl "http://127.0.0.1:8890/api/social?q=fastify&sources=reddit,hackernews&limit=5&time_range=month"
+curl -X POST http://127.0.0.1:8890/api/transcript -H 'Content-Type: application/json' \
+  -d '{"url":"https://www.youtube.com/watch?v=jNQXAC9IVRw","lang":"en","max_chars":2000}'
+```
+MCP tools: `media_search`, `book_availability`, `social_search`, `youtube_transcript`.
+Known blockers: Anna's Archive is behind DDoS-Guard; Z-Library needs login; Bluesky search returns 403; keyed ratings need `TMDB_API_KEY`, `OMDB_API_KEY`, `HARDCOVER_API_KEY`, `DISCOGS_TOKEN`.
+
 ### D. DeepWiki Codebase Q&A (`POST /api/deepwiki/ask`)
 Queries AI-generated, codebase-grounded documentation with inline citations via DeepWiki Streamable MCP (`mcp.deepwiki.com/mcp`). Auth-free for all public repos.
 ```bash
