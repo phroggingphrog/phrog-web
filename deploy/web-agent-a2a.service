@@ -1,0 +1,12 @@
+[Unit]
+Description=Deep Agents web agent (A2A + background jobs, loopback)
+After=network-online.target
+
+[Service]
+EnvironmentFile=%h/.config/self-hosted-web-mcp.env
+ExecStart=%h/workspace/self-hosted-web-mcp/bin/web-agent-a2a
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target

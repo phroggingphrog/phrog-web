@@ -1,0 +1,13 @@
+[Unit]
+Description=Chromium (new headless) for Jev browse mode: own throwaway profile, loopback CDP
+[Service]
+ExecStartPre=-/usr/bin/podman rm -f jev-chrome
+ExecStart=/usr/bin/podman run --rm --name jev-chrome -p 127.0.0.1:9222:9223 \
+  --shm-size=1g --memory=3g --pids-limit=1024 --cap-drop=ALL --security-opt=no-new-privileges \
+  -v %h/workspace/self-hosted-web-mcp/deploy/jev-chrome-entry.sh:/entry.sh:ro \
+  --entrypoint /bin/sh docker.io/unclecode/crawl4ai:0.9.3 /entry.sh
+ExecStop=/usr/bin/podman stop -t 5 jev-chrome
+Restart=on-failure
+RestartSec=10
+[Install]
+WantedBy=default.target

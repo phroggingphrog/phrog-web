@@ -1,0 +1,14 @@
+[Unit]
+Description=Crawl4AI fallback crawler (podman, direct homelab egress)
+[Service]
+EnvironmentFile=%h/.config/self-hosted-web-mcp.env
+ExecStartPre=-/usr/bin/podman rm -f crawl4ai-home
+ExecStart=/usr/bin/podman run --rm --name crawl4ai-home -p 127.0.0.1:11236:11235 \
+  -e CRAWL4AI_API_TOKEN -e CRAWL4AI_EXECUTE_JS_ENABLED=true \
+  --shm-size=1g --memory=4g --pids-limit=512 --cap-drop=ALL --security-opt=no-new-privileges --read-only --tmpfs /tmp:rw,mode=1777 --tmpfs /var/lib/redis:rw,mode=1777 --tmpfs /var/lib/crawl4ai/outputs:rw,mode=1777 --tmpfs /home/appuser/.crawl4ai:rw,mode=1777 --tmpfs /home/appuser/.cache/url_seeder:rw,mode=1777 --tmpfs /home/appuser/.gunicorn:rw,mode=1777 \
+  docker.io/unclecode/crawl4ai:0.9.3
+ExecStop=/usr/bin/podman stop -t 10 crawl4ai-home
+Restart=on-failure
+RestartSec=10
+[Install]
+WantedBy=default.target

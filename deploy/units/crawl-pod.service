@@ -1,0 +1,9 @@
+[Unit]
+Description=Pod for the Crawl4AI primary crawler and its tencentvps egress
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/podman pod create --replace --name crawl -p 127.0.0.1:11235:11235 -p 127.0.0.1:18118:8118
+ExecStop=/usr/bin/podman pod rm -f crawl
+[Install]
+WantedBy=default.target

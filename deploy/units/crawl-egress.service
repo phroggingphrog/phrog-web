@@ -1,0 +1,14 @@
+[Unit]
+Description=SSH tunnel to tencentvps + privoxy (inside the crawl pod)
+BindsTo=crawl-pod.service
+After=crawl-pod.service
+[Service]
+ExecStartPre=-/usr/bin/podman rm -f crawl-egress
+ExecStart=/usr/bin/podman run --rm --name crawl-egress --pod crawl \
+  -v %h/.ssh/tencent_egress:/run/secrets/key:ro \
+  localhost/crawl-egress:1
+ExecStop=/usr/bin/podman stop -t 5 crawl-egress
+Restart=always
+RestartSec=10
+[Install]
+WantedBy=default.target

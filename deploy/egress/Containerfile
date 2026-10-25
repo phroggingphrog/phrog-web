@@ -1,0 +1,6 @@
+FROM docker.io/library/alpine:3.20
+RUN apk add --no-cache openssh-client privoxy netcat-openbsd
+COPY privoxy.conf /etc/egress/privoxy.conf
+COPY known_hosts /etc/egress/known_hosts
+COPY entry.sh /entry.sh
+ENTRYPOINT ["/bin/sh", "/entry.sh"]

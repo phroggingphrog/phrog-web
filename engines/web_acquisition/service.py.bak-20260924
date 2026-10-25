@@ -1,0 +1,191 @@
+from __future__ import annotations
+
+import ipaddress
+import json
+import os
+import socket
+from dataclasses import dataclass
+from typing import Any
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote, urlparse
+from urllib.request import Request, urlopen
+
+
+class UpstreamError(RuntimeError):
+    """An upstream search/crawl request failed."""
+
+
+@dataclass(frozen=True)
+class Settings:
+    searxng_url: str = os.getenv("SEARXNG_URL", "http://127.0.0.1:8888").rstrip("/")
+    crawl4ai_url: str = os.getenv("CRAWL4AI_URL", "http://127.0.0.1:11235").rstrip("/")
+    crawl4ai_api_token: str = os.getenv("CRAWL4AI_API_TOKEN", "")
+    request_timeout_s: float = float(os.getenv("WEB_MCP_REQUEST_TIMEOUT_S", "45"))
+    max_urls: int = int(os.getenv("WEB_MCP_MAX_URLS", "10"))
+    max_markdown_chars: int = int(os.getenv("WEB_MCP_MAX_MARKDOWN_CHARS", "50000"))
+    allow_private_urls: bool = os.getenv("ALLOW_PRIVATE_URLS", "0").lower() in {"1", "true", "yes"}
+
+
+def _json_request(request: Request, timeout: float) -> Any:
+    try:
+        with urlopen(request, timeout=timeout) as response:
+            payload = response.read()
+    except HTTPError as exc:
+        body = exc.read(500).decode("utf-8", "replace")
+        raise UpstreamError(f"upstream returned HTTP {exc.code}: {body}") from exc
+    except (URLError, TimeoutError, OSError) as exc:
+        raise UpstreamError(f"upstream request failed: {exc}") from exc
+    try:
+        return json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise UpstreamError("upstream returned invalid JSON") from exc
+
+
+def _validate_public_url(value: str, allow_private: bool) -> str:
+    url = value.strip()
+    parsed = urlparse(url)
+    if parsed.scheme not in {"http", "https"} or not parsed.hostname:
+        raise ValueError(f"only absolute http(s) URLs are allowed: {value!r}")
+    if parsed.username or parsed.password:
+        raise ValueError("URLs containing username/password credentials are not allowed")
+    if len(url) > 4096:
+        raise ValueError("URL exceeds 4096 characters")
+    if allow_private:
+        return url
+
+    hostname = parsed.hostname.rstrip(".")
+    try:
+        addresses = {info[4][0] for info in socket.getaddrinfo(hostname, parsed.port or (443 if parsed.scheme == "https" else 80))}
+    except socket.gaierror as exc:
+        raise ValueError(f"could not resolve URL host {hostname!r}") from exc
+    for address in addresses:
+        try:
+            ip = ipaddress.ip_address(address)
+        except ValueError:
+            continue
+        if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast or ip.is_unspecified:
+            raise ValueError(f"private or non-public URL host is blocked: {hostname}")
+    return url
+
+
+def _markdown_from_result(result: dict[str, Any]) -> str:
+    markdown = result.get("markdown", "")
+    if isinstance(markdown, dict):
+        return str(markdown.get("fit_markdown") or markdown.get("raw_markdown") or markdown.get("markdown_with_citations") or "")
+    return str(markdown or result.get("extracted_content") or "")
+
+
+class WebAcquisitionService:
+    def __init__(self, settings: Settings | None = None) -> None:
+        self.settings = settings or Settings()
+
+    def search(self, query: str, limit: int = 5) -> dict[str, Any]:
+        query = query.strip()
+        if not query:
+            raise ValueError("query must not be empty")
+        limit = max(1, min(int(limit), 20))
+        url = f"{self.settings.searxng_url}/search?q={quote(query)}&format=json"
+        payload = _json_request(Request(url, headers={"Accept": "application/json", "User-Agent": "self-hosted-web-mcp/0.1"}), self.settings.request_timeout_s)
+        raw_results = payload.get("results", []) if isinstance(payload, dict) else []
+        results: list[dict[str, str]] = []
+        for item in raw_results:
+            if not isinstance(item, dict) or not item.get("url"):
+                continue
+            results.append({
+                "title": str(item.get("title") or item["url"]),
+                "url": str(item["url"]),
+                "snippet": str(item.get("content") or item.get("snippet") or ""),
+            })
+            if len(results) >= limit:
+                break
+        return {"query": query, "results": results, "count": len(results)}
+
+    def crawl(self, urls: list[str]) -> dict[str, Any]:
+        if not isinstance(urls, list) or not urls:
+            raise ValueError("urls must be a non-empty list")
+        if len(urls) > self.settings.max_urls:
+            raise ValueError(f"at most {self.settings.max_urls} URLs may be crawled per call")
+        clean_urls: list[str] = []
+        for value in urls:
+            if not isinstance(value, str):
+                raise ValueError("each URL must be a string")
+            clean = _validate_public_url(value, self.settings.allow_private_urls)
+            if clean not in clean_urls:
+                clean_urls.append(clean)
+        if not self.settings.crawl4ai_api_token:
+            raise RuntimeError("CRAWL4AI_API_TOKEN is not configured")
+
+        request = Request(
+            f"{self.settings.crawl4ai_url}/crawl",
+            data=json.dumps({"urls": clean_urls, "priority": 10, "extraction_strategy": "NoExtractionStrategy"}).encode(),
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.settings.crawl4ai_api_token}",
+                "User-Agent": "self-hosted-web-mcp/0.1",
+            },
+            method="POST",
+        )
+        payload = _json_request(request, self.settings.request_timeout_s)
+        raw_results = payload.get("results", []) if isinstance(payload, dict) else []
+        normalized: list[dict[str, Any]] = []
+        for result in raw_results:
+            if not isinstance(result, dict):
+                continue
+            result_url = str(result.get("url") or "")
+            requested_url = next((candidate for candidate in clean_urls if candidate.rstrip("/") == result_url.rstrip("/")), None)
+            metadata = result.get("metadata") if isinstance(result.get("metadata"), dict) else {}
+            markdown = _markdown_from_result(result)
+            normalized.append({
+                "url": result_url,
+                "requested_url": requested_url,
+                "success": bool(result.get("success")),
+                "status_code": result.get("status_code"),
+                "title": str(metadata.get("title") or ""),
+                "description": str(metadata.get("description") or ""),
+                "markdown": markdown[: self.settings.max_markdown_chars],
+                "metadata": metadata,
+                "redirected_url": result.get("redirected_url"),
+                "error": str(result.get("error_message") or "") or None,
+                "crawl_stats": result.get("crawl_stats") if isinstance(result.get("crawl_stats"), dict) else {},
+            })
+        return {
+            "success": bool(payload.get("success", True)) if isinstance(payload, dict) else False,
+            "results": normalized,
+            "count": len(normalized),
+            "server_processing_time_s": payload.get("server_processing_time_s") if isinstance(payload, dict) else None,
+        }
+
+    def deep_search(self, query: str, num_sources: int = 3) -> dict[str, Any]:
+        num_sources = max(1, min(int(num_sources), 10))
+        search = self.search(query, limit=max(num_sources * 2, num_sources))
+        candidates = search["results"][:num_sources]
+        selected: list[dict[str, str]] = []
+        skipped: list[dict[str, str]] = []
+        for candidate in candidates:
+            try:
+                _validate_public_url(candidate["url"], self.settings.allow_private_urls)
+                selected.append(candidate)
+            except ValueError as exc:
+                skipped.append({"url": candidate["url"], "reason": str(exc)})
+        crawled = self.crawl([item["url"] for item in selected]) if selected else {"results": [], "count": 0, "success": False}
+        blocks: list[dict[str, Any]] = []
+        for source, result in zip(selected, crawled.get("results", [])):
+            blocks.append({
+                "source": source,
+                "url": result.get("url") or source["url"],
+                "title": result.get("title") or source["title"],
+                "content": result.get("markdown", "")[:12000],
+                "success": result.get("success", False),
+                "status_code": result.get("status_code"),
+                "error": result.get("error"),
+            })
+        return {
+            "query": query.strip(),
+            "sources_requested": num_sources,
+            "sources_selected": len(selected),
+            "sources_crawled": len(blocks),
+            "skipped": skipped,
+            "context_blocks": blocks,
+            "note": "Deterministic retrieval context; an LLM can synthesize the cited blocks downstream.",
+        }
