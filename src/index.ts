@@ -16,6 +16,7 @@ import { createMcpServer } from './adapters/mcp/server.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from './providers/crawl.js';
 import { browse } from './providers/browse.js';
 import { extract } from './providers/extract.js';
+import { runAgent } from './providers/agent.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { registerSearxngCompat } from './searxng-compat.js';
@@ -311,6 +312,26 @@ fastify.get('/api/batch/:id', async (req, reply) => {
     return webCrawlStatus(id, ['1', 'true'].includes(q.include_results ?? ''), Number(q.offset ?? 0), Number(q.limit ?? 10));
   } catch (err) { return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) }); }
 });
+fastify.post('/api/agent', async (req, reply) => {
+  try {
+    return await runAgent(req.body as any);
+  } catch (err) {
+    return reply.status(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/agent/stream', async (req, reply) => {
+  reply.hijack();
+  reply.raw.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache', Connection: 'keep-alive' });
+  const send = (e: Record<string, any>) => reply.raw.write(`data: ${JSON.stringify(e)}\n\n`);
+  try {
+    await runAgent(req.body as any, send);
+  } catch (err) {
+    send({ type: 'ERROR', error: err instanceof Error ? err.message : String(err) });
+  }
+  reply.raw.end();
+});
+
 fastify.post('/api/browse', wrap(browse as any, ['url', 'goal']));
 fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
 fastify.post('/api/vault', wrap(researchVault as any, ['action']));

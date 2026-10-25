@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Unified, agent-agnostic web intelligence, search, and research hub",
   "main": "dist/index.js",
+  "bin": { "phrog-web": "dist/cli.js" },
   "type": "module",
   "scripts": {
     "build": "tsc",

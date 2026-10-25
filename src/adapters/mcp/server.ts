@@ -15,6 +15,7 @@ import { getTranscript } from '../../providers/transcript.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '../../providers/crawl.js';
 import { browse } from '../../providers/browse.js';
 import { extract } from '../../providers/extract.js';
+import { runAgent } from '../../providers/agent.js';
 import { researchVault } from '../../providers/vault.js';
 import { researchSearch } from '../../providers/sources.js';
 import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
@@ -389,6 +390,11 @@ server.tool('web_crawl_status', 'Progress (and optionally results) of a backgrou
 server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runner.', {
   url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
 }, safe(browse));
+
+server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent. Returns {status,result,steps,escalated_to,sources}.', {
+  url: z.string(), goal: z.string(), schema: z.record(z.any()).optional(),
+  mode: z.enum(['auto', 'fetch', 'browse', 'deep']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
+}, safe((a) => runAgent(a)));
 
 server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
   urls: z.array(z.string()), schema: z.record(z.any()), instructions: z.string().optional(),
