@@ -20,6 +20,8 @@ import { researchVault } from '../../providers/vault.js';
 import { researchSearch } from '../../providers/sources.js';
 import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
+import { logged, recentRuns } from '../../runlog.js';
+import { saveToBrainWiki } from '../../wiki/brain.js';
 
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
@@ -27,6 +29,14 @@ const text = (data: unknown) => ({
 
 export function createMcpServer(): McpServer {
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
+// Log every tool call: wrap the handler (always the last argument) of each server.tool registration.
+const origTool = server.tool.bind(server) as (...a: any[]) => unknown;
+(server as any).tool = (...args: any[]) => {
+  const name = args[0] as string;
+  const last = args.length - 1;
+  if (typeof args[last] === 'function') args[last] = logged(name, args[last]);
+  return origTool(...args);
+};
 
 server.tool(
   'quick_search',
@@ -236,7 +246,7 @@ server.tool(
 
 server.tool(
   'wiki_save',
-  'Distill and save research findings or notes into the LLM Wiki (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
+  'Save a note into the LOCAL vector wiki in this repo (not the brain; for the brain wiki inbox use save_to_wiki). Distill and save research findings or notes (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
   {
     title: z.string().describe('Note title (becomes filename slug)'),
     content: z.string().describe('Markdown note content with sections, summaries, and citations'),
@@ -408,10 +418,14 @@ server.tool('research_vault', 'Search/read/save reusable evidence in the Feynman
   run_id: z.string().optional(), ranked: z.boolean().optional(),
 }, safe(researchVault));
 
-server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.', {
-  title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
-}, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));
+server.tool('save_to_wiki', 'Save gathered web material or a completed deep-research job to the owner\'s brain wiki inbox (~/brain/wiki/inbox/) as a proposal. kind: "note" (summary, key points, details, gaps, related, sources). Give urls (read for you), text (research already gathered) or a question (researched first); or a completed deep-research job_id to file its cited report unchanged. Provide either job_id or urls/text/question.', {
+  kind: z.string().default('note'), urls: z.array(z.string()).nullable().default(null), text: z.string().default(''),
+  question: z.string().default(''), title: z.string().default(''), target: z.string().default(''), job_id: z.string().default(''),
+}, safe(saveToBrainWiki));
 
+server.tool('run_log', 'Recent phrog-web run-log records (MCP and REST calls: duration, ok, provider info), newest first. Optional tool filter.', {
+  limit: z.number().int().default(50), tool: z.string().optional(),
+}, safe(({ limit, tool }: any) => recentRuns(limit, tool)));
 
 // Compat tools: same names/args/defaults as the old Python `web` MCP.
 server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news".', {

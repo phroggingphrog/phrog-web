@@ -19,12 +19,37 @@ import { extract } from './providers/extract.js';
 import { runAgent } from './providers/agent.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
+import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
 import { registerSearxngCompat } from './searxng-compat.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
 
 await fastify.register(cors, { origin: true });
+
+// Run log: one JSON-lines record per /api/* call (payload captured in onSend for size/provider info).
+fastify.addHook('onSend', async (req: any, reply, payload) => {
+  if (req.url.startsWith('/api/')) {
+    req.runInfo = { bytes: typeof payload === 'string' ? Buffer.byteLength(payload) : Buffer.isBuffer(payload) ? payload.length : 0 };
+    if (typeof payload === 'string' && payload.length < 2_000_000) {
+      Object.assign(req.runInfo, resultInfo(payload));
+      if (reply.statusCode >= 400) { try { req.runInfo.error = shortError(JSON.parse(payload).error ?? payload); } catch { req.runInfo.error = shortError(payload); } }
+    }
+  }
+  return payload;
+});
+fastify.addHook('onResponse', async (req: any, reply) => {
+  const route = req.routeOptions?.url ?? req.url.split('?')[0];
+  if (!route.startsWith('/api/') || route === '/api/runs') return;
+  const args = req.method === 'GET' ? req.query : req.body;
+  const { bytes, ...info } = req.runInfo ?? {};
+  writeRun({ kind: 'rest', tool: `${req.method} ${route}`, args: summarize(args), status: reply.statusCode, duration_ms: Math.round(reply.elapsedTime), ok: reply.statusCode < 400, ...info, result_bytes: bytes ?? 0 });
+});
+
+fastify.get('/api/runs', async (req) => {
+  const q = req.query as { limit?: string; tool?: string };
+  return { runs: recentRuns(q.limit ? parseInt(q.limit, 10) : 50, q.tool) };
+});
 
 fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', version: '0.1.0' }));
 
@@ -338,6 +363,13 @@ fastify.post('/api/vault', wrap(researchVault as any, ['action']));
 
 // Streamable HTTP MCP (stateless: one server+transport per request, like the Python web MCP)
 const mcpHandler = async (req: any, reply: any) => {
+  const t0 = Date.now();
+  reply.raw.on('finish', () => {
+    if (reply.raw.statusCode >= 400) {
+      const b = req.body;
+      writeRun({ kind: 'rest', tool: `${req.method} /mcp`, args: summarize({ rpc_method: b?.method, id: b?.id, accept: req.headers.accept, content_type: req.headers['content-type'], protocol: req.headers['mcp-protocol-version'], has_session: !!req.headers['mcp-session-id'] }), status: reply.raw.statusCode, duration_ms: Date.now() - t0, ok: false, error: `HTTP ${reply.raw.statusCode} on /mcp` });
+    }
+  });
   const server = createMcpServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   reply.hijack();

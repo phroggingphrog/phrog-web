@@ -230,3 +230,10 @@ Research notes (phrog-web search/fetch, 2026-10-26):
 Implementation (`src/providers/agent.ts`, no new services): ladder `fetch` (crawl + extract.ts with an `answerable` flag) -> `browse` (Jev runner, output shaped to JSON by the LLM) -> `deep` (A2A agent 127.0.0.1:42619, token from `~/.config/web-agent-deep/a2a-token`). Auto mode starts at browse for interactive goals (click/type/wait...) and at deep for multi-page goals; otherwise escalates only when the fetch level says the page text lacks the answer. `max_steps` caps rungs (1-3), `timeout_s` (default 180) is the overall deadline.
 Request `{url, goal, schema?, mode?: auto|fetch|browse|deep, max_steps?, timeout_s?}`; response `{status: COMPLETED|FAILED, result, steps:[{action,detail,ms}], escalated_to, sources, error?}`. Stream events: STARTED, PROGRESS, COMPLETE or ERROR (SSE `data:` lines).
 Verified on PORT=8899: quotes.toscrape.com stayed at fetch (5s); the-internet dynamic_loading/1 escalated to browse and returned "Hello World!" (15s); books.toscrape.com cheapest book with schema returned "Starving Hearts (Triangular Trade ...", £13.99 at fetch (7s). The deep rung is wired but not exercised.
+
+---
+
+## Run logs and save_to_wiki (brain)
+
+- `src/runlog.ts`: JSON-lines log (default `~/.local/state/phrog-web/runs.jsonl`, `PHROG_WEB_RUNLOG`; rotates at 10MB, keeps 3). MCP tools are logged by wrapping `server.tool` handlers in `createMcpServer`; REST via Fastify onSend/onResponse hooks for `/api/*`. Keys matching key/token/secret/password/auth/cookie are redacted; strings truncated at 200 chars. Reads: `GET /api/runs?limit=&tool=`, MCP `run_log`. Failed `POST /mcp` (status >= 400) is logged with rpc method and accept/content-type headers (a client without `Accept: application/json, text/event-stream` gets 406).
+- `save_to_wiki` now matches the old Python tool (kind, urls, text, question, title, target, job_id) by running `engines/save_to_wiki_cli.py` (wraps `web_acquisition.wiki`) in `engines/.venv`. Output: `$WEB_AGENT_WIKI_INBOX` or `~/brain/wiki/inbox`. `wiki_save`/`wiki_search` stay the local vector wiki.

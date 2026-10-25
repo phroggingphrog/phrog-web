@@ -49,7 +49,7 @@ Escalate only when the lighter tool fails or returns incomplete content.
 
 ## Saving
 
-`save_to_wiki` (alias `wiki_save`) files a note into the brain wiki inbox. Use it for findings worth keeping, and say what you saved. `wiki_search` searches existing notes; check it before re-researching. `research_vault` holds reusable Feynman evidence.
+`save_to_wiki` (urls, text or question; optional title, target, job_id) reads the sources, writes one proposed page into ~/brain/wiki/inbox/ and returns its path. Use it for findings worth keeping, and say what you saved. `wiki_save` is different: it writes to the local vector wiki only. `wiki_search` searches that local wiki; check it before re-researching. `research_vault` holds reusable Feynman evidence.
 
 ## REST equivalents
 
@@ -62,3 +62,5 @@ Escalate only when the lighter tool fails or returns incomplete content.
 - Bluesky search is unavailable.
 - Results are public web only. Pages behind bot checks come back as skipped/blocked, not content; try `stealth` or `web_agent_run`.
 - Do not send private or personal data into search queries.
+
+`run_log` (MCP) and `GET /api/runs?limit=50&tool=` show recent calls with duration, ok and provider info.
