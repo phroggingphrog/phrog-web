@@ -10,7 +10,8 @@
 
 **Phrog Web** is an agent-agnostic, self-contained web retrieval, deep research, and personal knowledge hub. It provides a unified gateway with two interfaces:
 1. **HTTP REST API** on `http://127.0.0.1:8890` (TinyFish-compatible contracts).
-2. **Stdio MCP Server** via `node dist/adapters/mcp/server.js` (for Claude Code, Codex, DSH, Cursor).
+2. **Streamable HTTP MCP** at `http://127.0.0.1:<port>/mcp` (stateless, one server per request; Claude Code `--transport http`). Tools come from `createMcpServer()` in `src/adapters/mcp/server.ts`.
+2b. **Stdio MCP Server** via `node dist/adapters/mcp/server.js` (for Claude Code, Codex, DSH, Cursor).
 3. **Hermes Tool Definitions** via `src/adapters/schemas/hermes-tools.json` (OpenAI function-calling format).
 
 ---
@@ -185,3 +186,10 @@ Remaining gaps:
 - `web_crawl_start` (site crawl) is not ported.
 - `browse` needs the external Jev runner (JEV_RUNNER / JEV_DIR, see `jevPaths()` in src/config.ts) and a TYPESAFE/OPENROUTER key; it errors clearly if missing.
 - `research_vault` needs the Feynman MCP at WEB_AGENT_FEYNMAN_URL (default 127.0.0.1:8910).
+
+
+## Crawl capabilities added (feat/http-mcp-crawl)
+- `web_crawl` `actions` (click/type/press/scroll/wait/wait_for) and `stealth` are sent to Crawl4AI (`/crawl` run config for scroll/wait, `/execute_js` for click/type/press, `enable_stealth` browser config). A click that navigates the page hangs Crawl4AI `/execute_js` (60s timeout).
+- PDF (`pdftotext`) and Office (MarkItDown in the Python venv, `PHROG_WEB_PYTHON`, default `~/workspace/self-hosted-web-mcp/.venv/bin/python`) are converted in the plain fetcher (`src/providers/document.ts`).
+- `web_crawl_start` (also `POST /api/crawl/start`): same args as the Python tool; jobs share the batch job map and are read with `web_crawl_status`. In-process only.
+- Not ported: Trafilatura extraction (plain fetch still uses the regex cleaner), browser-rendered link discovery in site crawls (links come from plain HTML), daemon-persisted jobs, Python-style crawl job disk state.

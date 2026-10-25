@@ -11,7 +11,9 @@ import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
-import { webCrawl, webMap, webBatchStart, webCrawlStatus } from './providers/crawl.js';
+import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
+import { createMcpServer } from './adapters/mcp/server.js';
+import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from './providers/crawl.js';
 import { browse } from './providers/browse.js';
 import { extract } from './providers/extract.js';
 import { researchVault } from './providers/vault.js';
@@ -306,6 +308,7 @@ const wrap = (fn: (b: any) => Promise<unknown> | unknown, required: string[]) =>
 fastify.post('/api/crawl', wrap(webCrawl, ['urls']));
 fastify.post('/api/map', wrap(webMap, ['url']));
 fastify.post('/api/batch', wrap(webBatchStart, ['urls']));
+fastify.post('/api/crawl/start', wrap(webCrawlStart, ['url']));
 fastify.get('/api/batch/:id', async (req, reply) => {
   const { id } = req.params as { id: string };
   const q = req.query as { include_results?: string; offset?: string; limit?: string };
@@ -317,6 +320,27 @@ fastify.get('/api/batch/:id', async (req, reply) => {
 fastify.post('/api/browse', wrap(browse as any, ['url', 'goal']));
 fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
 fastify.post('/api/vault', wrap(researchVault as any, ['action']));
+
+// Streamable HTTP MCP (stateless: one server+transport per request, like the Python web MCP)
+const mcpHandler = async (req: any, reply: any) => {
+  const server = createMcpServer();
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+  reply.hijack();
+  reply.raw.on('close', () => { transport.close(); server.close(); });
+  try {
+    await server.connect(transport);
+    await transport.handleRequest(req.raw, reply.raw, req.body);
+  } catch (err) {
+    req.log.error(err);
+    if (!reply.raw.headersSent) {
+      reply.raw.writeHead(500, { 'Content-Type': 'application/json' });
+      reply.raw.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32603, message: 'Internal server error' }, id: null }));
+    }
+  }
+};
+fastify.post('/mcp', mcpHandler);
+fastify.get('/mcp', mcpHandler);
+fastify.delete('/mcp', mcpHandler);
 
 // Start Server
 const port = Number(process.env.PORT || config.server.port || 8890);

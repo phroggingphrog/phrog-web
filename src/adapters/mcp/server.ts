@@ -1,5 +1,7 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
+import { fileURLToPath } from 'node:url';
+import { realpathSync } from 'node:fs';
 import { z } from 'zod';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
@@ -10,21 +12,19 @@ import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
-import { webCrawl, webMap, webBatchStart, webCrawlStatus } from '../../providers/crawl.js';
+import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '../../providers/crawl.js';
 import { browse } from '../../providers/browse.js';
 import { extract } from '../../providers/extract.js';
 import { researchVault } from '../../providers/vault.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
-const server = new McpServer({
-  name: 'phrog-web',
-  version: '0.1.0',
-});
-
 // Helper for MCP text response
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
 });
+
+export function createMcpServer(): McpServer {
+const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 
 // 1. Quick Search
 server.tool(
@@ -374,7 +374,7 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
   catch (err) { return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] }; }
 };
 
-server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions/stealth are accepted but only force browser mode.', {
+server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions (click/type/press/scroll/wait/wait_for) and stealth force the browser. PDF and Office URLs are converted to text.', {
   urls: z.array(z.string()), max_chars: z.number().int().optional(), mode: z.string().optional(),
   actions: z.array(z.record(z.any())).optional(), stealth: z.boolean().optional(),
 }, safe(webCrawl));
@@ -382,6 +382,13 @@ server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|brow
 server.tool('web_map', 'List URLs of a site from sitemap or page links. Fast, no content read.', {
   url: z.string(), limit: z.number().int().optional(), search: z.string().optional(), include_subdomains: z.boolean().optional(),
 }, safe(webMap));
+
+server.tool('web_crawl_start', 'Start a background site crawl: follow links from url, markdown per page. include/exclude are URL regexes. Poll with web_crawl_status.', {
+  url: z.string(), max_pages: z.number().int().optional(), max_depth: z.number().int().optional(),
+  include: z.array(z.string()).optional(), exclude: z.array(z.string()).optional(),
+  include_subdomains: z.boolean().optional(), respect_robots: z.boolean().optional(),
+  max_chars: z.number().int().optional(), mode: z.string().optional(), stealth: z.boolean().optional(),
+}, safe(webCrawlStart));
 
 server.tool('web_batch_start', 'Start a background batch crawl of up to 500 URLs; poll with web_crawl_status.', {
   urls: z.array(z.string()), max_chars: z.number().int().optional(), mode: z.string().optional(),
@@ -412,6 +419,11 @@ server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.'
   title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
 }, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));
 
-// Run stdio transport
-const transport = new StdioServerTransport();
-await server.connect(transport);
+
+return server;
+}
+
+// Stdio entry: `node dist/adapters/mcp/server.js`
+if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  await createMcpServer().connect(new StdioServerTransport());
+}
