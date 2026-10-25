@@ -13,13 +13,13 @@ export interface VaultArgs {
   stance_target?: string; stance?: string; run_id?: string; tags?: string[]; limit?: number; ranked?: boolean;
 }
 
-async function call(tool: string, args: Record<string, any>): Promise<any> {
+export async function call(tool: string, args: Record<string, any>, timeoutMs = 90000): Promise<any> {
   loadConfig();
   const url = process.env.WEB_AGENT_FEYNMAN_URL || 'http://127.0.0.1:8910/mcp';
   const client = new Client({ name: 'phrog-web', version: '1.0.0' });
   try {
     await client.connect(new StreamableHTTPClientTransport(new URL(url)));
-    const result: any = await client.callTool({ name: tool, arguments: args }, undefined, { timeout: 90000 });
+    const result: any = await client.callTool({ name: tool, arguments: args }, undefined, { timeout: timeoutMs });
     const text = (result.content ?? []).map((c: any) => c.text ?? '').join('\n').trim();
     if (result.isError) throw new Error(text || `Feynman tool ${tool} failed`);
     if (!text) return null;

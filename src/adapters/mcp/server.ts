@@ -16,6 +16,8 @@ import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '
 import { browse } from '../../providers/browse.js';
 import { extract } from '../../providers/extract.js';
 import { researchVault } from '../../providers/vault.js';
+import { researchSearch } from '../../providers/sources.js';
+import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
 // Helper for MCP text response
@@ -419,6 +421,31 @@ server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.'
   title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
 }, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));
 
+
+// Compat tools: same names/args/defaults as the old Python `web` MCP.
+server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news".', {
+  query: z.string(), limit: z.number().int().default(5), time_range: z.string().nullable().default(null),
+  language: z.string().nullable().default(null), categories: z.string().nullable().default(null),
+}, safe(webSearch));
+
+server.tool('research_search', 'Free key-less research APIs queried in parallel. preset: academic | tech | all; or pass sources (openalex, arxiv, semantic_scholar, crossref, wikipedia, hackernews, stackexchange).', {
+  query: z.string(), preset: z.string().default('academic'), sources: z.array(z.string()).nullable().default(null),
+  limit: z.number().int().default(3), stackexchange_site: z.string().default('stackoverflow'),
+}, safe(researchSearch));
+
+server.tool('deep_research_start', 'Start SLOW, staged deep research in Feynman. Returns a job_id for status polling. workflow: deepresearch | lit | compare | review | audit | summarize | recipe | draft. Poll with deep_research_status.', {
+  topic: z.string(), workflow: z.string().default('deepresearch'), profile: z.string().default('full'), tier: z.string().default('pending'),
+  budget_usd: z.number().nullable().default(null), register: z.string().nullable().default(null),
+  inference_depth: z.string().nullable().default(null), domain_notes: z.string().nullable().default(null),
+}, safe(deepResearchStart));
+
+server.tool('deep_research_status', 'Progress of a deep research job. When status is completed, include_result=True returns the cited markdown.', {
+  job_id: z.string(), include_result: z.boolean().default(false),
+}, safe(deepResearchStatus));
+
+server.tool('deep_research_resume', 'Resume an interrupted Feynman run from its durable checkpoint and first unfinished stage.', {
+  run_id: z.string(),
+}, safe(deepResearchResume));
 
 return server;
 }
