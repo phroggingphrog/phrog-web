@@ -6,6 +6,11 @@ import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
 import { searchGithubRepos } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
+import { searchMedia, MediaType } from './providers/media.js';
+import { setupDone } from './setup.js';
+import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
+import { searchSocial } from './providers/social.js';
+import { getTranscript } from './providers/transcript.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 
 const config = loadConfig();
@@ -146,6 +151,75 @@ fastify.get('/api/github/search', async (req, reply) => {
   }
 });
 
+// Media, books, social, transcripts
+fastify.get('/api/media', async (req, reply) => {
+  const { q, type, limit } = req.query as { q?: string; type?: string; limit?: string };
+  if (!q || !type || !['book', 'film', 'music'].includes(type)) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/media' });
+  }
+  try {
+    return await searchMedia(q, type as MediaType, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/books', async (req, reply) => {
+  const { q, limit } = req.query as { q?: string; limit?: string };
+  if (!q) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/books' });
+  }
+  try {
+    return await searchBooks(q, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/books/download', async (req, reply) => {
+  const b = (req.body || {}) as { ref?: string; md5?: string; id?: string; source?: BookSource };
+  const ref = b.ref || b.md5 || b.id;
+  if (!ref) return reply.status(400).send({ error: 'Provide ref (from /api/books), md5 or id' });
+  try {
+    return await downloadBook(String(ref), { source: b.source });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/social', async (req, reply) => {
+  const { q, sources, limit, time_range } = req.query as { q?: string; sources?: string; limit?: string; time_range?: string };
+  if (!q) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/social' });
+  }
+  try {
+    return await searchSocial(q, {
+      sources: sources ? sources.split(',').map(x => x.trim()).filter(Boolean) : undefined,
+      limit: limit ? parseInt(limit, 10) : undefined,
+      timeRange: time_range as 'day' | 'week' | 'month' | 'year' | undefined,
+    });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/transcript', async (req, reply) => {
+  const { url, lang, max_chars } = (req.body || {}) as { url?: string; lang?: string; max_chars?: number };
+  if (!url) {
+    return reply.status(400).send({ error: 'Missing or invalid parameters for /api/transcript' });
+  }
+  try {
+    return await getTranscript(url, { lang, maxChars: max_chars });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 // 6. DeepWiki AI Documentation API
 fastify.post('/api/deepwiki/ask', async (req, reply) => {
   const { repo, question } = req.body as { repo?: string; question?: string };
@@ -224,6 +298,7 @@ const host = config.server.host || '127.0.0.1';
 try {
   await fastify.listen({ port, host });
   console.log(`Phrog Web Gateway listening on http://${host}:${port}`);
+  if (!setupDone()) console.log('Run `pnpm setup` to enable books, ratings and X');
 } catch (err) {
   fastify.log.error(err);
   process.exit(1);

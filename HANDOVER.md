@@ -54,6 +54,17 @@ Searches GitHub repositories via local SearXNG GitHub engine with fallback to Gi
 curl "http://127.0.0.1:8890/api/github/search?q=fastify&limit=2"
 ```
 
+### C2. Media, Books, Social, Transcripts
+```bash
+curl "http://127.0.0.1:8890/api/media?q=dune&type=book&limit=5"        # type=book|film|music
+curl "http://127.0.0.1:8890/api/books?q=dune&limit=5"                  # search-only availability
+curl "http://127.0.0.1:8890/api/social?q=fastify&sources=reddit,hackernews&limit=5&time_range=month"
+curl -X POST http://127.0.0.1:8890/api/transcript -H 'Content-Type: application/json' \
+  -d '{"url":"https://www.youtube.com/watch?v=jNQXAC9IVRw","lang":"en","max_chars":2000}'
+```
+MCP tools: `media_search`, `book_availability`, `social_search`, `youtube_transcript`.
+Known blockers: Anna's Archive is behind DDoS-Guard; Z-Library needs login; Bluesky search returns 403; keyed ratings need `TMDB_API_KEY`, `OMDB_API_KEY`, `HARDCOVER_API_KEY`, `DISCOGS_TOKEN`.
+
 ### D. DeepWiki Codebase Q&A (`POST /api/deepwiki/ask`)
 Queries AI-generated, codebase-grounded documentation with inline citations via DeepWiki Streamable MCP (`mcp.deepwiki.com/mcp`). Auth-free for all public repos.
 ```bash
@@ -153,3 +164,11 @@ All engines are vendored under `engines/` with zero VPS-specific symlinks:
 ## 7. Next Work (Phase 2)
 1. **Agent Browser Module (`src/browser/`)**: Implement local cookie and `storageState.json` profile manager so external agents (Hermes / Playwright) can launch pre-authenticated browser sessions without Google accounts.
 2. **Systemd Service**: When desired, create `~/.config/systemd/user/phrog-web.service` to keep the gateway running persistently.
+
+## Books: search and download (Z-Library, Anna's Archive)
+- Engine: `engines/zlibrary-mcp` (vendored rookslog/zlibrary-mcp, stdio MCP; tools `search`, `get_book`, `download`, `get_limits`, `get_history`). Built in place: `npm install && npm run build && UV_PROJECT_ENVIRONMENT=$PWD/.venv uv sync --no-dev` inside it (`node_modules`, `.venv`, `dist` are gitignored, so rebuild after a fresh clone).
+- Bridge: `src/providers/books.ts` keeps one long-lived MCP client. Creds pass only from `loadConfig()` env (`ZLIBRARY_EMAIL`, `ZLIBRARY_PASSWORD`, optional `ZLIBRARY_EAPI_DOMAIN`, `ANNAS_SECRET_KEY`, `ANNAS_BASE_URL`).
+- Search: `GET /api/books?q=...&limit=` or MCP `book_availability` (rows carry a `ref`). Refs are in-memory in the engine process; they are lost on gateway restart, so search again before downloading.
+- Download: `POST /api/books/download` with `{"ref": "<ref from search>"}` or `{"md5"|"id": "...", "source": "annas|zlibrary"}` (md5/id is resolved by a search first). MCP: `book_download`. Returns `{path, bytes}`. Files go to `PHROG_WEB_DOWNLOADS` or `<repo>/downloads` (gitignored).
+- Setup: `pnpm setup` (or `node dist/setup.js`) asks for optional keys (hidden input for secrets), merges them into `~/.config/phrog-web.env` (mode 600, existing keys kept, one backup per run in `~/backups/phrog-web/`, newest 3 kept), then prints a check table. `node dist/setup.js --check` only checks. The gateway logs "Run `pnpm setup`..." on start when no setup marker or key exists.
+- Blockers: no credentials entered yet (owner adds them). From this VPS Anna's website search fails (403 DDoS-Guard), so Anna search may stay down even with a key; Anna downloads use the member key API and may work. LibGen needs no key but is not in the default sources (pass `sources: ["libgen"]`). Z-Library and Anna success paths are untested without credentials. Failed searches return in about 11s (Anna's internal retries).
