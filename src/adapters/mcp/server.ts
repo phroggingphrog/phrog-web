@@ -15,10 +15,13 @@ import { getTranscript } from '../../providers/transcript.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '../../providers/crawl.js';
 import { browse } from '../../providers/browse.js';
 import { extract } from '../../providers/extract.js';
+import { runAgent } from '../../providers/agent.js';
 import { researchVault } from '../../providers/vault.js';
 import { researchSearch } from '../../providers/sources.js';
 import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
+import { logged, recentRuns } from '../../runlog.js';
+import { saveToBrainWiki } from '../../wiki/brain.js';
 
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
@@ -26,6 +29,14 @@ const text = (data: unknown) => ({
 
 export function createMcpServer(): McpServer {
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
+// Log every tool call: wrap the handler (always the last argument) of each server.tool registration.
+const origTool = server.tool.bind(server) as (...a: any[]) => unknown;
+(server as any).tool = (...args: any[]) => {
+  const name = args[0] as string;
+  const last = args.length - 1;
+  if (typeof args[last] === 'function') args[last] = logged(name, args[last]);
+  return origTool(...args);
+};
 
 server.tool(
   'quick_search',
@@ -137,7 +148,7 @@ server.tool(
           workflow: job.workflow,
           domain,
           status: job.status,
-          pollInstruction: `Call research_status with jobId "${job.jobId}" to inspect progress.`,
+          pollInstruction: `Call research_status with jobId "${job.jobId}" in about 60s, then follow its poll_after_s. Do not start a second research job for the same question.`,
         });
       }
     } catch (err) {
@@ -178,6 +189,11 @@ server.tool(
     const job = getResearchJob(jobId);
     if (!job) {
       return { isError: true, content: [{ type: 'text', text: `Research job "${jobId}" not found` }] };
+    }
+    if (job.status === 'running') {
+      const elapsed = Math.round((Date.now() - Date.parse(job.startedAt)) / 1000);
+      const poll_after_s = elapsed < 120 ? 60 : elapsed < 900 ? 180 : 300;
+      return text({ ...job, elapsed_s: elapsed, poll_after_s, hint: `Feynman research usually takes 5-60 minutes. Do not poll again for ${poll_after_s}s; continue other work and check back later.` });
     }
     return text(job);
   }
@@ -235,7 +251,7 @@ server.tool(
 
 server.tool(
   'wiki_save',
-  'Distill and save research findings or notes into the LLM Wiki (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
+  'Save a note into the LOCAL vector wiki in this repo (not the brain; for the brain wiki inbox use save_to_wiki). Distill and save research findings or notes (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
   {
     title: z.string().describe('Note title (becomes filename slug)'),
     content: z.string().describe('Markdown note content with sections, summaries, and citations'),
@@ -390,6 +406,11 @@ server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runn
   url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
 }, safe(browse));
 
+server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent. Returns {status,result,steps,escalated_to,sources}.', {
+  url: z.string(), goal: z.string(), schema: z.record(z.any()).optional(),
+  mode: z.enum(['auto', 'fetch', 'browse', 'deep']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
+}, safe((a) => runAgent(a)));
+
 server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
   urls: z.array(z.string()), schema: z.record(z.any()), instructions: z.string().optional(),
 }, safe(extract));
@@ -402,10 +423,14 @@ server.tool('research_vault', 'Search/read/save reusable evidence in the Feynman
   run_id: z.string().optional(), ranked: z.boolean().optional(),
 }, safe(researchVault));
 
-server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.', {
-  title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
-}, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));
+server.tool('save_to_wiki', 'Save gathered web material or a completed deep-research job to the owner\'s brain wiki inbox (~/brain/wiki/inbox/) as a proposal. kind: "note" (summary, key points, details, gaps, related, sources). Give urls (read for you), text (research already gathered) or a question (researched first); or a completed deep-research job_id to file its cited report unchanged. Provide either job_id or urls/text/question.', {
+  kind: z.string().default('note'), urls: z.array(z.string()).nullable().default(null), text: z.string().default(''),
+  question: z.string().default(''), title: z.string().default(''), target: z.string().default(''), job_id: z.string().default(''),
+}, safe(saveToBrainWiki));
 
+server.tool('run_log', 'Recent phrog-web run-log records (MCP and REST calls: duration, ok, provider info), newest first. Optional tool filter.', {
+  limit: z.number().int().default(50), tool: z.string().optional(),
+}, safe(({ limit, tool }: any) => recentRuns(limit, tool)));
 
 // Compat tools: same names/args/defaults as the old Python `web` MCP.
 server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news".', {
@@ -418,7 +443,7 @@ server.tool('research_search', 'Free key-less research APIs queried in parallel.
   limit: z.number().int().default(3), stackexchange_site: z.string().default('stackoverflow'),
 }, safe(researchSearch));
 
-server.tool('deep_research_start', 'Start SLOW, staged deep research in Feynman. Returns a job_id for status polling. workflow: deepresearch | lit | compare | review | audit | summarize | recipe | draft. Poll with deep_research_status.', {
+server.tool('deep_research_start', 'Start SLOW, staged deep research in Feynman. Returns a job_id for status polling. workflow: deepresearch | lit | compare | review | audit | summarize | recipe | draft. Poll with deep_research_status no more often than its poll_after_s (minutes, not seconds). Do not also start `research` for the same question.', {
   topic: z.string(), workflow: z.string().default('deepresearch'), profile: z.string().default('full'), tier: z.string().default('pending'),
   budget_usd: z.number().nullable().default(null), register: z.string().nullable().default(null),
   inference_depth: z.string().nullable().default(null), domain_notes: z.string().nullable().default(null),

@@ -36,7 +36,7 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
 // Feynman MCP runs deep research jobs one at a time.
 const WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'recipe', 'draft'];
 const MAX_TOTAL_MS = 12 * 3600 * 1000;
-interface DeepJob { id: string; kind: 'deep'; status: string; completed: number; total: null; error: string | null; note?: string; feynman_job_id?: string; result?: any }
+interface DeepJob { id: string; kind: 'deep'; status: string; started_at: number; completed: number; total: null; error: string | null; note?: string; feynman_job_id?: string; result?: any }
 const jobs = new Map<string, DeepJob>();
 let gate: Promise<unknown> = Promise.resolve();
 const field = (t: string, n: string) => t.match(new RegExp(`^${n}: (.+)$`, 'm'))?.[1].trim();
@@ -76,7 +76,7 @@ async function runDeep(job: DeepJob, p: Record<string, any>) {
 }
 
 function startDeep(p: Record<string, any>) {
-  const job: DeepJob = { id: randomUUID(), kind: 'deep', status: 'queued', completed: 0, total: null, error: null, note: 'waiting for the Feynman slot' };
+  const job: DeepJob = { id: randomUUID(), kind: 'deep', status: 'queued', started_at: Date.now(), completed: 0, total: null, error: null, note: 'waiting for the Feynman slot' };
   jobs.set(job.id, job);
   gate = gate.then(async () => {
     job.status = 'running'; job.note = undefined;
@@ -114,6 +114,13 @@ export function deepResearchStatus(a: { job_id: string; include_result?: boolean
   const out: Record<string, any> = { job_id: job.id, kind: 'deep', status: job.status, completed: job.completed, total: job.total, error: job.error };
   if (job.feynman_job_id) out.run_id = job.feynman_job_id;
   if (job.note) out.note = job.note;
+  const elapsed = Math.round((Date.now() - job.started_at) / 1000);
+  out.elapsed_s = elapsed;
+  if (job.status === 'queued' || job.status === 'running') {
+    // Feynman runs take 5-60+ min; tell clients not to poll in a tight loop.
+    out.poll_after_s = elapsed < 120 ? 60 : elapsed < 900 ? 180 : 300;
+    out.hint = `Deep research usually takes 5-60 minutes. Do not poll again for ${out.poll_after_s}s; continue other work (or answer with what you have) and check back later.`;
+  }
   if (job.result) {
     const { deliverable, status, ...rest } = job.result;
     out.research_status = status;

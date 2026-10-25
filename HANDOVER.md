@@ -207,3 +207,33 @@ Remaining gaps:
 - Backed by `executeSearch`. SearXNG-served results (and answers/infoboxes/suggestions/unresponsive_engines) pass through unchanged via `SearchResult.raw` / `SearchResponse.envelope`. TinyFish/Consensus results get the same keys filled (engine = provider, category general).
 - Academic categories (science/academic/papers) go through the existing Consensus -> SearXNG pipeline, so those results carry engine `consensus`.
 - Point a SearXNG client (e.g. DeepTutor) at `http://127.0.0.1:8890` as base URL.
+
+## CLI (feat/tinyfish-parity)
+- `src/cli.ts` -> `dist/cli.js`, bin `phrog-web`. Node built-ins only; calls the REST API (default `http://127.0.0.1:8890`, override `PHROG_WEB_URL` or `--url`).
+- Commands: `search`, `fetch`, `crawl`, `map`, `extract --schema`, `social`, `media --type`, `books`, `transcript`, `agent <url> "<goal>"` (needs `/api/agent`; 404 gives a clear message).
+- Full results go to `./phrog-web-out/<cmd>-<timestamp>.json|md` (or `--out`); stdout gets only a short summary and the file path, so model context stays small. `--stdout` prints everything, `--json` prints raw JSON. Non-zero exit on HTTP/network errors.
+- `crawl` POSTs `/api/crawl/start`, polls `/api/batch/:id`, then pages results 50 at a time.
+
+---
+
+## Agent endpoint (`POST /api/agent`, `POST /api/agent/stream`, MCP `web_agent_run`)
+
+Research notes (phrog-web search/fetch, 2026-10-26):
+- TinyFish Agent API: `POST /v1/automation/run` (blocking), `/run-async` (run_id, poll `GET /v1/runs/{id}`), `/run-sse` (streamed events, no Last-Event-ID reconnect; poll the run instead). Body is url + goal, optional JSON schema. https://docs.tinyfish.ai/agent-api/reference
+- TinyFish run-level failures: TASK_FAILED, SITE_BLOCKED, MAX_STEPS_EXCEEDED, TIMEOUT. `agent_config.max_steps` and `mode: strict` are beta-only. Same reference page. Event names (STARTED, PROGRESS, COMPLETE) are from the TinyFish docs and SDK; the per-event list was not rendered by our fetch, so STREAMING_URL/HEARTBEAT are unverified.
+- TinyFish structured output uses a restricted JSON Schema keyword allowlist with size/depth limits: https://docs.tinyfish.ai/key-concepts/structured-output
+- browser-use: Python agent loop (observe page state, LLM picks action, run, repeat) with custom tools, structured output (pydantic model) and a max_steps cap: https://github.com/browser-use/browser-use
+- Stagehand: three primitives, `act` (one action), `observe` (list candidate actions), `extract` (schema-typed data); deterministic code mixed with LLM steps: https://github.com/browserbase/stagehand
+- Skyvern: task = prompt/`navigation_goal` + optional `data_extraction_schema`, returns schema-shaped JSON: https://github.com/skyvern-ai/skyvern
+- Common pattern: cheap read first, interactive loop only when needed, schema-validated output, hard step/time caps, failure statuses instead of guessing.
+
+Implementation (`src/providers/agent.ts`, no new services): ladder `fetch` (crawl + extract.ts with an `answerable` flag) -> `browse` (Jev runner, output shaped to JSON by the LLM) -> `deep` (A2A agent 127.0.0.1:42619, token from `~/.config/web-agent-deep/a2a-token`). Auto mode starts at browse for interactive goals (click/type/wait...) and at deep for multi-page goals; otherwise escalates only when the fetch level says the page text lacks the answer. `max_steps` caps rungs (1-3), `timeout_s` (default 180) is the overall deadline.
+Request `{url, goal, schema?, mode?: auto|fetch|browse|deep, max_steps?, timeout_s?}`; response `{status: COMPLETED|FAILED, result, steps:[{action,detail,ms}], escalated_to, sources, error?}`. Stream events: STARTED, PROGRESS, COMPLETE or ERROR (SSE `data:` lines).
+Verified on PORT=8899: quotes.toscrape.com stayed at fetch (5s); the-internet dynamic_loading/1 escalated to browse and returned "Hello World!" (15s); books.toscrape.com cheapest book with schema returned "Starving Hearts (Triangular Trade ...", £13.99 at fetch (7s). The deep rung is wired but not exercised.
+
+---
+
+## Run logs and save_to_wiki (brain)
+
+- `src/runlog.ts`: JSON-lines log (default `~/.local/state/phrog-web/runs.jsonl`, `PHROG_WEB_RUNLOG`; rotates at 10MB, keeps 3). MCP tools are logged by wrapping `server.tool` handlers in `createMcpServer`; REST via Fastify onSend/onResponse hooks for `/api/*`. Keys matching key/token/secret/password/auth/cookie are redacted; strings truncated at 200 chars. Reads: `GET /api/runs?limit=&tool=`, MCP `run_log`. Failed `POST /mcp` (status >= 400) is logged with rpc method and accept/content-type headers (a client without `Accept: application/json, text/event-stream` gets 406).
+- `save_to_wiki` now matches the old Python tool (kind, urls, text, question, title, target, job_id) by running `engines/save_to_wiki_cli.py` (wraps `web_acquisition.wiki`) in `engines/.venv`. Output: `$WEB_AGENT_WIKI_INBOX` or `~/brain/wiki/inbox`. `wiki_save`/`wiki_search` stay the local vector wiki.
