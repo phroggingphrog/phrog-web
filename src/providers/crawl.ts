@@ -3,7 +3,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { loadConfig } from '../config.js';
-import { executeFetch } from './fetch.js';
+import { executeFetch, renderedLinks } from './fetch.js';
 
 const MAX_URLS = Number(process.env.WEB_MCP_MAX_URLS || 10);
 const MAX_MARKDOWN_CHARS = Number(process.env.WEB_MCP_MAX_MARKDOWN_CHARS || 50000);
@@ -146,6 +146,7 @@ export async function webMap(args: Args): Promise<Args> {
     try {
       const r = await httpGet(url);
       urls = [r.final, ...linksOf(r.final, r.body)];
+      if (urls.filter((u) => sameSite(u, url, subs)).length < 4) urls.push(...(await renderedLinks(r.final)));
     } catch (err) {
       return { url, source: 'none', count: 0, urls: [], error: err instanceof Error ? err.message : String(err) };
     }
@@ -287,6 +288,7 @@ export async function webCrawlStart(args: Args): Promise<Args> {
         try {
           const r = await httpGet(url);
           if (/html/i.test(r.body.slice(0, 2000)) || r.body.includes('<a ')) links = linksOf(r.final, r.body);
+          if (links.filter((l) => sameSite(l, start, subs)).length < 3 && mode !== 'plain') links.push(...(await renderedLinks(r.final)));
         } catch { /* content fetch below reports the failure */ }
         const page = await crawlOne(url, maxChars, mode, { stealth });
         job.results.push({ ...page, depth });

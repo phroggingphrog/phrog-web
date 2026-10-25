@@ -21,7 +21,7 @@ export function documentKind(url: string, contentType: string): string | null {
   return ['.pdf', '.docx', '.xlsx', '.pptx'].find((e) => path.endsWith(e)) ?? null;
 }
 
-function run(cmd: string, args: string[], input: Buffer, timeoutMs = 60000): Promise<string> {
+export function run(cmd: string, args: string[], input: Buffer, timeoutMs = 60000): Promise<string> {
   return new Promise((resolve, reject) => {
     const p = spawn(cmd, args, { stdio: ['pipe', 'pipe', 'pipe'] });
     let out = '', err = '';
@@ -35,7 +35,7 @@ function run(cmd: string, args: string[], input: Buffer, timeoutMs = 60000): Pro
   });
 }
 
-const pyPath = () =>
+export const pyPath = () =>
   process.env.PHROG_WEB_PYTHON || `${homedir()}/workspace/self-hosted-web-mcp/.venv/bin/python`;
 
 export async function convertDocument(ext: string, body: Buffer): Promise<{ title: string; markdown: string }> {
@@ -48,4 +48,15 @@ export async function convertDocument(ext: string, body: Buffer): Promise<{ titl
   const code = 'import sys,io;from markitdown import MarkItDown,StreamInfo;r=MarkItDown(enable_plugins=False).convert_stream(io.BytesIO(sys.stdin.buffer.read()),stream_info=StreamInfo(extension=sys.argv[1]));print(r.markdown)';
   const md = await run(py, ['-I', '-c', code, ext], body);
   return { title: '', markdown: md.trim() };
+}
+
+// Main-content extraction via Trafilatura (same Python venv); null on any failure so the caller can fall back.
+export async function extractMain(html: string, url: string): Promise<{ title: string; markdown: string } | null> {
+  const py = pyPath();
+  if (!existsSync(py)) return null;
+  const code = 'import sys,json,trafilatura as t;h=sys.stdin.buffer.read().decode("utf-8","replace");m=t.extract(h,url=sys.argv[1],output_format="markdown",include_links=True,include_tables=True,favor_recall=True);md=t.extract_metadata(h);print(json.dumps({"title":(md.title if md else "") or "","markdown":m or ""}))';
+  try {
+    const out = JSON.parse(await run(py, ['-I', '-c', code, url], Buffer.from(html, 'utf8'), 10000));
+    return out.markdown && out.markdown.length >= 150 ? out : null;
+  } catch { return null; }
 }
