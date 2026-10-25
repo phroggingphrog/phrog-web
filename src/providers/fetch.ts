@@ -1,5 +1,5 @@
 import { loadConfig } from '../config.js';
-import { documentKind, convertDocument } from './document.js';
+import { documentKind, convertDocument, extractMain } from './document.js';
 
 export interface FetchResult {
   url: string;
@@ -73,7 +73,10 @@ async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResu
     return { url, title: doc.title, markdown: cut, length: cut.length, provider_used: `plain:${docExt.slice(1)}`, statusCode: res.status };
   }
   const html = await res.text();
-  const { title, markdown } = cleanHtmlToMarkdown(html);
+  const cleaned = cleanHtmlToMarkdown(html);
+  const main = await extractMain(html, res.url || url);
+  const title = main?.title || cleaned.title;
+  const markdown = main ? main.markdown : cleaned.markdown;
 
   // If text is suspiciously small, it might be a JS-only SPA
   if (markdown.length < 150 && html.includes('<script')) {
@@ -123,7 +126,7 @@ function compileActions(actions: Array<Record<string, any>>): { scripts: string[
     const sel = step.selector;
     if (['click', 'type', 'wait_for'].includes(kind) && (typeof sel !== 'string' || !sel || sel.length > 200)) throw new Error(`${kind} needs a CSS selector (max 200 chars)`);
     let body: string;
-    if (kind === 'click') { interactive = true; body = `const e=document.querySelector(${q(sel)});if(!e)return 'no match: '+${q(sel)};e.click();return 'clicked';`; }
+    if (kind === 'click') { interactive = true; body = `const e=document.querySelector(${q(sel)});if(!e)return 'no match: '+${q(sel)};const a=e.closest('a[href]');const h=a&&a.getAttribute('href');if(h&&!${step.noNav}&&!/^(javascript:|#)/i.test(h)&&(!a.target||a.target==='_self')){document.body.setAttribute('data-pw-nav',a.href);return 'nav';}e.click();return 'clicked';`; }
     else if (kind === 'type') {
       interactive = true;
       body = `const e=document.querySelector(${q(sel)});if(!e)return 'no match: '+${q(sel)};e.focus();e.value=${q(String(step.text ?? '').slice(0, 2000))};e.dispatchEvent(new Event('input',{bubbles:true}));e.dispatchEvent(new Event('change',{bubbles:true}));return 'typed';`;
@@ -160,7 +163,15 @@ function crawl4aiRequest(url: string, options: FetchOptions): { path: string; bo
   return { path: '/crawl', body };
 }
 
-async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchResult> {
+async function fetchCrawl4ai(url: string, options: FetchOptions, hops = 0): Promise<FetchResult> {
+  // A click that navigates hangs Crawl4AI /execute_js, so a link click only marks the target; we then crawl the target with the remaining actions.
+  let rest: Array<Record<string, any>> | undefined;
+  const full = options;
+  const ci = options.actions?.findIndex((a) => a?.type === 'click') ?? -1;
+  if (hops !== 99 && options.actions && ci >= 0 && ci < options.actions.length - 1) {
+    rest = options.actions.slice(ci + 1);
+    options = { ...options, actions: options.actions.slice(0, ci + 1) };
+  }
   const config = loadConfig();
   const providerCfg = config.fetch.providers.crawl4ai || {};
   const primaryUrl = providerCfg.primaryUrl || 'http://127.0.0.1:11235';
@@ -191,6 +202,12 @@ async function fetchCrawl4ai(url: string, options: FetchOptions): Promise<FetchR
       }
 
       const data = await res.json() as any;
+      const nav = typeof data.html === 'string' && data.html.match(/data-pw-nav="([^"]+)"/);
+      if (nav && hops < 5) {
+        const target = nav[1].replace(/&amp;/g, '&');
+        return await fetchCrawl4ai(target, { ...options, actions: rest }, hops + 1);
+      }
+      if (rest) return await fetchCrawl4ai(url, { ...full, actions: full.actions!.map((a, i) => (a?.type === 'click' && i === ci ? { ...a, noNav: true } : a)) }, 99);
       const resultObj = Array.isArray(data.results) ? data.results[0] : (data.result || data);
       const md = resultObj?.markdown;
       const markdown = (typeof md === 'string' ? md : (md?.fit_markdown || md?.raw_markdown)) || resultObj?.text || '';
@@ -283,4 +300,24 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
   }
 
   throw new Error(`All fetch providers failed for ${url}. Errors: ${errors.join('; ')}`);
+}
+
+// Links from the rendered DOM (Crawl4AI /crawl `links.internal`), for JS-built sites where plain HTML has few anchors.
+export async function renderedLinks(url: string): Promise<string[]> {
+  const providerCfg = loadConfig().fetch.providers.crawl4ai || {};
+  const token = process.env.CRAWL4AI_API_TOKEN || '';
+  for (const base of [providerCfg.primaryUrl || 'http://127.0.0.1:11235', providerCfg.fallbackUrl || 'http://127.0.0.1:11236']) {
+    try {
+      const res = await fetch(new URL('/crawl', base).toString(), {
+        method: 'POST', signal: AbortSignal.timeout(40000),
+        headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: JSON.stringify({ urls: [url], priority: 10, crawler_config: { type: 'CrawlerRunConfig', params: { delay_before_return_html: 1.5 } } }),
+      });
+      if (!res.ok) continue;
+      const data = await res.json() as any;
+      const links = data.results?.[0]?.links;
+      return [...(links?.internal ?? []), ...(links?.external ?? [])].map((l: any) => String(l.href || '').split('#')[0]).filter(Boolean);
+    } catch { /* try next */ }
+  }
+  return [];
 }

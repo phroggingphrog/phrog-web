@@ -189,7 +189,9 @@ Remaining gaps:
 
 
 ## Crawl capabilities added (feat/http-mcp-crawl)
-- `web_crawl` `actions` (click/type/press/scroll/wait/wait_for) and `stealth` are sent to Crawl4AI (`/crawl` run config for scroll/wait, `/execute_js` for click/type/press, `enable_stealth` browser config). A click that navigates the page hangs Crawl4AI `/execute_js` (60s timeout).
+- `web_crawl` `actions` (click/type/press/scroll/wait/wait_for) and `stealth` are sent to Crawl4AI (`/crawl` run config for scroll/wait, `/execute_js` for click/type/press, `enable_stealth` browser config). A click on a link that navigates hangs Crawl4AI `/execute_js` (Python engine has the same limit; Crawl4AI rejects `js_code`/`c4a_script` from API requests). Fix: a click on `<a href>` only marks the target (`data-pw-nav`), then the target is crawled with the remaining actions (`fetchCrawl4ai` in src/providers/fetch.ts). Non-link clicks run normally.
 - PDF (`pdftotext`) and Office (MarkItDown in the Python venv, `PHROG_WEB_PYTHON`, default `~/workspace/self-hosted-web-mcp/.venv/bin/python`) are converted in the plain fetcher (`src/providers/document.ts`).
 - `web_crawl_start` (also `POST /api/crawl/start`): same args as the Python tool; jobs share the batch job map and are read with `web_crawl_status`. In-process only.
-- Not ported: Trafilatura extraction (plain fetch still uses the regex cleaner), browser-rendered link discovery in site crawls (links come from plain HTML), daemon-persisted jobs, Python-style crawl job disk state.
+- Plain fetch now uses Trafilatura (`extractMain` in document.ts, per-call subprocess in the same Python venv, 10s timeout, falls back to the regex cleaner). Office conversion verified on real .docx/.xlsx.
+- `web_map` (links fallback) and `web_crawl_start` add Crawl4AI rendered `links` when plain HTML has fewer than 4 (map) / 3 (crawl) same-site links (`renderedLinks`); skipped in crawl mode `plain`.
+- Not ported: daemon-persisted jobs, Python-style crawl job disk state.

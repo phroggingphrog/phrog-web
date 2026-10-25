@@ -3,7 +3,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
 import { loadConfig } from '../config.js';
-import { executeFetch } from './fetch.js';
+import { executeFetch, renderedLinks } from './fetch.js';
 
 const MAX_URLS = Number(process.env.WEB_MCP_MAX_URLS || 10);
 const MAX_MARKDOWN_CHARS = Number(process.env.WEB_MCP_MAX_MARKDOWN_CHARS || 50000);
@@ -92,13 +92,19 @@ async function httpGet(url: string, timeoutMs = 20000): Promise<{ final: string;
   return { final: res.url || url, status: res.status, body: await res.text() };
 }
 
+function isJunk(u: URL): boolean {
+  return !['http:', 'https:'].includes(u.protocol) || u.pathname.startsWith('/cdn-cgi/');
+}
+
+function bare(h: string): string { return h.replace(/^www\./, ''); }
+
 function linksOf(base: string, html: string): string[] {
   const out: string[] = [];
   for (const m of html.matchAll(/<a\b[^>]*?\shref\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)) {
     try {
       const u = new URL((m[1] ?? m[2]).trim(), base);
       u.hash = '';
-      if (['http:', 'https:'].includes(u.protocol)) out.push(u.toString());
+      if (['http:', 'https:'].includes(u.protocol) && !isJunk(u)) out.push(u.toString());
     } catch { /* skip */ }
   }
   return out;
@@ -106,7 +112,9 @@ function linksOf(base: string, html: string): string[] {
 
 function sameSite(u: string, root: string, subs: boolean): boolean {
   try {
-    const a = new URL(u).hostname, b = new URL(root).hostname;
+    const ua = new URL(u);
+    if (isJunk(ua)) return false;
+    const a = bare(ua.hostname), b = bare(new URL(root).hostname);
     return a === b || (subs && a.endsWith('.' + b));
   } catch { return false; }
 }
@@ -133,11 +141,13 @@ export async function webMap(args: Args): Promise<Args> {
   const subs = Boolean(pick(args, 'include_subdomains', 'includeSubdomains', false));
   const p = new URL(url);
   let sitemaps: string[] = [];
+  let origin = p.origin;
   try {
     const r = await httpGet(`${p.protocol}//${p.host}/robots.txt`, 10000);
+    origin = new URL(r.final).origin;
     if (r.status === 200) sitemaps = [...r.body.matchAll(/^sitemap:\s*(\S+)/gim)].map((m) => m[1]);
   } catch { /* none */ }
-  const candidates = sitemaps.length ? sitemaps : [`${p.protocol}//${p.host}/sitemap.xml`];
+  const candidates = sitemaps.length ? sitemaps : [`${origin}/sitemap.xml`];
   let urls: string[] = [];
   let source = 'sitemap';
   for (const sm of candidates.slice(0, 3)) urls.push(...(await sitemapUrls(sm, limit)));
@@ -146,14 +156,16 @@ export async function webMap(args: Args): Promise<Args> {
     try {
       const r = await httpGet(url);
       urls = [r.final, ...linksOf(r.final, r.body)];
+      if (urls.filter((u) => sameSite(u, url, subs)).length < 4) urls.push(...(await renderedLinks(r.final)));
     } catch (err) {
       return { url, source: 'none', count: 0, urls: [], error: err instanceof Error ? err.message : String(err) };
     }
   }
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const u of urls) {
-    if (seen.has(u) || !sameSite(u, url, subs)) continue;
+  for (const raw of urls) {
+    const u = raw.split('#')[0];
+    if (seen.has(u) || !(sameSite(u, url, subs) || sameSite(u, origin, subs))) continue;
     if (search && !u.toLowerCase().includes(search.toLowerCase())) continue;
     seen.add(u);
     out.push(u);
@@ -287,6 +299,7 @@ export async function webCrawlStart(args: Args): Promise<Args> {
         try {
           const r = await httpGet(url);
           if (/html/i.test(r.body.slice(0, 2000)) || r.body.includes('<a ')) links = linksOf(r.final, r.body);
+          if (links.filter((l) => sameSite(l, start, subs)).length < 3 && mode !== 'plain') links.push(...(await renderedLinks(r.final)));
         } catch { /* content fetch below reports the failure */ }
         const page = await crawlOne(url, maxChars, mode, { stealth });
         job.results.push({ ...page, depth });
