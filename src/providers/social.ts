@@ -88,6 +88,9 @@ async function reddit(q: string, limit: number, t?: string): Promise<SocialPost[
   const errs: string[] = [];
   for (const base of bases) {
     const local = /^https?:\/\/(127\.0\.0\.1|localhost)/.test(base);
+    // public Redlib instances intermittently return 404 / empty pages when Reddit rate-limits them
+    for (let attempt = 0; attempt < (local ? 1 : 3); attempt++) {
+    if (attempt) await new Promise((r) => setTimeout(r, 1500 * attempt));
     try {
       const res = await fetch(`${base}/search?q=${encodeURIComponent(q)}&type=link${t ? `&t=${t}` : ''}`, {
         headers: { 'User-Agent': 'phrog-web/1.0', Accept: 'text/html' }, // browser UAs trigger Anubis challenges on public Redlib instances
@@ -98,7 +101,9 @@ async function reddit(q: string, limit: number, t?: string): Promise<SocialPost[
       if (posts.length) return posts;
       throw new Error('no posts parsed');
     } catch (e: any) {
-      errs.push(`${base}: ${e?.cause?.code || e?.message}`);
+      errs.push(`${base}${attempt ? ` (retry ${attempt})` : ''}: ${e?.cause?.code || e?.message}`);
+      if (e?.cause?.code === 'ECONNREFUSED') break;
+    }
     }
   }
   throw new Error(`redlib failed (${errs.join('; ')})`);
