@@ -18,6 +18,7 @@ export interface SearchResult {
 
 export interface SearchOptions {
   mode?: 'quick' | 'live' | 'deep' | 'academic';
+  domain?: string;
   categories?: string[];
   timeRange?: 'day' | 'week' | 'month' | 'year';
   engines?: string[];
@@ -42,15 +43,17 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<Sea
   url.searchParams.set('q', query);
   url.searchParams.set('format', 'json');
 
-  if (options.categories?.length) {
-    url.searchParams.set('categories', options.categories.join(','));
+  const explicitCats = options.categories || (options.domain ? [options.domain] : undefined);
+  if (explicitCats?.length) {
+    url.searchParams.set('categories', explicitCats.join(','));
   } else if (options.mode === 'academic') {
     url.searchParams.set('categories', 'science,academic');
   } else if (options.mode === 'live') {
     url.searchParams.set('categories', 'news,general');
     url.searchParams.set('time_range', options.timeRange || 'day');
   } else if (options.mode === 'deep') {
-    url.searchParams.set('categories', 'general,it,science');
+    // Domain-agnostic by default; broad multi-engine web search
+    url.searchParams.set('categories', 'general');
   }
 
   if (options.timeRange && !url.searchParams.has('time_range')) {

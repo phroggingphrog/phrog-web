@@ -11,16 +11,25 @@ export interface ResearchCitation {
 
 export interface QuickResearchResponse {
   mode: 'quick';
+  domain: string;
   question: string;
   answer: string;
   citations: ResearchCitation[];
   provider_used: string;
 }
 
+export interface QuickResearchOptions {
+  domain?: 'web' | 'academic' | 'discussions' | 'all';
+  sources?: string[];
+  instructions?: string;
+  optimizationMode?: 'speed' | 'balanced' | 'quality';
+}
+
 export interface ResearchJob {
   jobId: string;
   workflow: string;
   topic: string;
+  domain?: string;
   pid?: number;
   status: 'running' | 'completed' | 'failed';
   startedAt: string;
@@ -35,11 +44,26 @@ export interface ResearchJob {
 // In-memory registry of active and completed jobs
 const jobs = new Map<string, ResearchJob>();
 
-// 1. Quick Research (Vane Engine)
-export async function executeQuickResearch(question: string, options: { instructions?: string } = {}): Promise<QuickResearchResponse> {
+// 1. Quick Research (Vane Engine with Academic / Multi-Domain support)
+export async function executeQuickResearch(
+  question: string,
+  options: QuickResearchOptions = {}
+): Promise<QuickResearchResponse> {
   const config = loadConfig();
   const vaneUrl = config.research?.vane?.url || 'http://127.0.0.1:3000';
   const timeoutMs = config.research?.vane?.timeoutMs || 120000;
+
+  // Resolve sources
+  let sources = ['web'];
+  if (options.sources?.length) {
+    sources = options.sources;
+  } else if (options.domain === 'academic') {
+    sources = ['academic'];
+  } else if (options.domain === 'discussions') {
+    sources = ['discussions'];
+  } else if (options.domain === 'all') {
+    sources = ['web', 'academic', 'discussions'];
+  }
 
   const res = await fetch(`${vaneUrl}/api/search`, {
     method: 'POST',
@@ -48,8 +72,8 @@ export async function executeQuickResearch(question: string, options: { instruct
     body: JSON.stringify({
       chatModel: { providerId: 'omniroute', key: 'deepseek-flash' },
       embeddingModel: { providerId: '15a56ef4-b6da-49c0-b2e4-8f865dac9d39', key: 'Xenova/all-MiniLM-L6-v2' },
-      optimizationMode: 'balanced',
-      sources: ['web'],
+      optimizationMode: options.optimizationMode || 'balanced',
+      sources,
       query: question,
       history: [],
       stream: false,
@@ -74,6 +98,7 @@ export async function executeQuickResearch(question: string, options: { instruct
 
   return {
     mode: 'quick',
+    domain: options.domain || 'web',
     question,
     answer: data.message,
     citations,
@@ -84,7 +109,7 @@ export async function executeQuickResearch(question: string, options: { instruct
 // 2. Deep Research (Headless Feynman Autonomous Agent)
 export function dispatchDeepResearch(
   topic: string,
-  options: { workflow?: string; callbackUrl?: string } = {}
+  options: { workflow?: string; domain?: string; callbackUrl?: string } = {}
 ): ResearchJob {
   const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const workflow = options.workflow || 'deepresearch';
@@ -94,6 +119,7 @@ export function dispatchDeepResearch(
     jobId,
     workflow,
     topic,
+    domain: options.domain,
     status: 'running',
     startedAt: new Date().toISOString(),
     callbackUrl: options.callbackUrl,
@@ -130,7 +156,6 @@ export function dispatchDeepResearch(
 
       if (exitCode === 0) {
         job.status = 'completed';
-        // Locate latest generated markdown in outputs/ or papers/
         job.deliverable = findLatestDeliverable(resolve(process.cwd(), 'engines/feynman/outputs')) || stdout;
       } else {
         job.status = 'failed';
@@ -174,7 +199,6 @@ function findLatestDeliverable(dir: string): string | undefined {
   if (!existsSync(dir)) return undefined;
   const files = readdirSync(dir).filter(f => f.endsWith('.md') && !f.endsWith('.provenance.md'));
   if (files.length === 0) return undefined;
-  // Read the newest file
   const newest = files[files.length - 1];
   return readFileSync(join(dir, newest), 'utf8');
 }

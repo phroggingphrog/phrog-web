@@ -83,6 +83,7 @@ fastify.post('/api/research', async (req, reply) => {
     question?: string;
     topic?: string;
     mode?: 'quick' | 'deep';
+    domain?: 'web' | 'academic' | 'discussions' | 'all';
     workflow?: string;
     callback_url?: string;
     instructions?: string;
@@ -97,7 +98,7 @@ fastify.post('/api/research', async (req, reply) => {
 
   if (mode === 'quick') {
     try {
-      const quickResult = await executeQuickResearch(prompt, { instructions: body.instructions });
+      const quickResult = await executeQuickResearch(prompt, { domain: body.domain, instructions: body.instructions });
       return quickResult;
     } catch (err) {
       req.log.error(err);

@@ -70,17 +70,18 @@ server.tool(
   }
 );
 
-// 4. Deep Search
+// 4. Deep Search (Domain-Agnostic by default)
 server.tool(
   'deep_search',
-  'Multi-category search aggregating general web, tech/code repositories (GitHub), and academic literature (arXiv).',
+  'Domain-agnostic deep search. Searches broadly across the general web by default, or accepts an optional domain/category parameter.',
   {
-    query: z.string().describe('Technical or academic search query'),
+    query: z.string().describe('Search query string'),
+    domain: z.string().optional().describe('Optional domain filter, e.g. "science", "it", "news", or custom category'),
     limit: z.number().int().min(1).max(30).optional().describe('Maximum results to return'),
   },
-  async ({ query, limit }) => {
+  async ({ query, domain, limit }) => {
     try {
-      const res = await executeSearch(query, { mode: 'deep', limit });
+      const res = await executeSearch(query, { mode: 'deep', domain, limit });
       return text(res);
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
@@ -110,23 +111,25 @@ server.tool(
 // 6. Universal Research (Vane Quick + Feynman Staged Workflows)
 server.tool(
   'research',
-  'Research a topic. Quick mode synthesizes answers in 3-5s (Vane). Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
+  'Research a topic. Quick mode synthesizes answers in 3-5s (Vane) across web or academic domains. Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
   {
     question: z.string().describe('Research question or topic'),
+    domain: z.enum(['web', 'academic', 'discussions', 'all']).default('web').describe('Domain target: web (general), academic (papers/arXiv/PubMed), or discussions (forums)'),
     workflow: z.enum(['quick', 'deepresearch', 'lit', 'compare', 'audit', 'review', 'draft', 'recipe', 'summarize']).default('quick').describe('Research workflow'),
     callback_url: z.string().url().optional().describe('Optional webhook URL to receive deep research results upon completion'),
   },
-  async ({ question, workflow, callback_url }) => {
+  async ({ question, domain, workflow, callback_url }) => {
     try {
       if (workflow === 'quick') {
-        const res = await executeQuickResearch(question);
+        const res = await executeQuickResearch(question, { domain });
         return text(res);
       } else {
-        const job = dispatchDeepResearch(question, { workflow, callbackUrl: callback_url });
+        const job = dispatchDeepResearch(question, { workflow, domain, callbackUrl: callback_url });
         return text({
-          message: `Autonomous Feynman research job dispatched for workflow "${workflow}".`,
+          message: `Autonomous Feynman research job dispatched for workflow "${workflow}" (domain: ${domain}).`,
           jobId: job.jobId,
           workflow: job.workflow,
+          domain,
           status: job.status,
           pollInstruction: `Call research_status with jobId "${job.jobId}" to inspect progress.`,
         });
