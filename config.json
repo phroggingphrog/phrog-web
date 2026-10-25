@@ -1,0 +1,48 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8890
+  },
+  "search": {
+    "pipeline": ["searxng", "tinyfish"],
+    "providers": {
+      "searxng": {
+        "url": "http://127.0.0.1:8888",
+        "timeoutMs": 4500,
+        "defaultCategories": ["general"]
+      },
+      "tinyfish": {
+        "url": "https://api.search.tinyfish.ai",
+        "timeoutMs": 5000
+      }
+    }
+  },
+  "fetch": {
+    "pipeline": ["plain", "crawl4ai", "tinyfish"],
+    "providers": {
+      "plain": {
+        "timeoutMs": 4000,
+        "maxChars": 60000
+      },
+      "crawl4ai": {
+        "primaryUrl": "http://127.0.0.1:11235",
+        "fallbackUrl": "http://127.0.0.1:11236",
+        "timeoutMs": 20000
+      },
+      "tinyfish": {
+        "url": "https://api.fetch.tinyfish.ai",
+        "timeoutMs": 15000
+      }
+    }
+  },
+  "research": {
+    "vane": {
+      "url": "http://127.0.0.1:3000",
+      "timeoutMs": 120000
+    },
+    "feynman": {
+      "binPath": "engines/feynman/bin/feynman.js",
+      "outputsDir": "outputs"
+    }
+  }
+}

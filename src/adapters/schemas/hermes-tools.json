@@ -1,0 +1,101 @@
+[
+  {
+    "type": "function",
+    "function": {
+      "name": "web_search",
+      "description": "Search the web across multiple search engines via Phrog Web (SearXNG + TinyFish fallback).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Search query string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "quick",
+              "live",
+              "deep"
+            ],
+            "description": "Search mode: quick (default), live (news/recent), or deep (multi-category)"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "description": "Maximum results to return"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "web_fetch",
+      "description": "Extract clean Markdown content from a URL via Phrog Web (cascading through Plain HTTP, Crawl4AI headless, and TinyFish).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Target URL to fetch and convert to Markdown"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "plain",
+              "browser",
+              "auto"
+            ],
+            "default": "auto",
+            "description": "Strategy: plain (fast), browser (Crawl4AI), or auto (smart fallback)"
+          },
+          "max_chars": {
+            "type": "integer",
+            "default": 50000,
+            "description": "Maximum Markdown character length"
+          }
+        },
+        "required": [
+          "url"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "web_research",
+      "description": "Synthesize research on a topic. Quick mode returns in ~4s (Vane). Deep mode dispatches an autonomous background research agent (Feynman).",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "question": {
+            "type": "string",
+            "description": "Question or research topic"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "quick",
+              "deep"
+            ],
+            "default": "quick",
+            "description": "Quick (fast cited answer) or deep (autonomous background process)"
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "Optional webhook URL to receive deep research results when complete"
+          }
+        },
+        "required": [
+          "question"
+        ]
+      }
+    }
+  }
+]
