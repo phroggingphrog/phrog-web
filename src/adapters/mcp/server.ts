@@ -33,7 +33,25 @@ server.tool(
   }
 );
 
-// 2. Live Search
+// 2. Academic Search (Consensus + arXiv)
+server.tool(
+  'academic_search',
+  'Search 220M+ peer-reviewed scientific papers via Consensus Academic API with study types, sample sizes, and plain takeaways.',
+  {
+    query: z.string().describe('Academic or scientific research question'),
+    limit: z.number().int().min(1).max(20).optional().describe('Maximum papers to return'),
+  },
+  async ({ query, limit }) => {
+    try {
+      const res = await executeSearch(query, { mode: 'academic', limit });
+      return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 3. Live Search
 server.tool(
   'live_search',
   'Search fresh, real-time web results filtered by recent time windows (day, week, month).',
@@ -52,7 +70,7 @@ server.tool(
   }
 );
 
-// 3. Deep Search
+// 4. Deep Search
 server.tool(
   'deep_search',
   'Multi-category search aggregating general web, tech/code repositories (GitHub), and academic literature (arXiv).',
@@ -70,7 +88,7 @@ server.tool(
   }
 );
 
-// 4. Clean Fetch
+// 5. Clean Fetch
 server.tool(
   'fetch',
   'Clean Markdown page extractor cascading through local Plain Fetch, local Crawl4AI (headless JS), and TinyFish Fetch.',
@@ -89,25 +107,26 @@ server.tool(
   }
 );
 
-// 5. Research
+// 6. Universal Research (Vane Quick + Feynman Staged Workflows)
 server.tool(
   'research',
-  'Research a topic. Quick mode synthesizes answers in 3-5s (Vane). Deep mode dispatches an autonomous background agent (Feynman).',
+  'Research a topic. Quick mode synthesizes answers in 3-5s (Vane). Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
   {
     question: z.string().describe('Research question or topic'),
-    mode: z.enum(['quick', 'deep']).default('quick').describe('Research depth/mode'),
+    workflow: z.enum(['quick', 'deepresearch', 'lit', 'compare', 'audit', 'review', 'draft', 'recipe', 'summarize']).default('quick').describe('Research workflow'),
     callback_url: z.string().url().optional().describe('Optional webhook URL to receive deep research results upon completion'),
   },
-  async ({ question, mode, callback_url }) => {
+  async ({ question, workflow, callback_url }) => {
     try {
-      if (mode === 'quick') {
+      if (workflow === 'quick') {
         const res = await executeQuickResearch(question);
         return text(res);
       } else {
-        const job = dispatchDeepResearch(question, { callbackUrl: callback_url });
+        const job = dispatchDeepResearch(question, { workflow, callbackUrl: callback_url });
         return text({
-          message: 'Autonomous Feynman deep research job dispatched.',
+          message: `Autonomous Feynman research job dispatched for workflow "${workflow}".`,
           jobId: job.jobId,
+          workflow: job.workflow,
           status: job.status,
           pollInstruction: `Call research_status with jobId "${job.jobId}" to inspect progress.`,
         });
@@ -118,12 +137,35 @@ server.tool(
   }
 );
 
-// 6. Research Status
+// 7. Dedicated Literature Review (Feynman Lit Workflow)
+server.tool(
+  'literature_review',
+  'Execute an autonomous academic literature review (Feynman lit workflow) analyzing papers, methodologies, and citation trees.',
+  {
+    topic: z.string().describe('Academic topic or hypothesis to review'),
+    callback_url: z.string().url().optional().describe('Optional webhook URL to receive completed review'),
+  },
+  async ({ topic, callback_url }) => {
+    try {
+      const job = dispatchDeepResearch(topic, { workflow: 'lit', callbackUrl: callback_url });
+      return text({
+        message: 'Feynman literature review agent dispatched.',
+        jobId: job.jobId,
+        workflow: 'lit',
+        status: job.status,
+      });
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+// 8. Research Status
 server.tool(
   'research_status',
   'Check the status and deliverable of a background Feynman deep research job.',
   {
-    jobId: z.string().describe('Job ID returned by research with mode="deep"'),
+    jobId: z.string().describe('Job ID returned by research or literature_review'),
   },
   async ({ jobId }) => {
     const job = getResearchJob(jobId);

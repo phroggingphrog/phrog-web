@@ -3,7 +3,7 @@
     "type": "function",
     "function": {
       "name": "web_search",
-      "description": "Search the web across multiple search engines via Phrog Web (SearXNG + TinyFish fallback).",
+      "description": "Fast web search across multiple search engines via Phrog Web (SearXNG + TinyFish fallback).",
       "parameters": {
         "type": "object",
         "properties": {
@@ -16,14 +16,39 @@
             "enum": [
               "quick",
               "live",
-              "deep"
+              "deep",
+              "academic"
             ],
-            "description": "Search mode: quick (default), live (news/recent), or deep (multi-category)"
+            "description": "Search mode: quick (default), live (news/recent), deep (code/tech), academic (Consensus + arXiv)"
           },
           "limit": {
             "type": "integer",
             "default": 10,
             "description": "Maximum results to return"
+          }
+        },
+        "required": [
+          "query"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "academic_search",
+      "description": "Search 220M+ peer-reviewed scientific papers via Consensus Academic API with study types, sample sizes, and plain takeaways.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Academic research question"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 10,
+            "description": "Maximum papers to return"
           }
         },
         "required": [
@@ -70,7 +95,7 @@
     "type": "function",
     "function": {
       "name": "web_research",
-      "description": "Synthesize research on a topic. Quick mode returns in ~4s (Vane). Deep mode dispatches an autonomous background research agent (Feynman).",
+      "description": "Synthesize research. Quick mode returns in ~4s (Vane). Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent in background.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -78,14 +103,21 @@
             "type": "string",
             "description": "Question or research topic"
           },
-          "mode": {
+          "workflow": {
             "type": "string",
             "enum": [
               "quick",
-              "deep"
+              "deepresearch",
+              "lit",
+              "compare",
+              "audit",
+              "review",
+              "draft",
+              "recipe",
+              "summarize"
             ],
             "default": "quick",
-            "description": "Quick (fast cited answer) or deep (autonomous background process)"
+            "description": "quick (Vane 4s synthesis) or Feynman workflow (lit: literature review, compare: cross-paper matrix, audit: code vs paper, review: peer review)"
           },
           "callback_url": {
             "type": "string",
@@ -94,6 +126,29 @@
         },
         "required": [
           "question"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "literature_review",
+      "description": "Launch an autonomous academic literature review (Feynman lit workflow) analyzing papers, methodologies, and citation graphs in background.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "topic": {
+            "type": "string",
+            "description": "Academic topic or hypothesis to review"
+          },
+          "callback_url": {
+            "type": "string",
+            "description": "Optional webhook URL to receive completed literature review"
+          }
+        },
+        "required": [
+          "topic"
         ]
       }
     }
