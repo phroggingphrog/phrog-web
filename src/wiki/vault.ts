@@ -74,7 +74,6 @@ export async function saveToWiki(
     updatedAt: now,
   };
 
-  // Embed and index note in SQLite
   try {
     const provider = getEmbeddingProvider();
     const [vector] = await provider.embed([`${title}\n${content}`]);

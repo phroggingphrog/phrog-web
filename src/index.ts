@@ -24,10 +24,8 @@ const fastify = Fastify({ logger: true });
 
 await fastify.register(cors, { origin: true });
 
-// Health check
 fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', version: '0.1.0' }));
 
-// 1. Search API (TinyFish & SearXNG unified)
 fastify.get('/api/search', async (req, reply) => {
   const query = req.query as {
     q?: string;
@@ -61,7 +59,6 @@ fastify.get('/api/search', async (req, reply) => {
   }
 });
 
-// 2. Fetch API (Clean Markdown reader with Crawl4AI / TinyFish fallback)
 fastify.post('/api/fetch', async (req, reply) => {
   const body = req.body as {
     url?: string;
@@ -91,7 +88,6 @@ fastify.post('/api/fetch', async (req, reply) => {
   }
 });
 
-// 3. Research API (Quick via Vane / Deep via Feynman autonomous agent)
 fastify.post('/api/research', async (req, reply) => {
   const body = req.body as {
     question?: string;
@@ -119,7 +115,6 @@ fastify.post('/api/research', async (req, reply) => {
       return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
     }
   } else {
-    // Autonomous background dispatch
     const job = dispatchDeepResearch(prompt, {
       workflow: body.workflow,
       callbackUrl: body.callback_url,
@@ -131,7 +126,6 @@ fastify.post('/api/research', async (req, reply) => {
   }
 });
 
-// 4. Research Job Status Check
 fastify.get('/api/research/:jobId', async (req, reply) => {
   const { jobId } = req.params as { jobId: string };
   const job = getResearchJob(jobId);
@@ -141,7 +135,6 @@ fastify.get('/api/research/:jobId', async (req, reply) => {
   return job;
 });
 
-// 5. GitHub Repository Search API
 fastify.get('/api/github/search', async (req, reply) => {
   const { q, query, limit } = req.query as { q?: string; query?: string; limit?: string };
   const target = q || query;
@@ -226,7 +219,6 @@ fastify.post('/api/transcript', async (req, reply) => {
   }
 });
 
-// 6. DeepWiki AI Documentation API
 fastify.post('/api/deepwiki/ask', async (req, reply) => {
   const { repo, question } = req.body as { repo?: string; question?: string };
   if (!repo || !question) {
@@ -255,7 +247,6 @@ fastify.get('/api/deepwiki/structure', async (req, reply) => {
   }
 });
 
-// 7. Agnostic LLM Wiki API (Karpathy Personal Knowledge Vault)
 fastify.post('/api/wiki/save', async (req, reply) => {
   const { title, content, tags, source } = req.body as {
     title?: string;
@@ -342,7 +333,6 @@ fastify.post('/mcp', mcpHandler);
 fastify.get('/mcp', mcpHandler);
 fastify.delete('/mcp', mcpHandler);
 
-// Start Server
 const port = Number(process.env.PORT || config.server.port || 8890);
 const host = config.server.host || '127.0.0.1';
 

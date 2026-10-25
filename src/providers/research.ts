@@ -44,7 +44,6 @@ export interface ResearchJob {
 // In-memory registry of active and completed jobs
 const jobs = new Map<string, ResearchJob>();
 
-// 1. Quick Research (Vane Engine with Academic / Multi-Domain support)
 export async function executeQuickResearch(
   question: string,
   options: QuickResearchOptions = {}
@@ -53,7 +52,6 @@ export async function executeQuickResearch(
   const vaneUrl = config.research?.vane?.url || 'http://127.0.0.1:3000';
   const timeoutMs = config.research?.vane?.timeoutMs || 120000;
 
-  // Resolve sources
   let sources = ['web'];
   if (options.sources?.length) {
     sources = options.sources;
@@ -106,7 +104,6 @@ export async function executeQuickResearch(
   };
 }
 
-// 2. Deep Research (Headless Feynman Autonomous Agent)
 export function dispatchDeepResearch(
   topic: string,
   options: { workflow?: string; domain?: string; callbackUrl?: string } = {}
@@ -127,13 +124,11 @@ export function dispatchDeepResearch(
 
   jobs.set(jobId, job);
 
-  // Ensure outputs directory exists
   const outputsDir = resolve(process.cwd(), 'outputs');
   if (!existsSync(outputsDir)) {
     mkdirSync(outputsDir, { recursive: true });
   }
 
-  // Spawn headless Feynman process
   try {
     const child = spawn(process.execPath, [feynmanBin, workflow, topic], {
       cwd: resolve(process.cwd(), 'engines/feynman'),
@@ -162,7 +157,6 @@ export function dispatchDeepResearch(
         job.error = stderr || `Process exited with code ${exitCode}`;
       }
 
-      // If callbackUrl was supplied, wake up the caller
       if (job.callbackUrl) {
         try {
           await fetch(job.callbackUrl, {

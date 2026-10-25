@@ -14,7 +14,7 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   return dot / (Math.sqrt(normA) * Math.sqrt(normB));
 }
 
-// 1. External OpenAI/OmniRoute/Ollama-compatible REST Embedding Provider
+// Supports OpenAI-compatible embedding endpoints, including OmniRoute and Ollama.
 export class ApiEmbeddingProvider implements EmbeddingProvider {
   name: string;
   dimensions: number;
@@ -56,7 +56,7 @@ export class ApiEmbeddingProvider implements EmbeddingProvider {
   }
 }
 
-// 2. Offline Deterministic Hashed TF-IDF Provider (Zero-config fallback)
+// Deterministic hashed TF-IDF provides embeddings without an external service.
 export class TfIdfEmbeddingProvider implements EmbeddingProvider {
   name = 'local-tfidf-256';
   dimensions = 256;

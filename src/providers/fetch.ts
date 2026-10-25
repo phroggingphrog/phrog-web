@@ -19,18 +19,15 @@ export interface FetchOptions {
 }
 
 function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } {
-  // Extract title
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const title = titleMatch ? titleMatch[1].trim() : '';
 
-  // Strip script, style, svg, noscript
   let text = html
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
     .replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '')
     .replace(/<svg\b[^<]*(?:(?!<\/svg>)<[^<]*)*<\/svg>/gi, '')
     .replace(/<noscript\b[^<]*(?:(?!<\/noscript>)<[^<]*)*<\/noscript>/gi, '');
 
-  // Convert basic headings and paragraphs
   text = text
     .replace(/<h1[^>]*>([\s\S]*?)<\/h1>/gi, '\n# $1\n')
     .replace(/<h2[^>]*>([\s\S]*?)<\/h2>/gi, '\n## $1\n')
@@ -38,7 +35,7 @@ function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } 
     .replace(/<p[^>]*>([\s\S]*?)<\/p>/gi, '\n$1\n')
     .replace(/<li[^>]*>([\s\S]*?)<\/li>/gi, '\n- $1')
     .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<[^>]+>/g, '') // remove remaining HTML tags
+    .replace(/<[^>]+>/g, '')
     .replace(/&nbsp;/g, ' ')
     .replace(/&amp;/g, '&')
     .replace(/&lt;/g, '<')

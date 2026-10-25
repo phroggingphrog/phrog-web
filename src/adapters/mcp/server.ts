@@ -20,7 +20,6 @@ import { researchSearch } from '../../providers/sources.js';
 import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
-// Helper for MCP text response
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
 });
@@ -28,7 +27,6 @@ const text = (data: unknown) => ({
 export function createMcpServer(): McpServer {
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 
-// 1. Quick Search
 server.tool(
   'quick_search',
   'Fast, structured web search using SearXNG multi-engine aggregation with automatic TinyFish fallback.',
@@ -46,7 +44,6 @@ server.tool(
   }
 );
 
-// 2. Academic Search (Consensus + arXiv)
 server.tool(
   'academic_search',
   'Search 220M+ peer-reviewed scientific papers via Consensus Academic API with study types, sample sizes, and plain takeaways.',
@@ -64,7 +61,6 @@ server.tool(
   }
 );
 
-// 3. Live Search
 server.tool(
   'live_search',
   'Search fresh, real-time web results filtered by recent time windows (day, week, month).',
@@ -83,7 +79,6 @@ server.tool(
   }
 );
 
-// 4. Deep Search (Domain-Agnostic by default)
 server.tool(
   'deep_search',
   'Domain-agnostic deep search. Searches broadly across the general web by default, or accepts an optional domain/category parameter.',
@@ -102,7 +97,6 @@ server.tool(
   }
 );
 
-// 5. Clean Fetch
 server.tool(
   'fetch',
   'Clean Markdown page extractor cascading through local Plain Fetch, local Crawl4AI (headless JS), and TinyFish Fetch.',
@@ -121,7 +115,6 @@ server.tool(
   }
 );
 
-// 6. Universal Research (Vane Quick + Feynman Staged Workflows)
 server.tool(
   'research',
   'Research a topic. Quick mode synthesizes answers in 3-5s (Vane) across web or academic domains. Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
@@ -153,7 +146,6 @@ server.tool(
   }
 );
 
-// 7. Dedicated Literature Review (Feynman Lit Workflow)
 server.tool(
   'literature_review',
   'Execute an autonomous academic literature review (Feynman lit workflow) analyzing papers, methodologies, and citation trees.',
@@ -176,7 +168,6 @@ server.tool(
   }
 );
 
-// 8. Research Status
 server.tool(
   'research_status',
   'Check the status and deliverable of a background Feynman deep research job.',
@@ -192,7 +183,6 @@ server.tool(
   }
 );
 
-// 9. GitHub Repository Search
 server.tool(
   'github_search',
   'Search public GitHub repositories for codebases, packages, stars, and licensing information.',
@@ -210,7 +200,6 @@ server.tool(
   }
 );
 
-// 10. DeepWiki Q&A
 server.tool(
   'deepwiki_ask',
   'Query AI-generated codebase documentation for any public GitHub repository (deepwiki.com) with grounded inline citations.',
@@ -228,7 +217,6 @@ server.tool(
   }
 );
 
-// 11. DeepWiki Table of Contents
 server.tool(
   'deepwiki_structure',
   'Retrieve the section outline and documentation table of contents for any public GitHub repo indexed by DeepWiki.',
@@ -245,7 +233,6 @@ server.tool(
   }
 );
 
-// 12. Save to LLM Wiki (Karpathy Agnostic Knowledge Vault)
 server.tool(
   'wiki_save',
   'Distill and save research findings or notes into the LLM Wiki (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
@@ -268,7 +255,6 @@ server.tool(
   }
 );
 
-// 13. Semantic Search LLM Wiki
 server.tool(
   'wiki_search',
   'Perform semantic vector search across all notes in the LLM Wiki vault using cosine similarity.',
@@ -416,7 +402,6 @@ server.tool('research_vault', 'Search/read/save reusable evidence in the Feynman
   run_id: z.string().optional(), ranked: z.boolean().optional(),
 }, safe(researchVault));
 
-// save_to_wiki: alias of wiki_save
 server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.', {
   title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
 }, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));

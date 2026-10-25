@@ -171,7 +171,6 @@ async function searchConsensus(query: string, options: SearchOptions): Promise<S
 
   const max = options.limit || 10;
   return data.results.slice(0, max).map(r => {
-    // Rich scientific snippet
     const parts: string[] = [];
     if (r.takeaway) parts.push(r.takeaway);
     else if (r.abstract) parts.push(r.abstract);
@@ -206,7 +205,6 @@ async function searchConsensus(query: string, options: SearchOptions): Promise<S
 export async function executeSearch(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
   const config = loadConfig();
 
-  // Determine pipeline:
   // If explicitly academic or science categories, use Consensus -> SearXNG
   const isAcademic =
     options.mode === 'academic' ||

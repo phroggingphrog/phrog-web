@@ -54,14 +54,12 @@ function loadEnvFile(filePath: string) {
       }
     }
   } catch (err) {
-    // ignore
   }
 }
 
 export function loadConfig(): AppConfig {
   if (cachedConfig) return cachedConfig;
 
-  // Auto-load env from phrog-web.env or self-hosted-web-mcp.env
   loadEnvFile(resolve(homedir(), '.config/phrog-web.env'));
   loadEnvFile(resolve(homedir(), '.config/self-hosted-web-mcp.env'));
   loadEnvFile(resolve(process.cwd(), '.env'));

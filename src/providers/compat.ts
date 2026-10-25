@@ -33,7 +33,7 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
   } catch (e) { throw err ?? e; }
 }
 
-// ---- deep research jobs (Feynman MCP), one at a time ----
+// Feynman MCP runs deep research jobs one at a time.
 const WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'recipe', 'draft'];
 const MAX_TOTAL_MS = 12 * 3600 * 1000;
 interface DeepJob { id: string; kind: 'deep'; status: string; completed: number; total: null; error: string | null; note?: string; feynman_job_id?: string; result?: any }

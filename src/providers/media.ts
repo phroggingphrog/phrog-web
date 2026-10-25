@@ -57,7 +57,7 @@ function yearOf(s?: string): number | undefined {
   return m ? Number(m[1]) : undefined;
 }
 
-// ---------- books ----------
+// Books
 async function openLibrary(query: string, limit: number): Promise<MediaItem[]> {
   const url = new URL('https://openlibrary.org/search.json');
   url.searchParams.set('q', query);
@@ -100,7 +100,7 @@ async function hardcover(query: string, limit: number): Promise<MediaItem[]> {
   }));
 }
 
-// ---------- film ----------
+// Film
 function parseSensCritique(content?: string): MediaRating[] | undefined {
   const m = content?.match(/Rating:\s*([\d.,]+)\s*\/\s*(\d+)/i);
   if (!m) return undefined;
@@ -163,7 +163,7 @@ async function omdb(query: string): Promise<MediaItem[]> {
   }];
 }
 
-// ---------- music ----------
+// Music
 async function musicBrainz(query: string, limit: number): Promise<MediaItem[]> {
   const url = new URL('https://musicbrainz.org/ws/2/release-group');
   url.searchParams.set('query', query);
@@ -202,7 +202,6 @@ async function discogs(query: string, limit: number): Promise<MediaItem[]> {
   }));
 }
 
-// ---------- main ----------
 export async function searchMedia(query: string, type: MediaType, opts: { limit?: number } = {}): Promise<MediaResponse> {
   const limit = opts.limit || 10;
   const jobs: Array<[string, Promise<MediaItem[]>]> = [];

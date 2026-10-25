@@ -71,7 +71,6 @@ async function callDeepWiki(toolName: string, args: Record<string, unknown>): Pr
 }
 
 export async function askDeepWiki(repo: string, question: string): Promise<DeepWikiAnswer> {
-  // Normalize repo name
   const cleanRepo = repo.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
   const answer = await callDeepWiki('ask_question', { repoName: cleanRepo, question });
   return {

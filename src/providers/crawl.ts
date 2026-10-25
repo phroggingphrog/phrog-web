@@ -84,7 +84,7 @@ export async function webCrawl(args: Args): Promise<Args> {
   return { success: results.some((r) => r.success), results, count: results.length, primary_error: null };
 }
 
-// ---- map ----
+// Site mapping
 
 async function httpGet(url: string, timeoutMs = 20000): Promise<{ final: string; status: number; body: string }> {
   await validatePublicUrl(url);
@@ -162,7 +162,7 @@ export async function webMap(args: Args): Promise<Args> {
   return { url, source, count: out.length, urls: out };
 }
 
-// ---- background jobs ----
+// Background jobs
 
 interface Job {
   id: string; kind: 'batch' | 'crawl'; status: 'queued' | 'running' | 'completed' | 'failed';
@@ -235,7 +235,7 @@ export function webCrawlStatus(jobId: string, includeResults = false, offset = 0
   return out;
 }
 
-// ---- site crawl job (port of sitecrawl.crawl_site) ----
+// Port of sitecrawl.crawl_site.
 
 async function robotsRules(url: string): Promise<string[]> {
   const p = new URL(url);
