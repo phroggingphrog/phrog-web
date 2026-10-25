@@ -6,6 +6,7 @@ export interface SearchResult {
   snippet: string;
   engine?: string;
   score?: number;
+  raw?: Record<string, unknown>;
   metadata?: {
     studyType?: string;
     sampleSize?: number;
@@ -24,6 +25,9 @@ export interface SearchOptions {
   engines?: string[];
   limit?: number;
   provider?: string;
+  pageno?: number;
+  language?: string;
+  safesearch?: string;
 }
 
 export interface SearchResponse {
@@ -31,9 +35,10 @@ export interface SearchResponse {
   results: SearchResult[];
   provider_used: string;
   total: number;
+  envelope?: Record<string, unknown>;
 }
 
-async function searchSearxng(query: string, options: SearchOptions): Promise<SearchResult[]> {
+async function searchSearxng(query: string, options: SearchOptions): Promise<{ results: SearchResult[]; envelope?: Record<string, unknown> }> {
   const config = loadConfig();
   const providerCfg = config.search.providers.searxng || {};
   const baseUrl = providerCfg.url || 'http://127.0.0.1:8888';
@@ -63,6 +68,9 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<Sea
   if (options.engines?.length) {
     url.searchParams.set('engines', options.engines.join(','));
   }
+  if (options.pageno) url.searchParams.set('pageno', String(options.pageno));
+  if (options.language) url.searchParams.set('language', options.language);
+  if (options.safesearch) url.searchParams.set('safesearch', options.safesearch);
 
   const res = await fetch(url.toString(), {
     signal: AbortSignal.timeout(timeoutMs),
@@ -73,17 +81,20 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<Sea
     throw new Error(`SearXNG HTTP ${res.status}: ${res.statusText}`);
   }
 
-  const data = await res.json() as { results?: Array<{ title?: string; url?: string; content?: string; engine?: string; score?: number }> };
-  if (!Array.isArray(data.results)) return [];
+  const data = await res.json() as { results?: Array<{ title?: string; url?: string; content?: string; engine?: string; score?: number }> } & Record<string, unknown>;
+  if (!Array.isArray(data.results)) return { results: [] };
 
   const max = options.limit || 15;
-  return data.results.slice(0, max).map(r => ({
+  const { results: _drop, ...envelope } = data;
+  const results = data.results.slice(0, max).map(r => ({
     title: r.title || '',
     url: r.url || '',
     snippet: r.content || '',
     engine: r.engine,
     score: r.score,
+    raw: r as Record<string, unknown>,
   }));
+  return { results, envelope };
 }
 
 async function searchTinyFish(query: string, options: SearchOptions): Promise<SearchResult[]> {
@@ -225,8 +236,9 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   for (const provider of pipeline) {
     try {
       let results: SearchResult[] = [];
+      let envelope: Record<string, unknown> | undefined;
       if (provider === 'searxng') {
-        results = await searchSearxng(query, options);
+        ({ results, envelope } = await searchSearxng(query, options));
       } else if (provider === 'tinyfish') {
         results = await searchTinyFish(query, options);
       } else if (provider === 'consensus') {
@@ -241,6 +253,7 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
           results,
           provider_used: provider,
           total: results.length,
+          envelope,
         };
       }
     } catch (err) {

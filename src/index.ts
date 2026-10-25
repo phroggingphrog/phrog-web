@@ -18,6 +18,7 @@ import { browse } from './providers/browse.js';
 import { extract } from './providers/extract.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
+import { registerSearxngCompat } from './searxng-compat.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
@@ -25,6 +26,8 @@ const fastify = Fastify({ logger: true });
 await fastify.register(cors, { origin: true });
 
 fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', version: '0.1.0' }));
+
+registerSearxngCompat(fastify);
 
 fastify.get('/api/search', async (req, reply) => {
   const query = req.query as {

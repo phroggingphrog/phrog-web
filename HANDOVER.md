@@ -201,3 +201,9 @@ Remaining gaps:
 - Rebuild venv: `cd engines && uv venv --python 3.11 .venv && uv pip install --python .venv/bin/python -r pyproject.toml`
 - Launch: `bin/web-agent-a2a` (A2A + OpenAI-compatible API). Host/port via `WEB_AGENT_A2A_HOST` / `WEB_AGENT_A2A_PORT` (default 127.0.0.1:42619); env file loaded by systemd (`~/.config/self-hosted-web-mcp.env`); token file `~/.config/web-agent-deep/a2a-token`.
 - Overrides: `PHROG_WEB_PYTHON` (python for launcher, Trafilatura, MarkItDown), `JEV_DIR` (default `~/apps/jev-ultrafast`), `JEV_RUNNER` (default `engines/jev_run.py`).
+
+## SearXNG-compatible /search (feat/searxng-compat)
+- `GET/POST /search` (src/searxng-compat.ts) mimics SearXNG JSON: params q, format, categories, engines, language, pageno, time_range, safesearch. Only `format=json` (others return 403, as the live instance does for csv).
+- Backed by `executeSearch`. SearXNG-served results (and answers/infoboxes/suggestions/unresponsive_engines) pass through unchanged via `SearchResult.raw` / `SearchResponse.envelope`. TinyFish/Consensus results get the same keys filled (engine = provider, category general).
+- Academic categories (science/academic/papers) go through the existing Consensus -> SearXNG pipeline, so those results carry engine `consensus`.
+- Point a SearXNG client (e.g. DeepTutor) at `http://127.0.0.1:8890` as base URL.
