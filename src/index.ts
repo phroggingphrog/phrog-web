@@ -11,6 +11,10 @@ import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
+import { webCrawl, webMap, webBatchStart, webCrawlStatus } from './providers/crawl.js';
+import { browse } from './providers/browse.js';
+import { extract } from './providers/extract.js';
+import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 
 const config = loadConfig();
@@ -290,6 +294,29 @@ fastify.get('/api/wiki/search', async (req, reply) => {
     return reply.status(500).send({ error: err instanceof Error ? err.message : String(err) });
   }
 });
+
+// Web-agent parity routes
+const wrap = (fn: (b: any) => Promise<unknown> | unknown, required: string[]) => async (req: any, reply: any) => {
+  const b = (req.body ?? {}) as Record<string, any>;
+  const missing = required.filter((k) => b[k] === undefined || b[k] === null || b[k] === '');
+  if (missing.length) return reply.status(400).send({ error: `Missing required: ${missing.join(', ')}` });
+  try { return await fn(b); }
+  catch (err) { req.log.error(err); return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) }); }
+};
+fastify.post('/api/crawl', wrap(webCrawl, ['urls']));
+fastify.post('/api/map', wrap(webMap, ['url']));
+fastify.post('/api/batch', wrap(webBatchStart, ['urls']));
+fastify.get('/api/batch/:id', async (req, reply) => {
+  const { id } = req.params as { id: string };
+  const q = req.query as { include_results?: string; offset?: string; limit?: string };
+  if (!id) return reply.status(400).send({ error: 'id is required' });
+  try {
+    return webCrawlStatus(id, ['1', 'true'].includes(q.include_results ?? ''), Number(q.offset ?? 0), Number(q.limit ?? 10));
+  } catch (err) { return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) }); }
+});
+fastify.post('/api/browse', wrap(browse as any, ['url', 'goal']));
+fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
+fastify.post('/api/vault', wrap(researchVault as any, ['action']));
 
 // Start Server
 const port = Number(process.env.PORT || config.server.port || 8890);

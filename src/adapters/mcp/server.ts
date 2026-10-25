@@ -10,6 +10,10 @@ import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
+import { webCrawl, webMap, webBatchStart, webCrawlStatus } from '../../providers/crawl.js';
+import { browse } from '../../providers/browse.js';
+import { extract } from '../../providers/extract.js';
+import { researchVault } from '../../providers/vault.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 
 const server = new McpServer({
@@ -364,6 +368,49 @@ server.tool(
     }
   }
 );
+
+const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
+  try { return text(await fn(a)); }
+  catch (err) { return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] }; }
+};
+
+server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions/stealth are accepted but only force browser mode.', {
+  urls: z.array(z.string()), max_chars: z.number().int().optional(), mode: z.string().optional(),
+  actions: z.array(z.record(z.any())).optional(), stealth: z.boolean().optional(),
+}, safe(webCrawl));
+
+server.tool('web_map', 'List URLs of a site from sitemap or page links. Fast, no content read.', {
+  url: z.string(), limit: z.number().int().optional(), search: z.string().optional(), include_subdomains: z.boolean().optional(),
+}, safe(webMap));
+
+server.tool('web_batch_start', 'Start a background batch crawl of up to 500 URLs; poll with web_crawl_status.', {
+  urls: z.array(z.string()), max_chars: z.number().int().optional(), mode: z.string().optional(),
+}, safe(webBatchStart));
+
+server.tool('web_crawl_status', 'Progress (and optionally results) of a background crawl job.', {
+  job_id: z.string(), include_results: z.boolean().optional(), offset: z.number().int().optional(), limit: z.number().int().optional(),
+}, safe((a) => webCrawlStatus(a.job_id, a.include_results ?? false, a.offset ?? 0, a.limit ?? 10)));
+
+server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runner.', {
+  url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
+}, safe(browse));
+
+server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
+  urls: z.array(z.string()), schema: z.record(z.any()), instructions: z.string().optional(),
+}, safe(extract));
+
+server.tool('research_vault', 'Search/read/save reusable evidence in the Feynman vault (action: status|search|read|save|add_claim|search_claims).', {
+  action: z.string(), query: z.string().optional(), note_id: z.string().optional(), title: z.string().optional(),
+  body: z.string().optional(), source: z.string().optional(), tags: z.array(z.string()).optional(), limit: z.number().int().optional(),
+  claim: z.string().optional(), quoted_support: z.string().optional(), confidence: z.string().optional(),
+  evidence_type: z.string().optional(), stance_target: z.string().optional(), stance: z.string().optional(),
+  run_id: z.string().optional(), ranked: z.boolean().optional(),
+}, safe(researchVault));
+
+// save_to_wiki: alias of wiki_save
+server.tool('save_to_wiki', 'Alias of wiki_save: save a note into the LLM Wiki.', {
+  title: z.string(), content: z.string(), tags: z.array(z.string()).optional(), source: z.string().optional(),
+}, safe(async ({ title, content, tags, source }) => ({ message: 'Note saved and vector-indexed in wiki vault', note: await saveToWiki(title, content, { tags, source }) })));
 
 // Run stdio transport
 const transport = new StdioServerTransport();

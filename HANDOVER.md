@@ -172,3 +172,16 @@ All engines are vendored under `engines/` with zero VPS-specific symlinks:
 - Download: `POST /api/books/download` with `{"ref": "<ref from search>"}` or `{"md5"|"id": "...", "source": "annas|zlibrary"}` (md5/id is resolved by a search first). MCP: `book_download`. Returns `{path, bytes}`. Files go to `PHROG_WEB_DOWNLOADS` or `<repo>/downloads` (gitignored).
 - Setup: `pnpm setup` (or `node dist/setup.js`) asks for optional keys (hidden input for secrets), merges them into `~/.config/phrog-web.env` (mode 600, existing keys kept, one backup per run in `~/backups/phrog-web/`, newest 3 kept), then prints a check table. `node dist/setup.js --check` only checks. The gateway logs "Run `pnpm setup`..." on start when no setup marker or key exists.
 - Blockers: no credentials entered yet (owner adds them). From this VPS Anna's website search fails (403 DDoS-Guard), so Anna search may stay down even with a key; Anna downloads use the member key API and may work. LibGen needs no key but is not in the default sources (pass `sources: ["libgen"]`). Z-Library and Anna success paths are untested without credentials. Failed searches return in about 11s (Anna's internal retries).
+
+
+## Web-agent parity tools
+REST: POST /api/crawl, /api/map, /api/batch, /api/browse, /api/extract, /api/vault; GET /api/batch/:id.
+MCP (same names/args as the Python web MCP): web_crawl, web_map, web_batch_start, web_crawl_status, browse, extract, research_vault, plus save_to_wiki (alias of wiki_save).
+Job status strings match Python (`running`, `completed`, `failed`).
+
+Remaining gaps:
+- `actions` and `stealth` in web_crawl only force browser mode; they are not applied.
+- No Trafilatura, PDF or Office conversion.
+- `web_crawl_start` (site crawl) is not ported.
+- `browse` needs the external Jev runner (JEV_RUNNER / JEV_DIR, see `jevPaths()` in src/config.ts) and a TYPESAFE/OPENROUTER key; it errors clearly if missing.
+- `research_vault` needs the Feynman MCP at WEB_AGENT_FEYNMAN_URL (default 127.0.0.1:8910).
