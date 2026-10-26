@@ -171,4 +171,51 @@ CREATE TABLE annotations (
 CREATE INDEX annotations_item ON annotations(item_id);
 `,
   },
+  {
+    // Jev scores, rendered post cards and the decisions agents (Hermes) make about posts. Self-contained: references only phase 1 tables.
+    id: '004_jev_decisions',
+    sql: `
+CREATE TABLE artifacts (
+  id TEXT PRIMARY KEY,
+  kind TEXT NOT NULL,
+  item_id TEXT REFERENCES items(id),
+  path TEXT NOT NULL,
+  created_at TEXT NOT NULL
+);
+CREATE INDEX artifacts_item ON artifacts(item_id, kind);
+
+CREATE TABLE predictions (
+  id TEXT PRIMARY KEY,
+  item_id TEXT NOT NULL REFERENCES items(id),
+  collection_run_id TEXT REFERENCES collection_runs(id),
+  scorer TEXT NOT NULL,
+  model_version TEXT NOT NULL,
+  preference_summary_version TEXT NOT NULL,
+  p_match REAL NOT NULL,
+  p_engage REAL,
+  confidence REAL,
+  cost_usd REAL,
+  calibrated INTEGER NOT NULL DEFAULT 0,
+  passed_filter INTEGER,
+  filter_reason TEXT,
+  screenshot_ref TEXT REFERENCES artifacts(id),
+  created_at TEXT NOT NULL
+);
+CREATE INDEX predictions_item ON predictions(item_id, preference_summary_version);
+CREATE INDEX predictions_created ON predictions(created_at);
+
+CREATE TABLE agent_decisions (
+  id TEXT PRIMARY KEY,
+  item_id TEXT NOT NULL REFERENCES items(id),
+  collection_run_id TEXT REFERENCES collection_runs(id),
+  prediction_id TEXT REFERENCES predictions(id),
+  client TEXT NOT NULL,
+  decision TEXT NOT NULL CHECK (decision IN ('interesting','not_interesting','send_to_owner','save_event')),
+  reason TEXT,
+  created_at TEXT NOT NULL,
+  idempotency_key TEXT NOT NULL UNIQUE
+);
+CREATE INDEX agent_decisions_item ON agent_decisions(item_id);
+`,
+  },
 ];

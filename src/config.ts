@@ -1,5 +1,5 @@
 import { readFileSync, existsSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
@@ -107,6 +107,26 @@ export function jevPaths(): { jevDir: string; runner: string } {
   const jevDir = process.env.JEV_DIR || resolve(homedir(), 'apps/jev-ultrafast');
   const runner = process.env.JEV_RUNNER || fileURLToPath(new URL('../engines/jev_run.py', import.meta.url));
   return { jevDir, runner };
+}
+
+const posNum = (v: string | undefined, d: number) => { const n = Number(v); return v !== undefined && v !== '' && Number.isFinite(n) && n >= 0 ? n : d; };
+
+/** Jev scoring, filter and screenshot settings, read from the environment at call time. */
+export function jevConfig() {
+  const th = process.env.PHROG_JEV_THRESHOLD || 'medium';
+  return {
+    url: process.env.PHROG_JEV_URL || 'https://openrouter.ai/api/alpha/decisions',
+    model: process.env.PHROG_JEV_MODEL || 'typesafe/jev-1.13',
+    keyFile: process.env.PHROG_JEV_KEY_FILE || null,
+    key: process.env.OPENROUTER_API_KEY || null,
+    tasteFile: process.env.PHROG_TASTE_FILE || null,
+    maxPostsPerDay: posNum(process.env.PHROG_JEV_MAX_POSTS_PER_DAY, 300),
+    maxUsdPerDay: posNum(process.env.PHROG_JEV_MAX_USD_PER_DAY, 1),
+    /** "medium" means p_match >= 0.5; a number 0..1 is used as is. */
+    threshold: th === 'medium' ? 0.5 : Math.min(1, posNum(th, 0.5)),
+    maxPassPerPage: Math.max(1, Math.trunc(posNum(process.env.PHROG_JEV_MAX_PASS_PER_PAGE, 8))),
+    artifactsDir: process.env.PHROG_PERSONAL_ARTIFACTS_DIR || resolve(dirname(personalConfig().dbPath), 'artifacts'),
+  };
 }
 
 /** Personal discovery settings, read from the environment at call time. No defaults for secrets. */

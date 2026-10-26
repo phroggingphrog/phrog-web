@@ -252,7 +252,7 @@
     "type": "function",
     "function": {
       "name": "feed",
-      "description": "Personal Instagram home feed (feed.v1) in the order Instagram served it. Needs the owner bearer token. Pass next_cursor as cursor to keep scrolling. Statuses other than ok/end (auth_required, challenge, rate_limited, busy, unsupported, failed) return no posts.",
+      "description": "Personal Instagram home feed (feed.v1) in the order Instagram served it. Needs the owner bearer token. Pass next_cursor as cursor to keep scrolling. Statuses other than ok/end (auth_required, challenge, rate_limited, busy, unsupported, failed) return no posts. With filter \"jev\" each post is scored first and only passing posts (with a screenshot URL) are returned; the rest are counted in filtered_out. Record your judgement of each post with feed_decide.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -283,10 +283,72 @@
           "cursor": {
             "type": "string",
             "description": "next_cursor from the previous page"
+          },
+          "filter": {
+            "type": "string",
+            "enum": [
+              "jev"
+            ],
+            "description": "Score posts with Jev; return only those worth a look, with screenshots"
+          },
+          "include_filtered": {
+            "type": "boolean",
+            "description": "With filter: also return posts that did not pass"
+          },
+          "order": {
+            "type": "string",
+            "enum": [
+              "feed",
+              "predicted"
+            ],
+            "default": "feed",
+            "description": "predicted sorts by p_match (needs filter)"
+          },
+          "exploration": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "default": 0,
+            "description": "Chance a below-threshold post passes anyway"
           }
         },
         "required": [
           "account"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "feed_decide",
+      "description": "Record your judgement of a feed post. Needs the owner bearer token. Stored with the feed run and the prediction shown; these are your guesses, not the owner's taste. Reuse idempotency_key to retry safely.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "description": "item_id from the feed"
+          },
+          "decision": {
+            "type": "string",
+            "enum": [
+              "interesting",
+              "not_interesting",
+              "send_to_owner",
+              "save_event"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "item_id",
+          "decision"
         ]
       }
     }
