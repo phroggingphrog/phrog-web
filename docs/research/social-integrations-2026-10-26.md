@@ -1,5 +1,7 @@
 # Social integrations: source review and recovered project intent
 
+The owner's subsequent architecture decision centralizes preference storage, behavioral learning and recommendation ranking in phrog-web, with Hermes as one authorized client. The implementation target is recorded in the [personal discovery execution plan](../plans/personal-discovery-execution-plan.md); the source findings below remain the original static assessment.
+
 Reviewed 2026-10-26. Scope: clone and explore the seven shortlisted upstream repositories (the original five plus social-media-research-cli and cobalt), recover the older doomscroll/social-replacement ideas, and identify integration boundaries. No provider installation, account access, service deployment, or implementation was performed.
 
 ## Conclusion
