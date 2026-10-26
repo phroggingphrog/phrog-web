@@ -512,9 +512,9 @@ server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runn
   url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
 }, safe(browse));
 
-server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent. Returns {status,result,steps,escalated_to,sources}.', {
+server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent -> TinyFish (when keyed). Returns {status,result,steps,escalated_to,sources}.', {
   url: z.string(), goal: z.string(), schema: z.record(z.any()).optional(),
-  mode: z.enum(['auto', 'fetch', 'browse', 'deep']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
+  mode: z.enum(['auto', 'fetch', 'browse', 'deep', 'tinyfish']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
 }, safe((a) => runAgent(a)));
 
 server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
