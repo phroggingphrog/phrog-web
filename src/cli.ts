@@ -16,6 +16,7 @@ const USAGE = `phrog-web <command> [options]
   transcript <url> [--lang xx]
   agent <url> "<goal>" [--schema ...]
   feed instagram --account <name> [--limit N] [--cursor C]   (needs PHROG_PERSONAL_TOKEN)
+  personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
         --out <path>  write full result there (default ./phrog-web-out/<cmd>-<ts>.<ext>)
         --stdout      print full output     --json  print raw JSON`;
@@ -26,12 +27,29 @@ const { values: v, positionals: pos } = parseArgs({
     url: { type: 'string' }, out: { type: 'string' }, stdout: { type: 'boolean' }, json: { type: 'boolean' },
     mode: { type: 'string' }, limit: { type: 'string' }, format: { type: 'string' },
     'max-pages': { type: 'string' }, depth: { type: 'string' }, schema: { type: 'string' },
-    sources: { type: 'string' }, account: { type: 'string' }, cursor: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
+    sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
   },
 });
 
 const base = (v.url || process.env.PHROG_WEB_URL || 'http://127.0.0.1:8890').replace(/\/$/, '');
 const die = (msg: string): never => { console.error(msg); process.exit(1); };
+
+if (pos[0] === 'personal') {
+  if (pos[1] !== 'import') die('personal: only "import" is available\n\n' + USAGE);
+  loadConfig();
+  const { SOURCES, runImport, formatImport } = await import('./personalization/imports/index.js');
+  const { importConfig } = await import('./config.js');
+  const { openPersonalDb } = await import('./personalization/db/index.js');
+  const want = v.source ?? 'all';
+  if (want !== 'all' && !(SOURCES as readonly string[]).includes(want)) die(`personal import: --source must be one of ${SOURCES.join('|')}|all`);
+  const cfg = importConfig();
+  const db = openPersonalDb(personalConfig().dbPath);
+  const results = await runImport(db, cfg.paths, want === 'all' ? [...SOURCES] : [want as (typeof SOURCES)[number]], { accountMap: cfg.accountMap, learnActions: cfg.learnActions }, !!v['dry-run']);
+  db.close();
+  console.log(v.json ? JSON.stringify(results) : formatImport(results));
+  process.exit(results.some((r) => r.status === 'failed') ? 1 : 0);
+}
+
 
 async function call(method: 'GET' | 'POST', path: string, body?: unknown, params?: Record<string, string | undefined>, headers?: Record<string, string>): Promise<any> {
   const u = new URL(base + path);
