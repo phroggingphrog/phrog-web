@@ -64,8 +64,48 @@ Feed tools come first. They are plain commands any agent can run, like a CLI: as
 
 - CLI: `phrog-web feed instagram --account <name> [--source home|explore] [--limit 20] [--cursor <c>]`. Same shape later for `x`, `rss <route>`, `youtube`.
 - MCP: `feed(provider, account, source, limit, cursor)`.
-- Each page returns: items (author, caption, image/video URLs, post link, posted time when known), `next_cursor`, and status (`ok`/`auth_required`/`challenge`/`unsupported`/`end`). The feed is raw: no judging or ranking. The caller (Hermes) reads the posts and decides what is interesting.
+- The feed behaves like the real app: posts come in the order Instagram served them, with the same mix (photos, carousels, reels, sponsored posts, suggested accounts you don't follow). Scrolling with `cursor` continues the same session, like swiping down; it does not restart from the top. `--order predicted` re-sorts a page by the prediction below; the default keeps Instagram's order.
 - Optional per-item extras on request: `--ocr`, `--describe` (image text and description), so a caller without vision can still read posters.
+
+Output is one versioned JSON schema (published as a JSON Schema file and in the MCP tool definition), the same for every provider:
+
+```json
+{
+  "schema_version": "feed.v1",
+  "provider": "instagram", "account": "<name>", "source": "home",
+  "status": "ok | auth_required | challenge | unsupported | end | partial",
+  "fetched_at": "UTC time", "cursor": "...", "next_cursor": "... | null",
+  "items": [{
+    "position": 1,
+    "item_id": "phrog id", "native_id": "instagram id", "url": "post link",
+    "type": "photo | carousel | video | reel",
+    "sponsored": false, "suggested": false,
+    "author": { "handle": "...", "name": "...", "followed": true },
+    "caption": "...", "hashtags": [], "mentions": [],
+    "media": [{ "type": "image | video", "url": "...", "alt_text": "...", "ocr_text": null, "description": null }],
+    "posted_at": "UTC time | null", "posted_precision": "exact | day | unknown",
+    "location": null, "like_count": null, "comment_count": null,
+    "seen_before": false, "first_seen_at": "UTC time",
+    "prediction": {
+      "p_engage": 0.0, "p_save": 0.0,
+      "calibrated": false, "model_version": "...",
+      "reasons": [{ "factor": "author_affinity", "effect": "+", "evidence": "liked 12 of their posts" }]
+    }
+  }]
+}
+```
+
+Unknown fields are `null`, never guessed. `prediction` is `null` until Phase 2.
+
+## 5a. Behaviour prediction
+
+Each feed item gets a probability that the owner would engage with it (`p_engage`: like, save, open or reply) and save it (`p_save`), learned from personal behaviour data:
+
+- Labels: past likes, saves, comments and shares in the social DB (`platform_events`, by author and post), plus phrog-web feedback and `seen_in_feed` items that got no action (weak negatives only; unseen is never negative).
+- Features: author affinity (past interactions with this author, followed or not), topic and place match from `annotations` against long-term and recent taste (behaviour-model results, `taste.md`), post type (reel vs photo vs carousel), sponsored/suggested, recency, already seen, Melbourne event signal (date, venue, distance).
+- Model: start with a simple, explainable model (regularised logistic regression or naive Bayes per feature group), so every score comes with its top reasons. Train on chronological splits: older behaviour trains, newer behaviour tests.
+- Honesty: report `calibrated: false` until calibration is checked on held-out data (Brier score and a reliability curve). Scores are probabilities about the owner's own behaviour, not truth about the post. Explicit rules (`exclude`, `avoid`) override the model.
+- Baselines to beat: Instagram's own order, "followed authors first", and "authors liked before". If the model does not beat them on held-out data, ship the feed without re-ordering.
 
 Ranked discovery sits on top of the feed tools (Phase 2):
 
@@ -90,14 +130,15 @@ Matching REST under `/api/personal/`. The Hermes cron can either scroll with `fe
 
 - DB and migrations (`source_accounts`, `collection_runs`, `items`, `item_ids`, `observations`).
 - Split `ig_scroll.py`: its feed-reading part moves under phrog-web ownership (under `engines/` or a configured path); its built-in image-judging prompt does not, because judging belongs to the caller or to Phase 2 ranking.
-- `phrog-web feed instagram` CLI + `feed` MCP tool with cursor paging for both accounts, owner token, honest status when login is needed.
+- `phrog-web feed instagram` CLI + `feed` MCP tool returning `feed.v1`, with cursor paging that continues the same scroll session, for both accounts; owner token; honest status when login is needed. Phase 0 checks whether `opencli instagram feed` can continue a scroll, and whether it exposes sponsored/suggested markers; if not, Phase 1 extends it.
 - Every fetched post is saved as an item plus a `seen_in_feed` observation, so repeated scrolls do not duplicate it.
 - Exit: Hermes runs `feed` on both accounts, pages through 3 pages, and gets the same posts as the old script; re-running adds no duplicate items.
 
-**Phase 2, ranked discovery, about 1 to 1.5 days.**
+**Phase 2, prediction and ranked discovery, about 2 to 3 days.**
 
 - Humanitix and Eventbrite through existing phrog-web search and fetch.
 - Ranking owned by phrog-web: port the `jev_score` logic from Hermes (`jev_mcp.py`), plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
+- Behaviour prediction (section 5a): features, model, chronological evaluation against the baselines, `prediction` filled in `feed.v1`, `--order predicted`.
 - `personal_discover` over MCP and REST, deliveries, feedback, preference rebuild (long vs recent).
 - Exit: shadow run next to the old cron for 3 days; the owner compares the two messages; a "not interested in X" changes the next run.
 
