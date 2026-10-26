@@ -252,27 +252,25 @@
     "type": "function",
     "function": {
       "name": "feed",
-      "description": "Personal Instagram home feed (feed.v1) in the order Instagram served it. Needs the owner bearer token. Pass next_cursor as cursor to keep scrolling. Statuses other than ok/end (auth_required, challenge, rate_limited, busy, unsupported, failed) return no posts. With filter \"jev\" each post is scored first and only passing posts (with a screenshot URL) are returned; the rest are counted in filtered_out. Record your judgement of each post with feed_decide.",
+      "description": "Personal feed (feed.v1). provider instagram: the owner's home feed in the order Instagram served it (needs account). provider rss: an RSS/Atom/JSON feed or RSSHub route given as source (account not needed); pages come from the stored list. Needs the owner bearer token. Pass next_cursor as cursor to keep scrolling. Statuses other than ok/end (auth_required, challenge, rate_limited, busy, unsupported, failed) return no posts. With filter \"jev\" each post is scored first and only passing posts (with a screenshot URL) are returned; the rest are counted in filtered_out. Record your judgement of each post with feed_decide.",
       "parameters": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
             "enum": [
-              "instagram"
+              "instagram",
+              "rss"
             ],
             "default": "instagram"
           },
           "account": {
             "type": "string",
-            "description": "Account name, letters, digits, dot, underscore, max 30"
+            "description": "Instagram account name, letters, digits, dot, underscore, max 30 (instagram only)"
           },
           "source": {
             "type": "string",
-            "enum": [
-              "home"
-            ],
-            "default": "home"
+            "description": "instagram: \"home\" (default). rss: an RSSHub route like /youtube/channel/UC... or an http(s) feed URL (required for rss)"
           },
           "limit": {
             "type": "integer",
@@ -312,9 +310,7 @@
             "description": "Chance a below-threshold post passes anyway"
           }
         },
-        "required": [
-          "account"
-        ]
+        "required": []
       }
     }
   },

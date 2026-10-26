@@ -21,16 +21,16 @@
     },
     "provider": {
       "enum": [
-        "instagram"
+        "instagram",
+        "rss"
       ]
     },
     "account": {
       "type": "string"
     },
     "source": {
-      "enum": [
-        "home"
-      ]
+      "type": "string",
+      "description": "\"home\" for instagram; for rss an RSSHub route (\"/youtube/channel/UC...\") or an http(s) feed URL"
     },
     "status": {
       "enum": [
@@ -112,6 +112,7 @@
               "carousel",
               "video",
               "reel",
+              "article",
               null
             ]
           },

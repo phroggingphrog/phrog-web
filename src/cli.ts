@@ -16,6 +16,7 @@ const USAGE = `phrog-web <command> [options]
   transcript <url> [--lang xx]
   agent <url> "<goal>" [--schema ...]
   feed instagram --account <name> [--limit N] [--cursor C] [--filter jev] [--include-filtered] [--order feed|predicted] [--exploration 0..1]
+  feed rss --source </rsshub/route|https://feed.url> [--limit N] [--cursor C] [--filter jev] [--include-filtered] [--order feed|predicted] [--exploration 0..1]
   feed decide <item_id> --decision interesting|not_interesting|send_to_owner|save_event [--reason "..."] [--key K]
                                                          (feed commands need PHROG_PERSONAL_TOKEN)
   personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
@@ -184,7 +185,7 @@ async function run(): Promise<{ data: any; ext: 'json' | 'md' }> {
       return { data: await call('POST', '/api/agent', { url: a[0], goal: a.slice(1).join(' '), schema: v.schema ? schemaArg(v.schema) : undefined }), ext: 'json' };
     }
     case 'feed': {
-      if (a[0] !== 'instagram' && a[0] !== 'decide') die('feed: provider must be "instagram" (or use "feed decide")\n\n' + USAGE);
+      if (a[0] !== 'instagram' && a[0] !== 'rss' && a[0] !== 'decide') die('feed: provider must be "instagram" or "rss" (or use "feed decide")\n\n' + USAGE);
       loadConfig();
       const token = personalConfig().token;
       if (!token) die('feed: PHROG_PERSONAL_TOKEN is not set');
@@ -193,9 +194,9 @@ async function run(): Promise<{ data: any; ext: 'json' | 'md' }> {
         if (!a[1] || !v.decision) die('feed decide: <item_id> and --decision are required');
         return { data: await call('POST', '/api/personal/feed/decide', { item_id: a[1], decision: v.decision, reason: v.reason, idempotency_key: v.key, client: 'cli' }, undefined, headers), ext: 'json' };
       }
-      if (!v.account) die('feed: --account is required');
+      if (a[0] === 'rss' ? !v.source : !v.account) die(a[0] === 'rss' ? 'feed rss: --source is required' : 'feed: --account is required');
       return { data: await call('GET', '/api/personal/feed', undefined, {
-        provider: 'instagram', account: v.account, limit: v.limit, cursor: v.cursor, filter: v.filter,
+        provider: a[0], account: v.account, source: v.source, limit: v.limit, cursor: v.cursor, filter: v.filter,
         include_filtered: v['include-filtered'] ? 'true' : undefined, order: v.order, exploration: v.exploration,
       }, headers), ext: 'json' };
     }
