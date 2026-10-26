@@ -9,6 +9,8 @@ One user: the owner. Many source accounts: Instagram (ykswrdn, phroggingphrog), 
 
 Phrog-web owns collection, storage, ranking and feedback. Hermes only calls an MCP tool to do discovery and presents the result. Existing anonymous search, fetch and research tools do not change.
 
+Direction of calls is one way: Hermes calls phrog-web as a tool; phrog-web never calls Hermes at runtime. Everything discovery needs (Instagram collector, taste inputs, scoring) moves into phrog-web, so any client gets the same discovery by calling the same tool.
+
 ## 2. First slice: move the existing daily discovery
 
 Hermes already runs a cron, "Daily discovery (doomscroll replacement)" (id fc55f4cbee37, `~/phrogvps/hermes/cron-jobs.json`, daily 18:00). Read its prompt for exact wording; do not edit it. It:
@@ -81,7 +83,8 @@ Matching REST under `/api/personal/`. Hermes cron becomes: call `personal_discov
 
 - DB and migrations.
 - Collectors: wrap `ig_scroll` for both accounts; Humanitix and Eventbrite through existing phrog-web search and fetch.
-- Ranking that reuses `jev_score`, rules and read-only historical taste.
+- Ranking owned by phrog-web: port the `jev_score` logic from Hermes (`jev_mcp.py`) into phrog-web rather than calling Hermes, plus rules and read-only historical taste.
+- Move the Instagram collector (`ig_scroll.py`) under phrog-web ownership (under `engines/` or wrapped via a configured path) and import the taste files (`lanes.md`, `taste.md`) once into `preference_rules`, so phrog-web no longer depends on files on the Hermes host.
 - `personal_discover` over MCP and REST, deliveries, owner token.
 - Exit: shadow run next to the old cron for 3 days; the owner compares the two messages.
 
