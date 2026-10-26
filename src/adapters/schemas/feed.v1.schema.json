@@ -300,6 +300,8 @@
                       "below_threshold",
                       "page_cap",
                       "budget",
+                      "stats_confident_pass",
+                      "stats_confident_fail",
                       null
                     ]
                   }
@@ -322,11 +324,15 @@
                   "model_version",
                   "scorer",
                   "preference_summary_version",
-                  "cost_usd"
+                  "cost_usd",
+                  "stats"
                 ],
                 "properties": {
                   "p_match": {
-                    "type": "number",
+                    "type": [
+                      "number",
+                      "null"
+                    ],
                     "description": "P(match level >= medium), 0..1"
                   },
                   "p_engage": {
@@ -345,18 +351,87 @@
                     "const": false
                   },
                   "model_version": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "scorer": {
-                    "const": "jev"
+                    "enum": [
+                      "jev",
+                      "stats"
+                    ]
                   },
                   "preference_summary_version": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ]
                   },
                   "cost_usd": {
                     "type": [
                       "number",
                       "null"
+                    ]
+                  },
+                  "stats": {
+                    "oneOf": [
+                      {
+                        "type": "null"
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "score",
+                          "matched"
+                        ],
+                        "properties": {
+                          "score": {
+                            "type": "number",
+                            "description": "Evidence-weighted mean of the matched subjects' posterior means, 0..1"
+                          },
+                          "matched": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "required": [
+                                "subject_type",
+                                "key",
+                                "mean",
+                                "ci"
+                              ],
+                              "properties": {
+                                "subject_type": {
+                                  "enum": [
+                                    "ig_author",
+                                    "music_artist",
+                                    "rss_source",
+                                    "topic",
+                                    "venue",
+                                    "event_category",
+                                    "place_category"
+                                  ]
+                                },
+                                "key": {
+                                  "type": "string"
+                                },
+                                "mean": {
+                                  "type": "number"
+                                },
+                                "ci": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "number"
+                                  },
+                                  "minItems": 2,
+                                  "maxItems": 2,
+                                  "description": "90% credible interval"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
                     ]
                   }
                 }

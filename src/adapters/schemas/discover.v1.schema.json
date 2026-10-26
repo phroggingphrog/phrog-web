@@ -74,7 +74,8 @@
           "title",
           "url",
           "reason",
-          "uncertainty"
+          "uncertainty",
+          "stats"
         ],
         "properties": {
           "rank": {
@@ -192,6 +193,66 @@
             "items": {
               "type": "string"
             }
+          },
+          "stats": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "score",
+                  "matched"
+                ],
+                "properties": {
+                  "score": {
+                    "type": "number",
+                    "description": "Evidence-weighted mean of the matched subjects' posterior means, 0..1"
+                  },
+                  "matched": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "subject_type",
+                        "key",
+                        "mean",
+                        "ci"
+                      ],
+                      "properties": {
+                        "subject_type": {
+                          "enum": [
+                            "ig_author",
+                            "music_artist",
+                            "rss_source",
+                            "topic",
+                            "venue",
+                            "event_category",
+                            "place_category"
+                          ]
+                        },
+                        "key": {
+                          "type": "string"
+                        },
+                        "mean": {
+                          "type": "number"
+                        },
+                        "ci": {
+                          "type": "array",
+                          "items": {
+                            "type": "number"
+                          },
+                          "minItems": 2,
+                          "maxItems": 2,
+                          "description": "90% credible interval"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            ]
           }
         }
       }
