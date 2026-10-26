@@ -1,4 +1,5 @@
 import { loadConfig } from '../config.js';
+import { executeSearch } from './search.js';
 
 export type MediaType = 'book' | 'film' | 'music';
 
@@ -120,6 +121,128 @@ async function searxngFilm(query: string, limit: number): Promise<MediaItem[]> {
   }));
 }
 
+const BROWSER_UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
+const unhtml = (x: string) => x.replace(/<[^>]+>/g, ' ').replace(/&#0?34;|&quot;/g, '"').replace(/&#0?39;|&#039;|&rsquo;/g, "'").replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim();
+
+/** Letterboxd: its search and review pages are bot-blocked, so films are found via web search and read from the film page
+ *  (JSON-LD rating + the popular reviews embedded in it). */
+async function letterboxd(query: string, limit: number): Promise<MediaItem[]> {
+  const web = await executeSearch(`letterboxd ${query}`, { limit: 20 });
+  const slugs = [...new Set((web.results as any[]).map((r) => String(r.url).match(/^https:\/\/letterboxd\.com\/film\/([a-z0-9-]+)\/?$/)?.[1]).filter(Boolean))] as string[];
+  const pages = await Promise.all(slugs.slice(0, Math.min(limit, 3)).map(async (slug) => {
+    const url = `https://letterboxd.com/film/${slug}/`;
+    const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+    if (!res.ok) return null;
+    const html = await res.text();
+    const ld = (() => { try { return JSON.parse(html.match(/<script type="application\/ld\+json">\s*(?:\/\*[\s\S]*?\*\/)?\s*([\s\S]*?)\s*(?:\/\*[\s\S]*?\*\/)?\s*<\/script>/)?.[1] || '{}'); } catch { return {}; } })();
+    const agg = ld.aggregateRating;
+    const reviews = html.split('class="production-viewing -viewing').slice(1, 6).map((b) => ({
+      by: b.match(/class="displayname">([^<]+)</)?.[1],
+      text: unhtml(b.match(/js-review-body[^>]*>([\s\S]*?)<\/div>/)?.[1] || '').slice(0, 400),
+      likes: Number(b.match(/data-count="(\d+)"/)?.[1]) || undefined,
+      spoiler: b.includes('This review may contain spoilers') || undefined,
+    })).filter((r) => r.text);
+    const title = unhtml(html.match(/og:title" content="([^"]*)"/)?.[1] || ld.name || slug);
+    return {
+      title,
+      year: yearOf(title),
+      creators: (ld.director || []).map((d: any) => d.name),
+      url,
+      source: 'letterboxd',
+      metadata: { genres: ld.genre, popular_reviews: reviews },
+      ratings: agg ? [{ source: 'letterboxd', score: agg.ratingValue, scale: 5, count: agg.ratingCount }] : undefined,
+    } as MediaItem;
+  }));
+  return pages.filter(Boolean) as MediaItem[];
+}
+
+/** Pages of one review site found through web search (the sites' own search pages are bot-blocked or JS-only). */
+async function sitePages(query: string, site: string, re: RegExp, max: number): Promise<{ url: string; html: string }[]> {
+  const web = await executeSearch(`${site} ${query}`, { limit: 20 });
+  const seen = new Set<string>();
+  const urls = ((web.results as any[]).map((r) => String(r.url).match(re)?.[0]).filter(Boolean) as string[])
+    .filter((u) => { const k = u.match(/\/show\/(\d+)/)?.[1] || u.replace(/\/$/, ''); return !seen.has(k) && !!seen.add(k); });
+  const pages = await Promise.all(urls.slice(0, max).map(async (url) => {
+    try {
+      const res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+      return res.ok ? { url, html: await res.text() } : null;
+    } catch { return null; }
+  }));
+  return pages.filter(Boolean) as { url: string; html: string }[];
+}
+
+const ogTitle = (html: string) => unhtml(html.match(/og:title" content="([^"]*)"/)?.[1] || '');
+const jsonField = (html: string, re: RegExp) => { const m = html.match(re); if (!m) return undefined; try { return JSON.parse(m[1]); } catch { return undefined; } };
+
+async function rottenTomatoes(query: string, limit: number): Promise<MediaItem[]> {
+  const pages = await sitePages(query, 'rotten tomatoes', /^https:\/\/www\.rottentomatoes\.com\/(m|tv)\/[a-z0-9_]+/, Math.min(limit, 3));
+  return pages.map(({ url, html }) => {
+    const critics = jsonField(html, /"criticsScore":(\{[^}]*\})/);
+    const audience = jsonField(html, /"audienceScore":(\{[^}]*\})/);
+    const block = unhtml(html.slice(html.indexOf('id="critics-consensus"'), html.indexOf('id="critics-consensus"') + 3000));
+    const consensus = html.includes('id="critics-consensus"') ? block.match(/Critics Consensus\s*(.*?)\s*Read Critics Reviews/)?.[1] : undefined;
+    const ratings: MediaRating[] = [];
+    if (critics?.score) ratings.push({ source: 'rottentomatoes:tomatometer', score: Number(critics.score), scale: 100, count: Number(critics.ratingCount) || undefined });
+    if (audience?.score) ratings.push({ source: 'rottentomatoes:audience', score: Number(audience.score), scale: 100, count: Number(audience.reviewCount) || undefined });
+    const title = ogTitle(html).replace(/\s*\|\s*Rotten Tomatoes$/, '');
+    return { title, year: yearOf(title), url, source: 'rottentomatoes', metadata: { critics_consensus: consensus || undefined, critics_average: critics?.averageRating, certified_fresh: critics?.certified }, ratings: ratings.length ? ratings : undefined };
+  });
+}
+
+async function pitchfork(query: string, limit: number): Promise<MediaItem[]> {
+  const pages = await sitePages(query, 'pitchfork review', /^https:\/\/pitchfork\.com\/reviews\/(albums|tracks)\/[a-z0-9-]+\/?/, Math.min(limit, 3));
+  return pages.map(({ url, html }) => {
+    const score = Number(html.match(/"rating":(\d+(?:\.\d)?)/)?.[1]);
+    const deks = [...html.matchAll(/"dangerousDek":"((?:[^"\\]|\\.)*)"/g)].map((m) => { try { return JSON.parse(`"${m[1]}"`); } catch { return m[1]; } }).filter((d) => !/your |saved|review is/i.test(d));
+    const genres = [...new Set([...html.matchAll(/"genres":\[\{"node":\{"name":"([^"]+)"/g)].map((m) => m[1].replace(/\\u002F/g, '/')))];
+    const title = ogTitle(html).replace(/\s*(Album|Track) Review\s*\|\s*Pitchfork$/, '');
+    return {
+      title, url, source: 'pitchfork',
+      metadata: { summary: unhtml(deks.sort((a, b) => b.length - a.length)[0] || '') || undefined, best_new_music: /isBestNewMusic":true/.test(html) || undefined, genres, author: unhtml(html.match(/"author":\{[^}]*"name":"([^"]+)"/)?.[1] || '') || undefined },
+      ratings: Number.isFinite(score) ? [{ source: 'pitchfork', score, scale: 10 }] : undefined,
+    } as MediaItem;
+  });
+}
+
+async function goodreads(query: string, limit: number): Promise<MediaItem[]> {
+  const pages = await sitePages(query, 'goodreads', /^https:\/\/www\.goodreads\.com\/book\/show\/[0-9]+[a-zA-Z0-9._-]*/, Math.min(limit, 3));
+  const titles = new Set<string>();
+  return pages.filter(({ html }) => { const t = ogTitle(html); return !titles.has(t) && !!titles.add(t); }).map(({ url, html }) => {
+    const agg = jsonField(html, /"aggregateRating":(\{[^}]*\})/);
+    const reviews = html.split('class="ReviewCard"').slice(1, 6).map((b) => ({
+      by: b.match(/aria-label="Review by ([^"]+)"/)?.[1] || b.match(/data-testid="name"[^>]*><a[^>]*>([^<]+)</)?.[1],
+      stars: Number(b.match(/aria-label="Rating (\d) out of 5"/)?.[1]) || undefined,
+      text: unhtml(b.match(/ReviewText__content"[^>]*>([\s\S]*?)<\/section>/)?.[1] || '').slice(0, 400),
+      likes: Number(b.match(/([\d,]+) likes/)?.[1]?.replace(/,/g, '')) || undefined,
+    })).filter((r) => r.text);
+    const title = ogTitle(html);
+    const author = unhtml(html.match(/class="ContributorLink__name"[^>]*>([^<]+)</)?.[1] || '');
+    return {
+      title, url, source: 'goodreads', creators: author ? [author] : undefined,
+      metadata: { popular_reviews: reviews },
+      ratings: agg ? [{ source: 'goodreads', score: agg.ratingValue, scale: 5, count: agg.ratingCount }] : undefined,
+    } as MediaItem;
+  });
+}
+
+/** Community discussion from one subreddit through Reddit's public search feed. */
+async function subreddit(sub: string, query: string, limit: number): Promise<MediaItem[]> {
+  const url = `https://www.reddit.com/r/${sub}/search.rss?q=${encodeURIComponent(query)}&restrict_sr=on&sort=relevance&limit=${limit}`;
+  let res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+  if (res.status === 429) {
+    await new Promise((r) => setTimeout(r, 2500));
+    res = await fetch(url, { headers: { 'User-Agent': BROWSER_UA }, signal: AbortSignal.timeout(TIMEOUT_MS) });
+  }
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const xml = await res.text();
+  return xml.split('<entry>').slice(1, limit + 1).map((e) => ({
+    title: unhtml(e.match(/<title>([\s\S]*?)<\/title>/)?.[1] || ''),
+    url: e.match(/<link href="([^"]+)"/)?.[1] || '',
+    source: `reddit:r/${sub}`,
+    metadata: { posted: e.match(/<published>([^<]+)</)?.[1]?.slice(0, 10) },
+  })).filter((i) => i.url);
+}
+
 async function tmdb(query: string, limit: number): Promise<MediaItem[]> {
   const key = env('TMDB_API_KEY');
   if (!key) throw new Error('no key');
@@ -211,7 +334,12 @@ export async function searchMedia(query: string, type: MediaType, opts: { limit?
     add('openlibrary', () => openLibrary(query, limit));
     add('searxng:openlibrary', () => searxngBooks(query, limit));
     add('hardcover', () => hardcover(query, limit));
+    add('goodreads', () => goodreads(query, limit));
+    add('reddit:r/books', () => subreddit('books', query, 3));
   } else if (type === 'film') {
+    add('letterboxd', () => letterboxd(query, limit));
+    add('rottentomatoes', () => rottenTomatoes(query, limit));
+    add('reddit:r/movies', () => subreddit('movies', query, 3));
     add('searxng:film', () => searxngFilm(query, limit));
     add('tmdb', () => tmdb(query, limit));
     add('omdb', () => omdb(query));
@@ -219,6 +347,8 @@ export async function searchMedia(query: string, type: MediaType, opts: { limit?
     add('musicbrainz', () => musicBrainz(query, limit));
     add('searxng:music', () => searxngMusic(query, limit));
     add('discogs', () => discogs(query, limit));
+    add('pitchfork', () => pitchfork(query, limit));
+    add('reddit:r/indieheads', () => subreddit('indieheads', query, 3));
   }
 
   const settled = await Promise.allSettled(jobs.map(j => j[1]));

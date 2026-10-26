@@ -23,6 +23,10 @@ Escalate only when the lighter tool fails or returns incomplete content.
 | | `academic_search`, `research_search` | Papers (Consensus; OpenAlex, arXiv, Semantic Scholar, Crossref). |
 | | `social_search` | Reddit, Hacker News, Lemmy, Mastodon, YouTube. |
 | | `media_search` | Book, film, music metadata and ratings. |
+| | `secondhand_search` / `secondhand_listing` | Used items: Facebook Marketplace, Depop, Poshmark (eBay with keys). |
+| | `marketplace_search` / `marketplace_product` | New items on AliExpress: price, shipping, store, ratings, reviews. |
+| | `deals_search` | OzBargain AU deals + past prices (votes, expired). Cross-check before buying. |
+| | `place_search` | Google Maps rating, review count, address, open status for places. |
 | | `github_search`, `deepwiki_ask` | Repos; grounded Q&A on a GitHub repo. |
 | | `research` (mode web) | Short cited answer in seconds (Vane). |
 | 2. Fetch | `fetch` | One URL to clean Markdown (plain, then headless JS, then TinyFish). |
