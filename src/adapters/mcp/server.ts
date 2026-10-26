@@ -10,6 +10,7 @@ import { searchGithubRepos } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
+import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct } from '../../providers/marketplace.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '../../providers/crawl.js';
@@ -332,6 +333,76 @@ server.tool(
   async (args) => {
     try {
       return text(await downloadBook(args.ref, { source: args.source }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'secondhand_search',
+  'Search secondhand marketplaces (Facebook Marketplace, Depop, Poshmark; eBay when keys are set) for used items, with price and location filters.',
+  {
+    query: z.string().describe('What to look for'),
+    marketplaces: z.array(z.enum(['facebook', 'depop', 'poshmark', 'ebay'])).optional().describe('Default: all available'),
+    location: z.string().optional().describe('City for Facebook Marketplace, e.g. "Melbourne, Australia"'),
+    minPrice: z.number().optional(),
+    maxPrice: z.number().optional(),
+    condition: z.string().optional().describe('e.g. new, used_like_new, used_good, used_fair'),
+    sort: z.string().optional().describe('e.g. price_low, price_high, newest'),
+    limit: z.number().int().min(1).max(50).optional().describe('Per marketplace (default 10)'),
+  },
+  async (args) => {
+    try {
+      return text(await searchSecondhand(args.query, args));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'secondhand_listing',
+  'Full details of one secondhand listing (description, seller, photos count) from its id and marketplace.',
+  {
+    listingId: z.string().describe('Listing id from secondhand_search'),
+    marketplace: z.enum(['facebook', 'depop', 'poshmark', 'ebay']),
+  },
+  async (args) => {
+    try {
+      return text(await secondhandListing(args.listingId, args.marketplace));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'marketplace_search',
+  'Search new-item marketplace products on AliExpress; returns product ids for marketplace_product.',
+  {
+    query: z.string().describe('Product to find'),
+    limit: z.number().int().min(1).max(30).optional(),
+  },
+  async (args) => {
+    try {
+      return text(await searchAliexpress(args.query, args.limit));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'marketplace_product',
+  'Full AliExpress product data: sale price, variants, shipping, store rating, star ratings and reviews (takes ~15s).',
+  {
+    product: z.string().describe('AliExpress product id or /item/<id>.html URL'),
+    reviews: z.number().int().min(0).max(50).optional().describe('Reviews to include (default 5)'),
+  },
+  async (args) => {
+    try {
+      return text(await aliexpressProduct(args.product, args.reviews));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }

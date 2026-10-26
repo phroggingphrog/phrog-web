@@ -1,0 +1,71 @@
+/**
+ * Marketplace registry - central place to register and access all marketplace implementations
+ */
+
+import { Marketplace } from './base.js';
+import { FacebookMarketplace } from './facebook/index.js';
+import { EbayMarketplace } from './ebay/index.js';
+import { DepopMarketplace } from './depop.js';
+import { PoshmarkMarketplace } from './poshmark.js';
+import { findChrome } from '../browser.js';
+
+export { Marketplace, BaseMarketplace } from './base.js';
+export { FacebookMarketplace } from './facebook/index.js';
+export { EbayMarketplace, resizeEbayImageUrl } from './ebay/index.js';
+export { DepopMarketplace } from './depop.js';
+export { PoshmarkMarketplace } from './poshmark.js';
+
+// Registry of all available marketplaces
+const marketplaces: Map<string, Marketplace> = new Map();
+
+// All known marketplace constructors
+const allMarketplaces: Record<string, () => Marketplace> = {
+  facebook: () => new FacebookMarketplace(),
+  ebay: () => new EbayMarketplace(),
+  depop: () => new DepopMarketplace(),
+  poshmark: () => new PoshmarkMarketplace(),
+};
+
+// Register marketplaces based on MARKETPLACES env var (comma-separated).
+// If not set, all marketplaces are enabled by default.
+export function initializeMarketplaces(): void {
+  const envList = process.env.MARKETPLACES?.split(',').map(s => s.trim().toLowerCase()).filter(Boolean);
+  const enabled = envList ?? Object.keys(allMarketplaces);
+
+  for (const name of enabled) {
+    const factory = allMarketplaces[name];
+    if (!factory) {
+      console.error(`Unknown marketplace "${name}" in MARKETPLACES — skipping`);
+      continue;
+    }
+    if (name === 'ebay' && (!process.env.EBAY_CLIENT_ID || !process.env.EBAY_CLIENT_SECRET)) {
+      console.error('eBay marketplace enabled but EBAY_CLIENT_ID/EBAY_CLIENT_SECRET not set — skipping');
+      continue;
+    }
+    if (name === 'depop' && !findChrome()) {
+      console.error('Depop marketplace enabled but Chrome/Chromium not found — skipping');
+      continue;
+    }
+    if (name === 'poshmark' && !findChrome()) {
+      console.error('Poshmark marketplace enabled but Chrome/Chromium not found — skipping');
+      continue;
+    }
+    registerMarketplace(factory());
+  }
+}
+
+export function registerMarketplace(marketplace: Marketplace): void {
+  marketplaces.set(marketplace.name, marketplace);
+}
+
+export function getMarketplace(name: string): Marketplace | undefined {
+  return marketplaces.get(name);
+}
+
+export function getAllMarketplaces(): Marketplace[] {
+  return Array.from(marketplaces.values());
+}
+
+export function listMarketplaceNames(): string[] {
+  return Array.from(marketplaces.keys());
+}

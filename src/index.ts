@@ -9,6 +9,7 @@ import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
+import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct, type SecondhandMarket } from './providers/marketplace.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
@@ -187,6 +188,36 @@ fastify.get('/api/media', async (req, reply) => {
   }
   try {
     return await searchMedia(q, type as MediaType, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/secondhand', async (req, reply) => {
+  const q = req.query as Record<string, string | undefined>;
+  if (!q.q && !q.id) return reply.status(400).send({ error: 'Provide q (search) or id+marketplace (listing)' });
+  try {
+    if (q.id && q.marketplace) return await secondhandListing(q.id, q.marketplace as SecondhandMarket);
+    return await searchSecondhand(q.q!, {
+      marketplaces: q.marketplaces ? (q.marketplaces.split(',') as SecondhandMarket[]) : undefined,
+      location: q.location,
+      minPrice: q.min_price ? Number(q.min_price) : undefined,
+      maxPrice: q.max_price ? Number(q.max_price) : undefined,
+      limit: q.limit ? parseInt(q.limit, 10) : undefined,
+    });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/marketplace', async (req, reply) => {
+  const q = req.query as Record<string, string | undefined>;
+  if (!q.q && !q.product) return reply.status(400).send({ error: 'Provide q (search) or product (id/URL)' });
+  try {
+    if (q.product) return await aliexpressProduct(q.product, q.reviews ? parseInt(q.reviews, 10) : undefined);
+    return await searchAliexpress(q.q!, q.limit ? parseInt(q.limit, 10) : undefined);
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
