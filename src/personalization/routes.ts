@@ -3,6 +3,9 @@ import { checkBearer } from './auth.js';
 import { getFeed, personalDb, FeedInputError } from './feed.js';
 import { feedDecide } from './decisions.js';
 import { readArtifact } from './filter.js';
+import { recordFeedback } from './feedback.js';
+import { personalDiscover } from './discover.js';
+import { personalPreferences, PreferenceInputError } from './preferences.js';
 
 export const isPersonalRoute = (url: string) => url.startsWith('/api/personal/');
 
@@ -50,6 +53,25 @@ export function registerPersonalRoutes(fastify: FastifyInstance) {
       return reply.status(500).send({ error: 'decide failed' });
     }
   });
+
+  const guarded = (name: string, fn: (req: FastifyRequest) => Promise<unknown> | unknown) => async (req: FastifyRequest, reply: FastifyReply) => {
+    if (!authorize(req, reply)) return reply;
+    try {
+      return await fn(req);
+    } catch (err) {
+      if (err instanceof FeedInputError || err instanceof PreferenceInputError) return reply.status(400).send({ error: err.message });
+      req.log.error({ err: err instanceof Error ? err.message : String(err) }, `personal ${name} failed`);
+      return reply.status(500).send({ error: `${name} failed` });
+    }
+  };
+
+  fastify.post('/api/personal/feedback', guarded('feedback', (req) => recordFeedback((req.body ?? {}) as any)));
+  fastify.post('/api/personal/discover', guarded('discover', (req) => {
+    const b = (req.body ?? {}) as Record<string, any>;
+    return personalDiscover({ intent: b.intent, constraints: b.constraints, limit: b.limit, client: b.client ?? 'rest' });
+  }));
+  fastify.get('/api/personal/preferences', guarded('preferences', () => personalPreferences({ action: 'get' })));
+  fastify.post('/api/personal/preferences', guarded('preferences', (req) => personalPreferences((req.body ?? {}) as any)));
 
   fastify.get('/api/personal/artifacts/:id', async (req, reply) => {
     if (!authorize(req, reply)) return reply;

@@ -352,5 +352,144 @@
         ]
       }
     }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "personal_discover",
+      "description": "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences. Needs the owner bearer token. Returns numbered items with link, date (null when not stated), venue, price, reason, uncertainty, delivery_id and failed_sources. After messaging the owner call personal_feedback type 'shown'. Never books anything.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "intent": {
+            "type": "string",
+            "description": "Optional focus; replaces the default categories"
+          },
+          "constraints": {
+            "type": "object",
+            "properties": {
+              "days": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 90
+              },
+              "radius_km": {
+                "type": "number"
+              },
+              "near": {
+                "type": "string"
+              }
+            }
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 30
+          }
+        },
+        "required": []
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "personal_feedback",
+      "description": "Record the owner's reaction to a discovery item. Needs the owner bearer token. Owner feedback is the truth label (like/save/want_to_go positive, dislike negative); not_now, too_far, too_expensive and this_time scope are not lasting dislikes. type 'shown' with delivery_id(s) records that you delivered the items. Reuse idempotency_key to retry safely.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "like",
+              "dislike",
+              "save",
+              "not_now",
+              "too_far",
+              "too_expensive",
+              "want_to_go",
+              "shown"
+            ]
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "delivery_id": {
+            "type": "string"
+          },
+          "delivery_ids": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "scope": {
+            "type": "string",
+            "enum": [
+              "this_time",
+              "item",
+              "creator",
+              "topic",
+              "venue"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "idempotency_key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "personal_preferences",
+      "description": "Read the owner's preference summary and explicit rules, rebuild it, or set/remove a rule. Needs the owner bearer token.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "get",
+              "rebuild",
+              "set_rule",
+              "remove_rule"
+            ]
+          },
+          "rule": {
+            "type": "string",
+            "enum": [
+              "prefer",
+              "avoid",
+              "exclude"
+            ]
+          },
+          "subject_key": {
+            "type": "string"
+          },
+          "subject_type": {
+            "type": "string"
+          },
+          "valid_until": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "rule_id": {
+            "type": "string"
+          }
+        },
+        "required": []
+      }
+    }
   }
 ]

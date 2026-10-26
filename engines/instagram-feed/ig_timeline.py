@@ -42,20 +42,46 @@ def current_account():
     return f.read_text().strip() if f.exists() else "ykswrdn"
 
 
+def restart_chrome():
+    """Restart the shared opencli Chrome once. Only called while holding the lock; re-checks the Hermes cron guard first."""
+    if busy_process():
+        return False
+    try:
+        subprocess.run(["systemctl", "--user", "restart", "opencli-chrome"], capture_output=True, timeout=60)
+    except (subprocess.TimeoutExpired, OSError):
+        return False
+    time.sleep(20)
+    return True
+
+
 def run_opencli(cursor):
     cmd = ["opencli", "instagram", "timeline", "-f", "json"]
     if cursor:
         cmd += ["--cursor", cursor]
-    last = ""
-    for attempt in range(2):  # first call after a Chrome start sometimes says "Navigation rejected"
+    last, rejected = "", False
+
+    def attempt():
+        nonlocal last, rejected
         r = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
         try:
             rows, _ = json.JSONDecoder().raw_decode(r.stdout.lstrip())
-            return json.loads(rows[0]["payload"]), ""
+            return json.loads(rows[0]["payload"])
         except (ValueError, KeyError, IndexError, TypeError):
-            last = (r.stdout + r.stderr).strip().splitlines()
-            last = " ".join(l.strip() for l in last if "Navigation" in l or "error" in l.lower() or "message" in l)[:200] or "no output"
-            time.sleep(3)
+            raw = (r.stdout + r.stderr).strip()
+            rejected = "navigation rejected" in raw.lower()
+            lines = raw.splitlines()
+            last = " ".join(l.strip() for l in lines if "Navigation" in l or "error" in l.lower() or "message" in l)[:200] or "no output"
+            return None
+
+    for _ in range(2):  # first call after a Chrome start sometimes says "Navigation rejected"
+        p = attempt()
+        if p is not None:
+            return p, ""
+        time.sleep(3)
+    if rejected and restart_chrome():  # still rejected after the retry: restart Chrome once, try once more
+        p = attempt()
+        if p is not None:
+            return p, ""
     return None, last
 
 

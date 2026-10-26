@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
+import type { DatabaseSync } from 'node:sqlite';
 import { jevConfig } from '../config.js';
 
 export const LEVELS = ['none', 'low', 'medium', 'high'] as const;
@@ -8,10 +9,20 @@ const MAX_SUMMARY_CHARS = 8000;
 
 export interface PreferenceSummary { text: string; version: string }
 
-/** Preference text from the private taste file (PHROG_TASTE_FILE). Version = first 12 hex of sha256 of the text. */
-export function preferenceSummary(): PreferenceSummary {
+/** Owner's own taste text from the private taste file (PHROG_TASTE_FILE); empty when not configured. */
+export function readTaste(): string {
   const f = jevConfig().tasteFile;
-  const text = f && existsSync(f) ? readFileSync(f, 'utf8').trim().slice(0, MAX_SUMMARY_CHARS) : '';
+  return f && existsSync(f) ? readFileSync(f, 'utf8').trim().slice(0, MAX_SUMMARY_CHARS) : '';
+}
+
+/**
+ * Preference summary used by Jev. With a DB, the stored data-derived summary (see preferences.ts) wins once one has been built;
+ * otherwise the taste text alone. Version = first 12 hex of sha256 of the text, so any change in tastes invalidates Jev's cache.
+ */
+export function preferenceSummary(d?: DatabaseSync): PreferenceSummary {
+  const stored = d ? (d.prepare('SELECT version, text FROM preference_summary WHERE id = 1').get() as any) : undefined;
+  if (stored) return { text: stored.text, version: stored.version };
+  const text = readTaste();
   return { text, version: createHash('sha256').update(text).digest('hex').slice(0, 12) };
 }
 
@@ -53,6 +64,7 @@ const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
  */
 export async function scorePost(post: JevPost, prefs: PreferenceSummary): Promise<JevScore> {
   const c = jevConfig();
+  const noun = post.type === 'event' ? 'event' : 'post';
   const state = {
     post: {
       caption: (post.caption ?? '').slice(0, 1500),
@@ -64,8 +76,8 @@ export async function scorePost(post: JevPost, prefs: PreferenceSummary): Promis
     preferences: prefs.text,
   };
   const questions = {
-    match: { type: 'score', instructions: "How well does this post match the owner's preferences?", criteria: [...LEVELS] },
-    engage: { type: 'noul', instructions: 'Would the owner want to see this post today?' },
+    match: { type: 'score', instructions: `How well does this ${noun} match the owner's preferences?`, criteria: [...LEVELS] },
+    engage: { type: 'noul', instructions: `Would the owner want to see this ${noun} today?` },
   };
   const res = await fetch(c.url, {
     method: 'POST',

@@ -218,4 +218,95 @@ CREATE TABLE agent_decisions (
 CREATE INDEX agent_decisions_item ON agent_decisions(item_id);
 `,
   },
+  {
+    // Ranked discovery: events, runs, deliveries, owner feedback, explicit rules, derived preferences and their stored summary.
+    id: '005_discover_feedback',
+    sql: `
+CREATE TABLE event_details (
+  item_id TEXT PRIMARY KEY REFERENCES items(id),
+  starts_at TEXT,
+  ends_at TEXT,
+  timezone TEXT,
+  time_precision TEXT NOT NULL DEFAULT 'unknown' CHECK (time_precision IN ('minute','day','unknown')),
+  venue_text TEXT,
+  venue_item_id TEXT REFERENCES items(id),
+  distance_km REAL,
+  price_min REAL,
+  price_max REAL,
+  currency TEXT,
+  booking_url TEXT,
+  category TEXT,
+  status TEXT NOT NULL DEFAULT 'unknown' CHECK (status IN ('scheduled','cancelled','sold_out','unknown')),
+  last_checked_at TEXT
+);
+CREATE INDEX event_details_starts ON event_details(starts_at);
+
+CREATE TABLE discovery_runs (
+  id TEXT PRIMARY KEY,
+  client TEXT,
+  intent TEXT,
+  constraints_json TEXT,
+  ranker_version TEXT,
+  started_at TEXT NOT NULL,
+  finished_at TEXT,
+  status TEXT,
+  failed_sources_json TEXT,
+  stats_json TEXT
+);
+
+CREATE TABLE deliveries (
+  id TEXT PRIMARY KEY,
+  discovery_run_id TEXT NOT NULL REFERENCES discovery_runs(id),
+  item_id TEXT NOT NULL REFERENCES items(id),
+  position INTEGER NOT NULL,
+  reason TEXT,
+  returned_at TEXT NOT NULL,
+  displayed_at TEXT
+);
+CREATE INDEX deliveries_run ON deliveries(discovery_run_id);
+CREATE INDEX deliveries_item ON deliveries(item_id);
+
+CREATE TABLE feedback (
+  id TEXT PRIMARY KEY,
+  item_id TEXT NOT NULL REFERENCES items(id),
+  delivery_id TEXT REFERENCES deliveries(id),
+  type TEXT NOT NULL CHECK (type IN ('like','dislike','save','not_now','too_far','too_expensive','want_to_go')),
+  scope TEXT NOT NULL CHECK (scope IN ('this_time','item','creator','topic','venue')),
+  reason TEXT,
+  created_at TEXT NOT NULL,
+  idempotency_key TEXT NOT NULL UNIQUE
+);
+CREATE INDEX feedback_item ON feedback(item_id);
+
+CREATE TABLE preference_rules (
+  id TEXT PRIMARY KEY,
+  subject_type TEXT NOT NULL,
+  subject_key TEXT NOT NULL,
+  rule TEXT NOT NULL CHECK (rule IN ('prefer','avoid','exclude','radius','budget')),
+  value TEXT,
+  valid_until TEXT,
+  note TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE TABLE preferences (
+  subject_type TEXT NOT NULL,
+  subject_key TEXT NOT NULL,
+  horizon TEXT NOT NULL CHECK (horizon IN ('long','recent')),
+  score REAL NOT NULL,
+  evidence_count INTEGER NOT NULL,
+  distinct_days INTEGER NOT NULL,
+  computed_at TEXT NOT NULL,
+  version TEXT NOT NULL,
+  PRIMARY KEY (subject_type, subject_key, horizon)
+);
+
+CREATE TABLE preference_summary (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  version TEXT NOT NULL,
+  text TEXT NOT NULL,
+  computed_at TEXT NOT NULL
+);
+`,
+  },
 ];

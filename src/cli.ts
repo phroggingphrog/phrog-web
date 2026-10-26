@@ -19,6 +19,9 @@ const USAGE = `phrog-web <command> [options]
   feed decide <item_id> --decision interesting|not_interesting|send_to_owner|save_event [--reason "..."] [--key K]
                                                          (feed commands need PHROG_PERSONAL_TOKEN)
   personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
+  personal preferences [--rebuild]                       (local; data-derived preference summary and rules)
+  personal discover [--intent "..."] [--days N] [--near place] [--radius-km N] [--limit N]
+  personal feedback <item_id|delivery_id> --type like|dislike|save|not_now|too_far|too_expensive|want_to_go|shown [--scope this_time|item|creator|topic|venue] [--reason "..."] [--key K]
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
         --out <path>  write full result there (default ./phrog-web-out/<cmd>-<ts>.<ext>)
         --stdout      print full output     --json  print raw JSON`;
@@ -30,6 +33,7 @@ const { values: v, positionals: pos } = parseArgs({
     mode: { type: 'string' }, limit: { type: 'string' }, format: { type: 'string' },
     'max-pages': { type: 'string' }, depth: { type: 'string' }, schema: { type: 'string' },
     sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' }, filter: { type: 'string' }, 'include-filtered': { type: 'boolean' }, order: { type: 'string' }, exploration: { type: 'string' },
+    intent: { type: 'string' }, days: { type: 'string' }, near: { type: 'string' }, 'radius-km': { type: 'string' }, rebuild: { type: 'boolean' }, scope: { type: 'string' },
     decision: { type: 'string' }, reason: { type: 'string' }, key: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
   },
 });
@@ -37,8 +41,44 @@ const { values: v, positionals: pos } = parseArgs({
 const base = (v.url || process.env.PHROG_WEB_URL || 'http://127.0.0.1:8890').replace(/\/$/, '');
 const die = (msg: string): never => { console.error(msg); process.exit(1); };
 
+if (pos[0] === 'personal' && pos[1] === 'preferences') {
+  loadConfig();
+  const { personalPreferences } = await import('./personalization/preferences.js');
+  const r: any = personalPreferences({ action: v.rebuild ? 'rebuild' : 'get' });
+  if (v.json) console.log(JSON.stringify(r));
+  else if (r.rebuilt) console.log(`rebuilt: summary ${r.length} chars, version ${r.version}\n` + Object.entries(r.counts as Record<string, { long: number; recent: number }>).map(([k, c]) => `  ${k}: ${c.long} long, ${c.recent} recent`).join('\n'));
+  else console.log(r.summary ? `${r.summary.text}\n\n(version ${r.summary.version}, ${r.summary.length} chars, computed ${r.summary.computed_at}; ${r.rules.length} active rules)` : 'no summary yet: run with --rebuild');
+  process.exit(0);
+}
+if (pos[0] === 'personal' && (pos[1] === 'discover' || pos[1] === 'feedback')) {
+  loadConfig();
+  const token = personalConfig().token;
+  if (!token) die('personal: PHROG_PERSONAL_TOKEN is not set');
+  const headers = { authorization: `Bearer ${token}` };
+  let data: any;
+  if (pos[1] === 'discover') {
+    data = await call('POST', '/api/personal/discover', {
+      intent: v.intent, limit: v.limit ? Number(v.limit) : undefined, client: 'cli',
+      constraints: { days: v.days ? Number(v.days) : undefined, near: v.near, radius_km: v['radius-km'] ? Number(v['radius-km']) : undefined },
+    }, undefined, headers);
+  } else {
+    if (!pos[2] || !v.type) die('personal feedback: <item_id|delivery_id> and --type are required');
+    const id = pos[2]!;
+    data = await call('POST', '/api/personal/feedback', {
+      type: v.type, scope: v.scope, reason: v.reason, idempotency_key: v.key,
+      ...(id.startsWith('dlv_') ? { delivery_id: id } : { item_id: id }),
+    }, undefined, headers);
+  }
+  if (v.json) console.log(JSON.stringify(data));
+  else if (pos[1] === 'feedback') console.log(data.type === 'shown' ? `shown: ${data.updated} deliveries updated` : `${data.type} (${data.scope}, ${data.effect}) for ${data.item_id}${data.duplicate ? ' (already recorded)' : ''}`);
+  else {
+    console.log(`discover ${data.run_id}: ${data.status}, ${data.items.length} items, ${data.counts.with_exact_date} with a date, cost $${data.cost_usd}${data.failed_sources.length ? `, ${data.failed_sources.length} failed sources` : ''}`);
+    for (const it of data.items) console.log(`${it.rank}. ${it.title} | ${it.starts_at ?? 'date unknown'} | ${it.venue ?? 'venue unknown'} | ${it.url}\n   ${it.reason} [${it.delivery_id}]`);
+  }
+  process.exit(0);
+}
 if (pos[0] === 'personal') {
-  if (pos[1] !== 'import') die('personal: only "import" is available\n\n' + USAGE);
+  if (pos[1] !== 'import') die('personal: use import, preferences, discover or feedback\n\n' + USAGE);
   loadConfig();
   const { SOURCES, runImport, formatImport } = await import('./personalization/imports/index.js');
   const { importConfig } = await import('./config.js');

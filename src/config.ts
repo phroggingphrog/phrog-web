@@ -129,6 +129,17 @@ export function jevConfig() {
   };
 }
 
+/** personal_discover limits, read from the environment at call time. */
+export function discoverConfig() {
+  const int = (v: string | undefined, d: number) => Math.max(1, Math.trunc(posNum(v, d)));
+  return {
+    city: (process.env.PHROG_DISCOVER_CITY || 'Melbourne').trim().slice(0, 60),
+    maxPages: int(process.env.PHROG_DISCOVER_MAX_PAGES, 20),
+    maxJev: int(process.env.PHROG_DISCOVER_MAX_JEV, 20),
+    maxSearches: int(process.env.PHROG_DISCOVER_MAX_SEARCHES, 24),
+  };
+}
+
 /** Personal discovery settings, read from the environment at call time. No defaults for secrets. */
 export function personalConfig(): { dbPath: string; token: string | null; collectorCmd: string | null; collectorTimeoutMs: number } {
   const t = Number(process.env.PHROG_IG_COLLECTOR_TIMEOUT_S);
