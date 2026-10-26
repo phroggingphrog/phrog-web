@@ -42,7 +42,7 @@ test('ok page is stored and returned as feed.v1', async () => {
   const f = await getFeed({ provider: 'instagram', account: 'owner_one', limit: 3 });
   assert.equal(f.schema_version, 'feed.v1');
   assert.equal(f.status, 'ok');
-  assert.equal(f.next_cursor, 'NEXT:abc==');
+  assert.match(f.next_cursor!, /^run_[0-9a-f-]{36}$/);
   assert.equal(f.items.length, 3);
   const [a, b, c] = f.items;
   assert.equal(a.posted_at, '2026-09-21T14:13:20.000Z');
@@ -66,6 +66,15 @@ test('cursor is passed through as one argv element', async () => {
   await getFeed({ provider: 'instagram', account: 'owner_one', limit: 5, cursor: 'AbC_-=:.|x' });
   const last = JSON.parse(readFileSync(argsFile, 'utf8').trim().split('\n').pop()!);
   assert.deepEqual(last, ['--account', 'owner_one', '--limit', '5', '--cursor', 'AbC_-=:.|x']);
+});
+
+test('returned next_cursor resumes with the raw collector cursor', async () => {
+  const f = await getFeed({ provider: 'instagram', account: 'owner_one', limit: 3 });
+  const g = await getFeed({ provider: 'instagram', account: 'owner_one', limit: 3, cursor: f.next_cursor });
+  assert.equal(g.cursor, f.next_cursor);
+  const last = JSON.parse(readFileSync(argsFile, 'utf8').trim().split('\n').pop()!);
+  assert.deepEqual(last.slice(-2), ['--cursor', 'NEXT:abc==']);
+  await assert.rejects(getFeed({ provider: 'instagram', account: 'someone_else', limit: 3, cursor: f.next_cursor }), FeedInputError);
 });
 
 test('ssh collector gets remote-shell-quoted arguments', async () => {

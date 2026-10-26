@@ -45,6 +45,8 @@ function runStatus(s: CollectorResult['status']): string {
   }
 }
 
+const RUN_CURSOR_RE = /^run_[0-9a-f-]{36}$/;
+
 export async function getFeed(req: FeedRequest) {
   if (req.provider !== 'instagram') throw new FeedInputError('provider must be "instagram"');
   if (!ACCOUNT_RE.test(req.account ?? '')) throw new FeedInputError('account must match [A-Za-z0-9._]{1,30}');
@@ -52,11 +54,19 @@ export async function getFeed(req: FeedRequest) {
   if (source !== 'home') throw new FeedInputError('source must be "home"');
   const limit = req.limit ?? DEFAULT_LIMIT;
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) throw new FeedInputError(`limit must be an integer 1..${MAX_LIMIT}`);
-  const cursor = req.cursor || null;
-  if (cursor !== null && !CURSOR_RE.test(cursor)) throw new FeedInputError('cursor has invalid characters or length');
+  const given = req.cursor || null;
+  if (given !== null && !CURSOR_RE.test(given)) throw new FeedInputError('cursor has invalid characters or length');
 
   const cfg = personalConfig();
   const d = db();
+  // next_cursor is the id of the run that fetched the previous page; the raw Instagram cursor stays in the DB.
+  let cursor = given;
+  if (given !== null && RUN_CURSOR_RE.test(given)) {
+    const row = d.prepare(`SELECT r.next_checkpoint FROM collection_runs r JOIN source_accounts a ON a.id = r.source_account_id
+      WHERE r.id = ? AND a.provider = ? AND a.handle = ?`).get(given, req.provider, req.account) as any;
+    if (!row?.next_checkpoint) throw new FeedInputError('unknown cursor for this account');
+    cursor = row.next_checkpoint;
+  }
   const now = () => new Date().toISOString();
   const runId = `run_${randomUUID()}`;
   const startedAt = now();
@@ -127,8 +137,8 @@ export async function getFeed(req: FeedRequest) {
       });
     });
 
-    d.prepare('UPDATE collection_runs SET finished_at = ?, status = ?, items_seen = ?, items_new = ?, error = ? WHERE id = ?')
-      .run(now(), runStatus(res.status), out.length, newCount, res.error, runId);
+    d.prepare('UPDATE collection_runs SET finished_at = ?, status = ?, items_seen = ?, items_new = ?, error = ?, next_checkpoint = ? WHERE id = ?')
+      .run(now(), runStatus(res.status), out.length, newCount, res.error, res.next_cursor ?? null, runId);
     if (res.status === 'ok' || res.status === 'end') d.prepare("UPDATE source_accounts SET status = 'ok', last_verified_at = ? WHERE id = ?").run(now(), accountId);
     else if (res.status === 'auth_required' || res.status === 'challenge') d.prepare('UPDATE source_accounts SET status = ? WHERE id = ?').run(res.status, accountId);
     d.exec('COMMIT');
@@ -138,7 +148,7 @@ export async function getFeed(req: FeedRequest) {
     schema_version: 'feed.v1',
     provider: req.provider, account: req.account, source,
     status: res.status, fetched_at: fetchedAt,
-    cursor: res.cursor ?? cursor, next_cursor: res.next_cursor,
+    cursor: given, next_cursor: res.next_cursor ? runId : null,
     ...(res.error ? { error: res.error } : {}),
     items: out,
   };

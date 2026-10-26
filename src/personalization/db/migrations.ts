@@ -82,4 +82,9 @@ CREATE TABLE observations (
 CREATE INDEX observations_item ON observations(item_id);
 `,
   },
+  {
+    // Instagram cursors grow ~700 chars per page; callers get the short run id instead.
+    id: '002_next_checkpoint',
+    sql: `ALTER TABLE collection_runs ADD COLUMN next_checkpoint TEXT;`,
+  },
 ];
