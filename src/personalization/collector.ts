@@ -2,8 +2,8 @@ import { execFile } from 'node:child_process';
 import { basename } from 'node:path';
 
 export const ACCOUNT_RE = /^[A-Za-z0-9._]{1,30}$/;
-// Instagram next_max_id is base64-like and can contain + and /; the remote shell receives it single-quoted.
-export const CURSOR_RE = /^[A-Za-z0-9_\-=:.|+/]{1,512}$/;
+// Instagram next_max_id is base64-like, can contain + and /, and was observed at 1232 chars; the remote shell receives it single-quoted.
+export const CURSOR_RE = /^[A-Za-z0-9_\-=:.|+/]{1,4096}$/;
 
 export const COLLECTOR_STATUSES = ['ok', 'end', 'auth_required', 'challenge', 'rate_limited', 'busy', 'unsupported', 'failed'] as const;
 export type CollectorStatus = (typeof COLLECTOR_STATUSES)[number];
