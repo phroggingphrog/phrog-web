@@ -10,6 +10,7 @@ import { searchGithubRepos } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
+import { searchDeals } from '../../providers/ozbargain.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct } from '../../providers/marketplace.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
@@ -403,6 +404,23 @@ server.tool(
   async (args) => {
     try {
       return text(await aliexpressProduct(args.product, args.reviews));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'deals_search',
+  'Australian deals and price history from OzBargain: price, votes, store link, posted date, expired flag. Use to cross-check a product price before buying. No query = latest deals.',
+  {
+    query: z.string().optional().describe('Product or brand, e.g. "ugreen usb c hub"'),
+    limit: z.number().int().min(1).max(30).optional(),
+    includeExpired: z.boolean().optional().describe('Keep expired deals as past-price reference (default true)'),
+  },
+  async (args) => {
+    try {
+      return text(await searchDeals(args.query, args));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
