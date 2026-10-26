@@ -27,7 +27,9 @@ import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } 
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 import { logged, recentRuns } from '../../runlog.js';
 import { saveToBrainWiki } from '../../wiki/brain.js';
-import { getFeed } from '../../personalization/feed.js';
+import { getFeed, personalDb } from '../../personalization/feed.js';
+import { feedDecide, DECISIONS } from '../../personalization/decisions.js';
+import { readArtifact, ARTIFACT_URL_PREFIX } from '../../personalization/filter.js';
 import { stdioAuthorized, AUTH_REQUIRED_MESSAGE } from '../../personalization/auth.js';
 
 const text = (data: unknown) => ({
@@ -565,15 +567,44 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
   catch (err) { return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] }; }
 };
 
-server.tool('feed', 'Personal Instagram home feed as feed.v1 (owner bearer token required). Posts come in the order Instagram served them; pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed.', {
+const MAX_FEED_IMAGES = 8;
+
+server.tool('feed', 'Personal Instagram home feed as feed.v1 (owner bearer token required). Posts come in the order Instagram served them; pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. With filter "jev" each post is scored first; only passing posts are returned (the rest are counted in filtered_out) and their screenshots follow the JSON as images, so look at them and record your call with feed_decide.', {
   provider: z.enum(['instagram']).default('instagram'),
   account: z.string().describe('Account name, [A-Za-z0-9._]{1,30}'),
   source: z.enum(['home']).default('home'),
   limit: z.number().int().min(1).max(50).default(20),
   cursor: z.string().optional().describe('next_cursor from the previous page'),
+  filter: z.enum(['jev']).optional().describe('Score posts with Jev and return only those worth a look, with screenshots'),
+  include_filtered: z.boolean().optional().describe('With filter: also return posts that did not pass (no screenshots)'),
+  order: z.enum(['feed', 'predicted']).optional().describe('predicted sorts by p_match (needs filter)'),
+  exploration: z.number().min(0).max(1).optional().describe('Chance 0..1 that a below-threshold post passes anyway. Default 0'),
 }, async (a: any) => {
   if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
-  return safe(getFeed)(a);
+  try {
+    const feed = await getFeed(a);
+    const content: any[] = [{ type: 'text' as const, text: JSON.stringify(feed, null, 2) }];
+    for (const it of feed.items as any[]) {
+      if (content.length > MAX_FEED_IMAGES) break;
+      const shot: string | undefined = it.filter?.passed ? it.render?.screenshot : undefined;
+      if (!shot?.startsWith(ARTIFACT_URL_PREFIX)) continue;
+      const png = readArtifact(personalDb(), shot.slice(ARTIFACT_URL_PREFIX.length));
+      if (png) content.push({ type: 'image' as const, data: png.toString('base64'), mimeType: 'image/png' });
+    }
+    return { content };
+  } catch (err) {
+    return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] };
+  }
+});
+
+server.tool('feed_decide', "Record your judgement of a feed post (owner bearer token required). Stored with the feed run and the prediction shown. These are your guesses, not the owner's taste. Pass the same idempotency_key to retry safely.", {
+  item_id: z.string().describe('item_id from the feed'),
+  decision: z.enum(DECISIONS),
+  reason: z.string().max(2000).optional(),
+  idempotency_key: z.string().max(128).optional(),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
+  return safe((x) => feedDecide({ ...x, client: 'mcp' }))(a);
 });
 
 server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions (click/type/press/scroll/wait/wait_for) and stealth force the browser. PDF and Office URLs are converted to text.', {
