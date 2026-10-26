@@ -10,6 +10,7 @@ import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
+import { searchPlaces } from './providers/places.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct, type SecondhandMarket } from './providers/marketplace.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
@@ -189,6 +190,17 @@ fastify.get('/api/media', async (req, reply) => {
   }
   try {
     return await searchMedia(q, type as MediaType, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/places', async (req, reply) => {
+  const q = req.query as Record<string, string | undefined>;
+  if (!q.q) return reply.status(400).send({ error: 'Missing q' });
+  try {
+    return await searchPlaces(q.q, { limit: q.limit ? parseInt(q.limit, 10) : undefined });
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });

@@ -11,6 +11,7 @@ import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchDeals } from '../../providers/ozbargain.js';
+import { searchPlaces } from '../../providers/places.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct } from '../../providers/marketplace.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
@@ -421,6 +422,22 @@ server.tool(
   async (args) => {
     try {
       return text(await searchDeals(args.query, args));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'place_search',
+  'Google Maps places with Google rating, review count, category, address and open status (e.g. "pho footscray", "State Library Victoria"). Review text needs GOOGLE_PLACES_API_KEY.',
+  {
+    query: z.string().describe('Place or "what near where"'),
+    limit: z.number().int().min(1).max(20).optional(),
+  },
+  async (args) => {
+    try {
+      return text(await searchPlaces(args.query, { limit: args.limit }));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
