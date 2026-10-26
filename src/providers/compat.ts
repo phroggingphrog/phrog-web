@@ -5,6 +5,8 @@ import { executeSearch } from './search.js';
 import { call } from './vault.js';
 
 const TIME_RANGES = ['day', 'week', 'month', 'year'];
+/** Image engines that return icons or museum art, which drown out product photos. */
+export const NOISY_IMAGE_ENGINES = new Set(['lucide', 'artic', 'iconify', 'svgrepo', 'openclipart']);
 
 export async function webSearch(a: { query: string; limit?: number; time_range?: string | null; language?: string | null; categories?: string | null }) {
   const query = a.query.trim();
@@ -20,9 +22,11 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
     const res = await fetch(`${(process.env.SEARXNG_URL || 'http://127.0.0.1:8888').replace(/\/$/, '')}/search?${p}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
     if (!res.ok) throw new Error(`SearXNG HTTP ${res.status}`);
     const raw: any[] = ((await res.json()) as any).results ?? [];
-    const results = raw.filter((r) => r?.url).slice(0, limit).map((r) => ({
+    const images = /\bimages\b/.test(a.categories ?? '');
+    const results = raw.filter((r) => r?.url && !(images && NOISY_IMAGE_ENGINES.has(r.engine))).slice(0, limit).map((r) => ({
       title: String(r.title || r.url), url: String(r.url), snippet: String(r.content || r.snippet || ''),
       published_date: String(r.publishedDate || r.published_at || '') || null, engines: (r.engines ?? []).map(String),
+      ...(r.img_src && { image: String(r.img_src).replace(/^\/\//, 'https://'), thumbnail: r.thumbnail_src ? String(r.thumbnail_src).replace(/^\/\//, 'https://') : undefined }),
     }));
     if (results.length) return { query, results, count: results.length, provider: 'searxng' };
   } catch (e) { err = e; }

@@ -88,7 +88,9 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<{ r
 
   const max = options.limit || 15;
   const { results: _drop, ...envelope } = data;
-  const results = data.results.slice(0, max).map(r => ({
+  const images = (options.categories || []).includes('images');
+  const noisy = new Set(['lucide', 'artic', 'iconify', 'svgrepo', 'openclipart']);
+  const results = data.results.filter(r => !(images && noisy.has(r.engine as string))).slice(0, max).map(r => ({
     title: r.title || '',
     url: r.url || '',
     snippet: r.content || '',

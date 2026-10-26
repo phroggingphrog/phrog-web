@@ -80,6 +80,7 @@ export interface SecondhandOptions {
   limit?: number;
   condition?: string;
   sort?: string;
+  includeImages?: boolean;
 }
 
 export interface SecondhandResult {
@@ -99,6 +100,7 @@ export async function searchSecondhand(query: string, opts: SecondhandOptions = 
     ...(place && { location: place }),
     ...(opts.radiusKm !== undefined && { radiusMiles: Math.round(opts.radiusKm / 1.609) }),
     limit: opts.limit ?? 10,
+    includeImages: opts.includeImages ?? true,
     ...(opts.minPrice !== undefined && { minPrice: opts.minPrice }),
     ...(opts.maxPrice !== undefined && { maxPrice: opts.maxPrice }),
     ...(opts.condition && { condition: opts.condition }),
@@ -116,7 +118,7 @@ export async function searchSecondhand(query: string, opts: SecondhandOptions = 
 }
 
 export async function secondhandListing(listingId: string, marketplace: SecondhandMarket): Promise<{ marketplace: string; text: string }> {
-  return { marketplace, text: await call('get_listing_details', { listingId, marketplace, includeImages: false }) };
+  return { marketplace, text: await call('get_listing_details', { listingId, marketplace, includeImages: true }) };
 }
 
 export interface AliexpressHit {
