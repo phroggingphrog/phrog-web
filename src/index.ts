@@ -11,7 +11,7 @@ import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
-import { visualSearch } from './providers/visual.js';
+import { visualSearch, getTempImage } from './providers/visual.js';
 import { resolveLocation, localizeQuery } from './location.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct, type SecondhandMarket } from './providers/marketplace.js';
 import { searchSocial } from './providers/social.js';
@@ -198,6 +198,13 @@ fastify.get('/api/media', async (req, reply) => {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
   }
+});
+
+// Short-lived photo links for Bing Visual Search (see providers/visual.ts). Unknown or expired tokens are 404.
+fastify.get('/i/:token', async (req, reply) => {
+  const img = getTempImage((req.params as { token: string }).token);
+  if (!img) return reply.status(404).send('not found');
+  return reply.header('Cache-Control', 'no-store').header('X-Robots-Tag', 'noindex').type(img.type).send(img.body);
 });
 
 fastify.post('/api/visual', { bodyLimit: 12 * 1024 * 1024 }, async (req, reply) => {

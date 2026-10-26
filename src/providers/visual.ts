@@ -1,9 +1,10 @@
 // Visual search: identify an item from a photo, then look it up in shops, deals and secondhand listings.
 // The image goes to the vision model (VISION_MODEL, default claude/haiku via OmniRoute; not a free route) and, only when it
-// is a public URL, to Bing Visual Search. Google Lens is not used: it answers this server with a CAPTCHA.
+// is a public URL (or PHROG_PUBLIC_IMAGE_BASE gives local photos a 5-minute link), to Bing Visual Search. Google Lens is not used: it answers this server with a CAPTCHA.
 import { readFileSync, statSync, existsSync } from 'node:fs';
 import { resolve, dirname, extname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { randomBytes } from 'node:crypto';
 import { loadConfig } from '../config.js';
 import { omnirouteKey } from './browse.js';
 import { searchAliexpress, searchSecondhand } from './marketplace.js';
@@ -14,6 +15,29 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PUPPETEER = resolve(REPO_ROOT, 'engines/secondhand-mcp/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js');
 const MAX_BYTES = 8 * 1024 * 1024;
 const MIME: Record<string, string> = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif' };
+
+// Short-lived public links so Bing can read a local photo. Off unless PHROG_PUBLIC_IMAGE_BASE is set
+// (e.g. https://mcp-webagent.phroggingphrog.com, with only /i/* exempt from the login). Links expire after 5 minutes
+// and are deleted as soon as Bing has finished.
+const TEMP_TTL_MS = 5 * 60 * 1000;
+const temp = new Map<string, { type: string; body: Buffer; expires: number }>();
+
+export function getTempImage(token: string): { type: string; body: Buffer } | undefined {
+  const t = temp.get(token);
+  if (!t) return undefined;
+  if (Date.now() > t.expires) { temp.delete(token); return undefined; }
+  return t;
+}
+
+function tempLink(dataUrl: string): { url: string; done: () => void } | undefined {
+  const base = process.env.PHROG_PUBLIC_IMAGE_BASE?.replace(/\/$/, '');
+  const m = dataUrl.match(/^data:(image\/[a-z+.-]+);base64,(.+)$/);
+  if (!base || !m) return undefined;
+  for (const [k, v] of temp) if (Date.now() > v.expires) temp.delete(k);
+  const token = randomBytes(24).toString('base64url');
+  temp.set(token, { type: m[1], body: Buffer.from(m[2], 'base64'), expires: Date.now() + TEMP_TTL_MS });
+  return { url: `${base}/i/${token}`, done: () => temp.delete(token) };
+}
 
 export interface Identified {
   item?: string;
@@ -95,9 +119,11 @@ export async function visualSearch(image: string, opts: { hint?: string; shop?: 
   const errors: VisualResult['errors'] = [];
   const err = (source: string) => (e: any) => { errors.push({ source, error: e instanceof Error ? e.message : String(e) }); return undefined; };
   const { dataUrl, publicUrl } = await loadImage(image);
+  const link = publicUrl ? undefined : tempLink(dataUrl);
+  const bingUrl = publicUrl ?? link?.url;
   const [identified, bing] = await Promise.all([
     identify(dataUrl, opts.hint).catch(err('vision')),
-    publicUrl ? bingIdentify(publicUrl).catch(err('bing')) : Promise.resolve(undefined),
+    bingUrl ? bingIdentify(bingUrl).catch(err('bing')).finally(() => link?.done()) : Promise.resolve(undefined),
   ]);
   const query = (identified?.search_query || bing || identified?.item || '').trim();
   if (!query) throw new Error(`could not identify the image (${errors.map((e) => `${e.source}: ${e.error}`).join('; ')})`);
