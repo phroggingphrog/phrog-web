@@ -5,7 +5,7 @@ import { executeSearch, SearchOptions } from './providers/search.js';
 import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
 import { searchGithubRepos } from './providers/github.js';
-import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
+import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
@@ -347,6 +347,19 @@ fastify.get('/api/deepwiki/structure', async (req, reply) => {
   try {
     const res = await getDeepWikiStructure(repo);
     return res;
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/deepwiki/read', async (req, reply) => {
+  const { repo, max_chars } = req.query as { repo?: string; max_chars?: string };
+  if (!repo) {
+    return reply.status(400).send({ error: 'Query parameter "repo" (e.g. owner/repo) is required' });
+  }
+  try {
+    return await readDeepWikiContents(repo, max_chars ? Number(max_chars) : undefined);
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
