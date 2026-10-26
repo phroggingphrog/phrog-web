@@ -54,7 +54,8 @@ Separate SQLite file (`node:sqlite`), not the wiki index. Path from config.
 - `deliveries`: id, discovery_run_id, item_id, position, reason, returned_at, displayed_at (NULL until shown). Returned is not shown; unshown is not disliked.
 - `feedback`: id, item_id, delivery_id (NULL ok), type (like/dislike/save/not_now/too_far/too_expensive/want_to_go), scope (this_time/item/creator/topic/venue), reason, created_at, idempotency_key UNIQUE. "Too expensive this time" is not a lasting dislike.
 - `preference_rules`: id, subject_type, subject_key, rule (prefer/avoid/exclude/radius/budget), value, valid_until, note, created_at. Explicit rules beat derived scores.
-- `predictions`: item_id, collection_run_id, p_engage, p_save, calibrated, model_version, reasons_json, created_at. Kept so later behaviour can check how good past predictions were.
+- `predictions`: item_id, collection_run_id, scorer (jev), model_version, preference_summary_version, p_match, p_engage, confidence, cost_usd, calibrated, created_at. Kept so owner reactions can check how good past predictions were.
+- `agent_decisions`: id, item_id, collection_run_id, prediction_id, client (hermes), decision (interesting/not_interesting/send_to_owner/save_event), reason, created_at, idempotency_key UNIQUE. Never used as owner-taste labels.
 - `preferences` (derived, rebuilt from scratch each run, no history): subject_type, subject_key, horizon (long/recent), score, evidence_count, distinct_days, computed_at, ranker_version. Explanations are computed on demand from source tables, not stored per row.
 
 ## 5. Interfaces
@@ -88,9 +89,9 @@ Output is one versioned JSON schema (published as a JSON Schema file and in the 
     "location": null, "like_count": null, "comment_count": null,
     "seen_before": false, "first_seen_at": "UTC time",
     "prediction": {
-      "p_engage": 0.0, "p_save": 0.0,
+      "p_match": 0.0, "p_engage": 0.0, "confidence": 0.0,
       "calibrated": false, "model_version": "...",
-      "reasons": [{ "factor": "author_affinity", "effect": "+", "evidence": "liked 12 of their posts" }]
+      "scorer": "jev", "preference_summary_version": "...", "cost_usd": 0.0
     }
   }]
 }
@@ -98,15 +99,7 @@ Output is one versioned JSON schema (published as a JSON Schema file and in the 
 
 Unknown fields are `null`, never guessed. `prediction` is `null` until Phase 2.
 
-## 5a. Behaviour prediction
-
-Each feed item gets a probability that the owner would engage with it (`p_engage`: like, save, open or reply) and save it (`p_save`), learned from personal behaviour data:
-
-- Labels: past likes, saves, comments and shares in the social DB (`platform_events`, by author and post), plus phrog-web feedback and `seen_in_feed` items that got no action (weak negatives only; unseen is never negative).
-- Features: author affinity (past interactions with this author, followed or not), topic and place match from `annotations` against long-term and recent taste (behaviour-model results, `taste.md`), post type (reel vs photo vs carousel), sponsored/suggested, recency, already seen, Melbourne event signal (date, venue, distance).
-- Model: start with a simple, explainable model (regularised logistic regression or naive Bayes per feature group), so every score comes with its top reasons. Train on chronological splits: older behaviour trains, newer behaviour tests.
-- Honesty: report `calibrated: false` until calibration is checked on held-out data (Brier score and a reliability curve). Scores are probabilities about the owner's own behaviour, not truth about the post. Explicit rules (`exclude`, `avoid`) override the model.
-- Baselines to beat: Instagram's own order, "followed authors first", and "authors liked before". If the model does not beat them on held-out data, ship the feed without re-ordering.
+- `feed_decide(item_id, decision, reason)`: Hermes records its judgement on a post (section 5a).
 
 Ranked discovery sits on top of the feed tools (Phase 2):
 
@@ -116,6 +109,28 @@ Ranked discovery sits on top of the feed tools (Phase 2):
 - `personal_preferences`: read and set rules.
 
 Matching REST under `/api/personal/`. The Hermes cron can either scroll with `feed` and judge the posts itself, or call `personal_discover` for a ranked list. Either way it sends the message and reports `personal_feedback(shown)`. Booking stays a Hermes action ("book N").
+
+## 5a. Who decides, and how prediction works
+
+**Hermes decides what is interesting.** phrog-web serves the feed and a probability per post; Hermes reads the posts and makes the call. Every call is saved in phrog-web's DB:
+
+- Every `feed` call: a `collection_runs` row plus one `observations` row (`seen_in_feed`) per post, with its position and flags.
+- Every Hermes judgement: Hermes calls `feed_decide(item_id, decision, reason)` (MCP + `phrog-web feed decide`), with decision `interesting` / `not_interesting` / `send_to_owner` / `save_event`. Stored in `agent_decisions` with the feed run, the prediction shown at the time, and the client name.
+- Every owner reaction to what Hermes sent (reply, "book N", "not this", saved, ignored) arrives through `personal_feedback` and is stored as owner feedback.
+
+**Jev gives the probability.** For each post, phrog-web calls Jev (`typesafe/jev-1.13` via OpenRouter's decisions endpoint, the same service Hermes's `jev_mcp.py` uses) directly, not through Hermes:
+
+- State sent: the post (caption, author, type, OCR/description text, event date/place if found) and a short preference summary built from personal behaviour data (top authors, topics, places and recent changes from the social/behaviour DBs, `taste.md` and explicit rules). Raw history, messages and account credentials are never sent.
+- Questions: one `score` question ("how well does this match the owner's preferences": none/low/medium/high) and one `noul` question ("would the owner want to see this today?"). Jev's probabilities fill `prediction.p_match` and `prediction.p_engage`, with its confidence and cost.
+- Budget: configured max posts and dollars per day; skip Jev for posts already scored with the same preference-summary version.
+- Explicit rules (`exclude`, `avoid`) override Jev.
+
+**Keeping the learning honest:**
+
+- Hermes's decisions are Hermes's guesses, not the owner's taste. They are stored and evaluated but never used as training labels for the owner's preferences; otherwise the system would learn from itself.
+- Owner reactions are the truth labels. They update the preference summary and measure how good Jev and Hermes were: per decision type, hit rate, and Jev calibration (Brier score, reliability curve). `calibrated: false` until that check passes.
+- Baselines to beat: Instagram's own order and "authors liked before". If Jev ordering does not beat them on owner reactions, keep the feed in Instagram order and leave `prediction` as information only.
+- Later, only if Jev plateaus: a small local model trained on owner reactions, using Jev's score as one feature.
 
 ## 6. Phases
 
@@ -138,8 +153,9 @@ Matching REST under `/api/personal/`. The Hermes cron can either scroll with `fe
 **Phase 2, prediction and ranked discovery, about 2 to 3 days.**
 
 - Humanitix and Eventbrite through existing phrog-web search and fetch.
-- Ranking owned by phrog-web: port the `jev_score` logic from Hermes (`jev_mcp.py`), plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
-- Behaviour prediction (section 5a): features, model, chronological evaluation against the baselines, `prediction` filled in `feed.v1`, `--order predicted`.
+- Ranking owned by phrog-web: the same Jev scoring as the feed, plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
+- Jev scoring in phrog-web (section 5a): preference summary from behaviour data, per-post Jev call with budget and caching, `prediction` filled in `feed.v1`, `--order predicted`.
+- `feed_decide` tool and `agent_decisions`; owner reactions via `personal_feedback`; weekly report of Hermes hit rate and Jev calibration against owner reactions.
 - `personal_discover` over MCP and REST, deliveries, feedback, preference rebuild (long vs recent).
 - Exit: shadow run next to the old cron for 3 days; the owner compares the two messages; a "not interested in X" changes the next run.
 
