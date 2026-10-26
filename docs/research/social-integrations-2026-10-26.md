@@ -1,6 +1,6 @@
 # Social integrations: source review and recovered project intent
 
-Reviewed 2026-10-26. Scope: clone and explore the five shortlisted upstream repositories, recover the older doomscroll/social-replacement ideas, and identify integration boundaries. No provider installation, account access, service deployment, or implementation was performed.
+Reviewed 2026-10-26. Scope: clone and explore the seven shortlisted upstream repositories (the original five plus social-media-research-cli and cobalt), recover the older doomscroll/social-replacement ideas, and identify integration boundaries. No provider installation, account access, service deployment, or implementation was performed.
 
 ## Conclusion
 
@@ -9,6 +9,8 @@ The older goal is to have Hermes read the owner's feeds, find relevant local eve
 For that goal, X Signal is the most directly matched X component in this shortlist. Socai offers broader platform operations, but its Instagram adapter does not expose a home-feed command at the reviewed revision. RSSHub supplies selected account/channel feeds and an authenticated X home route. Last30days supplies research planning, evidence fusion, watchlists, and briefing code. ScrapeCreators supplies workflow instructions and API documentation, not a self-hosted acquisition engine.
 
 The proposed division is phrog-web for retrieval, Hermes for personal relevance, scheduling, preference feedback, and delivery. This is a proposal, not a description of a completed integration.
+
+The expanded shortlist also includes social-media-research-cli as a protocol-first acquisition candidate with a passive Chrome session bridge, and cobalt as a media-resolution/downloading service after discovery. Neither establishes a replacement for Instagram home-feed collection at the reviewed revisions.
 
 ## Clone inventory and review limits
 
@@ -19,10 +21,12 @@ The clones live outside the application checkout, in the sibling directory `../p
 - `RSSHub`: `DIYgod/RSSHub`, commit `1f481e461da07398cdbc3961414e397b9eb91948`, 7,179 tracked files.
 - `last30days-skill`: `mvanhorn/last30days-skill`, commit `6f9052cca8fcafad9055c438b7b3f9112f2ee20f`, 597 tracked files.
 - `social-media-research-skills`: `ScrapeCreators/social-media-research-skills`, commit `64ba7b4dea71e130d2712ffb6c1c1024b3b7c4b2`, 20 tracked files.
+- `social-media-research-cli`: `ifccod/social-media-research-cli`, commit `a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49`, 448 tracked files.
+- `cobalt`: `imputnet/cobalt`, commit `a636575b09de1fc55d9b8cd98cac88f5f2f16b42`, 468 tracked files.
 
 Each clone has a sibling `<repo>-inventory.json` containing every tracked path, file size, and SHA-256 for source/configuration/documentation text formats. `inventory-summary.json` records origins, revisions, counts, and top-level module distribution. These inventories fingerprint the snapshots; hashes are not a security audit.
 
-The checked-in license files identify socai as Apache-2.0, X Signal/last30days/ScrapeCreators skills as MIT, and RSSHub as AGPL-3.0. Preserve those upstream licenses when evaluating reuse; RSSHub should not be assumed to share the licensing of the other candidates.
+The checked-in license files identify socai as Apache-2.0, X Signal/last30days/ScrapeCreators skills/social-media-research-cli as MIT, and RSSHub as AGPL-3.0. Cobalt's API/root license is AGPL-3.0; its web directory has a separate CC-BY-NC-SA-4.0 license. Preserve those upstream licenses when evaluating reuse; do not assume every directory shares one license.
 
 This is a repository-wide architectural exploration with focused reading of acquisition, authentication, interfaces, persistence, and relevant tests. It is not a line-by-line audit of every file. In particular, RSSHub has 1,980 namespace files and 3,571 literal `export const route` declarations across 6,187 route-tree TypeScript files; those are source inventory counts, not tested working endpoints. Website assets, desktop styling, and unrelated route implementations were inventoried but not exhaustively reviewed. No upstream test suite or live authenticated capability was verified.
 
@@ -48,7 +52,7 @@ That reconstruction mentions `collect_social.py`, `social_radar.py`, `ig_scroll.
 
 `~/projects/hermes-revamp/INTENT.md` records the October 23-24 direction: understand the owner's behavior and preferences, navigate as the owner, use Jev and an Android VM where appropriate, and learn repeatable navigation from recordings. The same record separates Pictho and clone/emulation work from the assistant project, while documenting later voice/emulation integration.
 
-This broader idea includes acting as well as reading. The current exploration authorizes neither social posting nor messaging. Existing DMs/communication bridges should be evaluated separately from feed acquisition; none of these five repositories supplies a verified replacement for the existing Instagram/WhatsApp messaging pipeline.
+This broader idea includes acting as well as reading. The current exploration authorizes neither social posting nor messaging. Existing DMs/communication bridges should be evaluated separately from feed acquisition; none of these seven repositories supplies a verified replacement for the existing Instagram/WhatsApp messaging pipeline.
 
 I recovered explicit doomscroll-replacement requirements in the Hermes records. I did not locate a separate project repository or authoritative project card named `Doomscroller`. T3 searches were project-scoped; connected board searches returned no matching record. The Hermes requirement should not silently be relabeled as a separately recovered app.
 
@@ -157,6 +161,44 @@ The [social-listening workflow](https://github.com/ScrapeCreators/social-media-r
 
 Recommended shape: an optional hosted public-data provider plus workflow references. It cannot read the owner's personalized signed-in home feed merely because an API key exists. No endpoint call, credit spend, or skill installation was performed; repository skill text was treated as material under review, not installed instructions.
 
+## 6. Social Media Research CLI
+
+Added to the shortlist at the owner's request. This repository has a Python `reverse` CLI, platform-specific protocol clients, a shared browser-session daemon, and a Chrome Manifest V3 extension. Its 448 tracked files include 193 test-tree files, 187 production-package files, and 61 extension-tree files. These are inventory counts, not a statement that every test passes.
+
+### Architecture and acquisition
+
+[CLI dispatch](https://github.com/ifccod/social-media-research-cli/blob/a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49/reverse/__main__.py) loads a platform's command module. [Catalog generation](https://github.com/ifccod/social-media-research-cli/blob/a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49/reverse/catalog.py) derives command/argument descriptions from argparse declarations; discovery is not a separately maintained endpoint list. The package requires Python >=3.11 and has cryptography, curl-cffi, PyExecJS, and websockets dependencies. Node/V8 handles selected signing calculations and extension tests rather than a general browser-agent loop.
+
+The intended acquisition order is direct Python HTTP, extracted local signing logic, then a temporary session bridge where needed. The [session daemon](https://github.com/ifccod/social-media-research-cli/blob/a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49/reverse/browser_session.py) has loopback transport, private local state/control tokens, registered extension identities, request validation, and platform-family serialization. The extension is intended to use existing matching tabs and issue allowlisted in-page requests while platform cookies remain in Chrome. Missing tabs/login/runtime produce explicit failures. An explicit interactive login handoff is distinct from unattended collection; scheduled use must not depend on silently opening or navigating tabs.
+
+### Fit to feed replacement
+
+The [X client](https://github.com/ifccod/social-media-research-cli/blob/a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49/reverse/twitter_reverse/client.py) implements `get_home_feed`, described as the signed-in For You stream, through `/bridge/v1/twitter/home-feed`, with limit/cursor handling and normalized timeline output. It also implements search and account/user-timeline operations. This makes it a concrete acquisition alternative for the X pilot, alongside X Signal and socai. The X `following` command retrieves the account relationship list; it must not be confused with a Following posts timeline.
+
+The [Instagram CLI](https://github.com/ifccod/social-media-research-cli/blob/a1b13c9a86b1a0ea4d9d2fd79949cfc8a05b4c49/reverse/instagram_reverse/cli.py) explicitly describes itself as an anonymous public-data client and exposes profile, profile-page, user posts, individual posts, and ID conversion. No Instagram home-feed operation is present in that interface.
+
+This repo also contains account discovery, follow, scheduled-post, and batch-follow code. Those operations are outside a retrieval adapter's scope. Broad platform/command counts should be checked against each command's actual transport and current evidence; a protocol module or mobile research artifact alone is not a verified callable capability.
+
+Recommended shape: run a bounded read-only CLI allowlist on the session host and normalize structured results/errors into phrog-web. Keep the existing browser-session prerequisites visible to Hermes. Compared with X Signal, this is a wider acquisition toolkit rather than the same durable research/jobs/monitor service. First pilot: a small X For You read, cursor continuation, and explicit missing-tab/expired-login checks. No extension, package, or session was installed or started in this pass.
+
+## 7. Cobalt
+
+Added to the shortlist at the owner's request as a media stage. The monorepo separates a Node/Express API (`api/`), frontend (`web/`), and shared client/version packages. The API's [package manifest](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/api/package.json) includes FFmpeg, HTTP/HLS processing, validation, service-specific dependencies, and optional stores. Reusing the API does not require adopting the frontend.
+
+### Request and media flow
+
+The [API contract](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/docs/api.md) accepts a source URL at `POST /` with JSON headers. [Validation](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/api/src/processing/schema.js), URL/service matching, and individual service handlers select a media result; [action selection](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/api/src/processing/match-action.js) chooses direct/proxied download, image picker, audio, merging/remuxing, or local processing.
+
+Responses can be `redirect`, `tunnel`, `picker`, `local-processing`, or `error`. A phrog-web adapter must handle each explicitly. It cannot assume a successful result is always one permanent file URL. [Stream management](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/api/src/stream/manage.js) creates expiring signed tunnel URLs; downstream analysis should consume the media promptly and preserve the original post URL as provenance rather than treating the tunnel link as durable evidence.
+
+The [cookie manager](https://github.com/imputnet/cobalt/blob/a636575b09de1fc55d9b8cd98cac88f5f2f16b42/api/src/processing/cookie/manager.js) can load configured service cookies from a file and write updates. It is not a general browser profile or interactive login manager. Instance API-key/JWT authentication is separate from upstream platform authentication. Official API documentation says hosted instances are not intended for arbitrary integration without permission; the candidate integration is a self-hosted instance.
+
+### Fit and limits
+
+Use cobalt after a source has been discovered: resolve a supported post into images/video/audio, then hand selected media to existing OCR/transcript/analysis capabilities. This supports event posters, reels, and source preservation for the doomscroll-replacement workflow. Cobalt does not discover personalized feeds, rank relevance, mine comments, learn preferences, or itself provide semantic transcription.
+
+Recommended pilot: one single video, one multi-image picker, an audio-only result, an expired tunnel, and an unsupported/login-required source. Compare with existing yt-dlp and socai media paths to avoid adding a duplicate service without a demonstrated coverage gain. Service support and fixtures were inspected statically; downloads and platform login were not tested.
+
 ## Proposed feature boundaries and next evidence
 
 1. **Separate feed reads from topic search.** A future feed operation should preserve platform, source surface (Following/For You/profile/list/channel), account scope, cursor, completeness, and collection time. Current `SocialPost`/`SocialResponse` in `src/providers/social.ts` lacks much of this information.
@@ -166,9 +208,10 @@ Recommended shape: an optional hosted public-data provider plus workflow referen
 5. **Add relevance and outcome feedback in Hermes.** Extract candidate events with original links and explicit date/place uncertainty; compare against interests, radius, schedule, duplicates, and expired events. Record accepted/dismissed choices so relevance can improve. Do not infer personal taste from popularity alone.
 6. **Keep retrieval, actions, and credentials distinct.** Hermes can own vault interaction and consent; provider workers must still own browser/session state. A vault alone does not create a working session. Social writes and messaging require their own concrete task scope.
 7. **Deliver a bounded selection.** A daily or requested brief should explain why each item is relevant and whether it came from a personal feed, followed source, or keyword search. The acceptance test is useful discovery without the owner opening an endless feed.
+8. **Include the two new candidates in pilots.** Social-media-research-cli is a third X acquisition candidate and a broader protocol toolkit. Cobalt is a separate media stage after discovery, evaluated against current download/transcript coverage. Neither changes the unresolved Instagram home-feed prerequisite.
 
 No implementation is implied by this list. The next implementation decision should follow the feed/session pilot, especially the missing Instagram home-feed evidence.
 
 ## Verification
 
-The application remained unchanged apart from this report. `npx tsc` exited 0; local `/health` returned `status: ok`; `git diff --check` passed. All 30 pinned upstream source links were checked against existing files at the exact cloned commits. All five clones were clean, and their inventory counts were checked for consistency. Upstream authenticated operation, upstream builds, and full upstream suites were not run because this pass was static exploration and did not install dependencies or access accounts.
+The application remained unchanged apart from this report. `npx tsc`, local `/health`, `git diff --check`, pinned source-link verification, clone cleanliness, and inventory consistency are checked for each report update. Upstream authenticated operation, upstream builds, and full upstream suites were not run because this pass was static exploration and did not install dependencies or access accounts.
