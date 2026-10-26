@@ -11,6 +11,8 @@ import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
+import { visualSearch, getTempImage } from './providers/visual.js';
+import { resolveLocation, localizeQuery } from './location.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct, type SecondhandMarket } from './providers/marketplace.js';
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
@@ -67,9 +69,11 @@ fastify.get('/api/search', async (req, reply) => {
     time_range?: 'day' | 'week' | 'month' | 'year';
     limit?: string;
     provider?: string;
+    near?: string;
   };
 
-  const searchQuery = query.q || query.query;
+  const raw = query.q || query.query;
+  const searchQuery = raw ? localizeQuery(raw, await resolveLocation(query.near)) : raw;
   if (!searchQuery) {
     return reply.status(400).send({ error: 'Query parameter "q" or "query" is required' });
   }
@@ -196,11 +200,29 @@ fastify.get('/api/media', async (req, reply) => {
   }
 });
 
+// Short-lived photo links for Bing Visual Search (see providers/visual.ts). Unknown or expired tokens are 404.
+fastify.get('/i/:token', async (req, reply) => {
+  const img = getTempImage((req.params as { token: string }).token);
+  if (!img) return reply.status(404).send('not found');
+  return reply.header('Cache-Control', 'no-store').header('X-Robots-Tag', 'noindex').type(img.type).send(img.body);
+});
+
+fastify.post('/api/visual', { bodyLimit: 12 * 1024 * 1024 }, async (req, reply) => {
+  const b = (req.body || {}) as { image?: string; hint?: string; shop?: boolean; limit?: number; near?: string };
+  if (!b.image) return reply.status(400).send({ error: 'Provide image (URL, file path or data:image/ URL)' });
+  try {
+    return await visualSearch(b.image, b);
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 fastify.get('/api/places', async (req, reply) => {
   const q = req.query as Record<string, string | undefined>;
   if (!q.q) return reply.status(400).send({ error: 'Missing q' });
   try {
-    return await searchPlaces(q.q, { limit: q.limit ? parseInt(q.limit, 10) : undefined });
+    return await searchPlaces(q.q, { limit: q.limit ? parseInt(q.limit, 10) : undefined, near: q.near });
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
@@ -210,7 +232,7 @@ fastify.get('/api/places', async (req, reply) => {
 fastify.get('/api/deals', async (req, reply) => {
   const q = req.query as Record<string, string | undefined>;
   try {
-    return await searchDeals(q.q, { limit: q.limit ? parseInt(q.limit, 10) : undefined, includeExpired: q.expired !== 'false' });
+    return await searchDeals(q.q, { limit: q.limit ? parseInt(q.limit, 10) : undefined, includeExpired: q.expired !== 'false', near: q.near });
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
@@ -225,6 +247,7 @@ fastify.get('/api/secondhand', async (req, reply) => {
     return await searchSecondhand(q.q!, {
       marketplaces: q.marketplaces ? (q.marketplaces.split(',') as SecondhandMarket[]) : undefined,
       location: q.location,
+      radiusKm: q.radius_km ? Number(q.radius_km) : undefined,
       minPrice: q.min_price ? Number(q.min_price) : undefined,
       maxPrice: q.max_price ? Number(q.max_price) : undefined,
       limit: q.limit ? parseInt(q.limit, 10) : undefined,

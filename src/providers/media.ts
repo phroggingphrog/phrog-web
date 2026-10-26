@@ -18,6 +18,7 @@ export interface MediaItem {
   source: string;
   metadata?: Record<string, unknown>;
   ratings?: MediaRating[];
+  image?: string;
 }
 
 export interface MediaResponse {
@@ -148,6 +149,7 @@ async function letterboxd(query: string, limit: number): Promise<MediaItem[]> {
       year: yearOf(title),
       creators: (ld.director || []).map((d: any) => d.name),
       url,
+      image: html.match(/og:image" content="([^"]*)"/)?.[1],
       source: 'letterboxd',
       metadata: { genres: ld.genre, popular_reviews: reviews },
       ratings: agg ? [{ source: 'letterboxd', score: agg.ratingValue, scale: 5, count: agg.ratingCount }] : undefined,
@@ -171,6 +173,7 @@ async function sitePages(query: string, site: string, re: RegExp, max: number): 
   return pages.filter(Boolean) as { url: string; html: string }[];
 }
 
+const ogImage = (html: string) => html.match(/og:image" content="([^"]*)"/)?.[1];
 const ogTitle = (html: string) => unhtml(html.match(/og:title" content="([^"]*)"/)?.[1] || '');
 const jsonField = (html: string, re: RegExp) => { const m = html.match(re); if (!m) return undefined; try { return JSON.parse(m[1]); } catch { return undefined; } };
 
@@ -185,7 +188,7 @@ async function rottenTomatoes(query: string, limit: number): Promise<MediaItem[]
     if (critics?.score) ratings.push({ source: 'rottentomatoes:tomatometer', score: Number(critics.score), scale: 100, count: Number(critics.ratingCount) || undefined });
     if (audience?.score) ratings.push({ source: 'rottentomatoes:audience', score: Number(audience.score), scale: 100, count: Number(audience.reviewCount) || undefined });
     const title = ogTitle(html).replace(/\s*\|\s*Rotten Tomatoes$/, '');
-    return { title, year: yearOf(title), url, source: 'rottentomatoes', metadata: { critics_consensus: consensus || undefined, critics_average: critics?.averageRating, certified_fresh: critics?.certified }, ratings: ratings.length ? ratings : undefined };
+    return { title, year: yearOf(title), url, image: ogImage(html), source: 'rottentomatoes', metadata: { critics_consensus: consensus || undefined, critics_average: critics?.averageRating, certified_fresh: critics?.certified }, ratings: ratings.length ? ratings : undefined };
   });
 }
 
@@ -197,7 +200,7 @@ async function pitchfork(query: string, limit: number): Promise<MediaItem[]> {
     const genres = [...new Set([...html.matchAll(/"genres":\[\{"node":\{"name":"([^"]+)"/g)].map((m) => m[1].replace(/\\u002F/g, '/')))];
     const title = ogTitle(html).replace(/\s*(Album|Track) Review\s*\|\s*Pitchfork$/, '');
     return {
-      title, url, source: 'pitchfork',
+      title, url, image: ogImage(html), source: 'pitchfork',
       metadata: { summary: unhtml(deks.sort((a, b) => b.length - a.length)[0] || '') || undefined, best_new_music: /isBestNewMusic":true/.test(html) || undefined, genres, author: unhtml(html.match(/"author":\{[^}]*"name":"([^"]+)"/)?.[1] || '') || undefined },
       ratings: Number.isFinite(score) ? [{ source: 'pitchfork', score, scale: 10 }] : undefined,
     } as MediaItem;
@@ -218,7 +221,7 @@ async function goodreads(query: string, limit: number): Promise<MediaItem[]> {
     const title = ogTitle(html);
     const author = unhtml(html.match(/class="ContributorLink__name"[^>]*>([^<]+)</)?.[1] || '');
     return {
-      title, url, source: 'goodreads', creators: author ? [author] : undefined,
+      title, url, image: ogImage(html), source: 'goodreads', creators: author ? [author] : undefined,
       metadata: { popular_reviews: reviews },
       ratings: agg ? [{ source: 'goodreads', score: agg.ratingValue, scale: 5, count: agg.ratingCount }] : undefined,
     } as MediaItem;

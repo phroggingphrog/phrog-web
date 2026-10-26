@@ -12,6 +12,8 @@ import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchDeals } from '../../providers/ozbargain.js';
 import { searchPlaces } from '../../providers/places.js';
+import { visualSearch } from '../../providers/visual.js';
+import { resolveLocation, localizeQuery } from '../../location.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct } from '../../providers/marketplace.js';
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
@@ -347,7 +349,8 @@ server.tool(
   {
     query: z.string().describe('What to look for'),
     marketplaces: z.array(z.enum(['facebook', 'depop', 'poshmark', 'ebay'])).optional().describe('Default: all available'),
-    location: z.string().optional().describe('City for Facebook Marketplace, e.g. "Melbourne, Australia"'),
+    location: z.string().optional().describe('City for Facebook Marketplace, e.g. "Melbourne, Australia" (default: saved location)'),
+    radiusKm: z.number().optional().describe('Search radius in km (Facebook Marketplace)'),
     minPrice: z.number().optional(),
     maxPrice: z.number().optional(),
     condition: z.string().optional().describe('e.g. new, used_like_new, used_good, used_fair'),
@@ -418,6 +421,7 @@ server.tool(
     query: z.string().optional().describe('Product or brand, e.g. "ugreen usb c hub"'),
     limit: z.number().int().min(1).max(30).optional(),
     includeExpired: z.boolean().optional().describe('Keep expired deals as past-price reference (default true)'),
+    near: z.string().optional().describe('Place whose state is used to flag state-only deals (default: saved location)'),
   },
   async (args) => {
     try {
@@ -434,10 +438,30 @@ server.tool(
   {
     query: z.string().describe('Place or "what near where"'),
     limit: z.number().int().min(1).max(20).optional(),
+    near: z.string().optional().describe('Suburb/city to search around; default is the saved location'),
   },
   async (args) => {
     try {
-      return text(await searchPlaces(args.query, { limit: args.limit }));
+      return text(await searchPlaces(args.query, { limit: args.limit, near: args.near }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'visual_search',
+  'Search by photo: identifies the item (vision model; Bing Visual Search too for public image URLs), then checks AliExpress, OzBargain deals and secondhand listings. image = URL, local file path, or data: URL.',
+  {
+    image: z.string().describe('Image URL, absolute file path on the gateway host, or data:image/... URL'),
+    hint: z.string().optional().describe('Extra context, e.g. "the shoes, not the bag"'),
+    shop: z.boolean().optional().describe('Also search shops/deals/secondhand (default true)'),
+    limit: z.number().int().min(1).max(10).optional(),
+    near: z.string().optional(),
+  },
+  async (args) => {
+    try {
+      return text(await visualSearch(args.image, args));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
@@ -512,9 +536,9 @@ server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runn
   url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
 }, safe(browse));
 
-server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent. Returns {status,result,steps,escalated_to,sources}.', {
+server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent -> TinyFish (when keyed). Returns {status,result,steps,escalated_to,sources}.', {
   url: z.string(), goal: z.string(), schema: z.record(z.any()).optional(),
-  mode: z.enum(['auto', 'fetch', 'browse', 'deep']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
+  mode: z.enum(['auto', 'fetch', 'browse', 'deep', 'tinyfish']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
 }, safe((a) => runAgent(a)));
 
 server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
@@ -539,10 +563,14 @@ server.tool('run_log', 'Recent phrog-web run-log records (MCP and REST calls: du
 }, safe(({ limit, tool }: any) => recentRuns(limit, tool)));
 
 // Compat tools: same names/args/defaults as the old Python `web` MCP.
-server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news".', {
+server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news", "images". Local-intent queries ("near me", "best cafe") get the saved location or `near` added.', {
   query: z.string(), limit: z.number().int().default(5), time_range: z.string().nullable().default(null),
   language: z.string().nullable().default(null), categories: z.string().nullable().default(null),
-}, safe(webSearch));
+  near: z.string().nullable().default(null),
+}, safe(async (a: any) => {
+  const { near, ...rest } = a;
+  return webSearch({ ...rest, query: localizeQuery(rest.query, await resolveLocation(near ?? undefined)) });
+}));
 
 server.tool('research_search', 'Free key-less research APIs queried in parallel. preset: academic | tech | all; or pass sources (openalex, arxiv, semantic_scholar, crossref, wikipedia, hackernews, stackexchange).', {
   query: z.string(), preset: z.string().default('academic'), sources: z.array(z.string()).nullable().default(null),

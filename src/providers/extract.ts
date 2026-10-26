@@ -12,7 +12,7 @@ const MAX_INPUT_CHARS = 60000;
 const RETRIES = 2;
 
 /** Minimal JSON Schema check (type, required, properties, items, enum, nullable via type arrays). */
-function validate(v: any, s: any, path = ''): string[] {
+export function validate(v: any, s: any, path = ''): string[] {
   const errs: string[] = [];
   if (!s || typeof s !== 'object') return errs;
   const at = path || '(root)';

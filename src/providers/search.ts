@@ -6,6 +6,8 @@ export interface SearchResult {
   snippet: string;
   engine?: string;
   score?: number;
+  image?: string;
+  thumbnail?: string;
   raw?: Record<string, unknown>;
   metadata?: {
     studyType?: string;
@@ -86,12 +88,15 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<{ r
 
   const max = options.limit || 15;
   const { results: _drop, ...envelope } = data;
-  const results = data.results.slice(0, max).map(r => ({
+  const images = (options.categories || []).includes('images');
+  const noisy = new Set(['lucide', 'artic', 'iconify', 'svgrepo', 'openclipart']);
+  const results = data.results.filter(r => !(images && noisy.has(r.engine as string))).slice(0, max).map(r => ({
     title: r.title || '',
     url: r.url || '',
     snippet: r.content || '',
     engine: r.engine,
     score: r.score,
+    ...((r as any).img_src && { image: (r as any).img_src, thumbnail: (r as any).thumbnail_src || undefined }),
     raw: r as Record<string, unknown>,
   }));
   return { results, envelope };
