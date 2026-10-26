@@ -488,15 +488,16 @@ server.tool(
 
 server.tool(
   'youtube_transcript',
-  'Fetch the transcript of a YouTube video (manual or auto captions).',
+  'Fetch the transcript of a YouTube video: manual or auto captions first, then speech-to-text (OpenAI-compatible /audio/transcriptions, e.g. OmniRoute) when the video has no captions. source in the result is manual, auto or stt.',
   {
     url: z.string().describe('YouTube video URL'),
     lang: z.string().optional().describe('Caption language, default en'),
     maxChars: z.number().int().min(100).optional().describe('Truncate text to this many characters'),
+    stt: z.enum(['auto', 'off', 'force']).optional().describe('auto (default): STT only if no captions; off: captions only; force: always transcribe the audio'),
   },
   async (args) => {
     try {
-      return text(await getTranscript(args.url, { lang: args.lang, maxChars: args.maxChars }));
+      return text(await getTranscript(args.url, { lang: args.lang, maxChars: args.maxChars, stt: args.stt }));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
