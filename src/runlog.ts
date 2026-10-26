@@ -43,7 +43,7 @@ export function resultInfo(result: unknown): Record<string, unknown> {
   if (!obj || typeof obj !== 'object') return {};
   const o = Array.isArray(obj) ? obj[0] ?? {} : obj;
   const info: Record<string, unknown> = {};
-  for (const k of ['provider_used', 'fetcher', 'sources_used', 'escalated_to']) if (o[k] != null) info[k] = o[k];
+  for (const k of ['provider_used', 'statusCode', 'attempts', 'fetcher', 'sources_used', 'escalated_to']) if (o[k] != null) info[k] = o[k];
   if (info.provider_used == null && o.provider != null) info.provider_used = o.provider;
   return info;
 }
