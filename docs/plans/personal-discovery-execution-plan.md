@@ -27,7 +27,7 @@ Paths here are discovery pointers only. Code reads them from config; no host pat
 
 ## 3. Data rules
 
-- Existing normalized DBs (music, social, activity, media, google-takeout, behaviour-model; schemas in `~/phrogvps/data/schemas/*.sql`) are read in place through read-only SQLite ATTACH with configured paths. The archive is never copied into the new DB.
+- Existing normalized DBs (music, social, activity, media, google-takeout, behaviour-model; schemas in `~/phrogvps/data/schemas/*.sql`) are imported into phrog-web's DB, which becomes the single central personal database kept up to date by live interactions (owner 2026-10-26: "making my old exisqting database into a centralised one that can kept updated by all of these live interactions"; chose phrog-web DB as the central store). Reason: the old build scripts drop and recreate their tables from exports, so live rows written into them would be wiped. Imports are read-only on the old DBs, keep provenance (source DB, table, row, file hash), and are idempotent: a new export is re-imported without duplicates. The old DBs stay as a read-only archive. `serve__personal` is a mirror and is not imported. Messages and other non-discovery categories stay out unless asked.
 - `serve__personal` is a mirror, not extra evidence.
 - `events.jsonl` is imported once. `lanes.md` seeds `preference_rules` once.
 - Unknown stays unknown (never guess a duration or a time).
@@ -161,6 +161,12 @@ Every post, passed or not, keeps its Jev score in `predictions`, so the threshol
 - Every fetched post is saved as an item plus a `seen_in_feed` observation, so repeated scrolls do not duplicate it.
 - Exit: Hermes runs `feed` on both accounts, pages through 3 pages, and gets the same posts as the old script; re-running adds no duplicate items.
 
+**Phase 1b, central import, about 1 day.**
+
+- Importers (read-only on the old DBs, configured paths): Instagram/TikTok/other `platform_events` and `follows` from social; music plays, library and favourites; activity saved places and searches; media descriptions/OCR where they join to posts. Map into `source_accounts`, `items`, `item_ids`, `observations` (purpose `unknown`, original time precision) and current-state rows for follows/saves.
+- Provenance on every row; re-running the importer on the same or a newer export adds zero duplicates; genuine repeat plays stay separate.
+- Exit: per-source counts match the old DBs (minus documented exclusions); a second run changes nothing; live feed rows and imported rows link through `item_ids` where the same post appears in both.
+
 **Phase 2, prediction and ranked discovery, about 2 to 3 days.**
 
 - Humanitix and Eventbrite through existing phrog-web search and fetch.
@@ -185,7 +191,7 @@ Every post, passed or not, keeps its Jev score in `predictions`, so the threshol
 
 ## 7. Later, and non-goals
 
-Multi-user (would be one DB per user), OAuth, durable data-control jobs, entity merge and split, preference snapshots, watchlists, a GUI, copying the archive, training models. Only if pick quality drops: exploration share, Jev calibration and baseline comparisons, a local model using Jev's score as a feature.
+Multi-user (would be one DB per user), OAuth, durable data-control jobs, entity merge and split, preference snapshots, watchlists, a GUI, training models. Only if pick quality drops: exploration share, Jev calibration and baseline comparisons, a local model using Jev's score as a feature.
 
 ## 8. Verification
 
