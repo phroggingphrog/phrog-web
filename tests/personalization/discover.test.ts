@@ -100,7 +100,7 @@ function seedHistory() {
   d.prepare("INSERT INTO agent_decisions (id, item_id, client, decision, created_at, idempotency_key) VALUES ('dcn_1', 'it_p3', 'hermes', 'interesting', ?, 'x')").run(at);
 }
 
-const rows = () => personalDb().prepare('SELECT subject_type, subject_key, horizon, score, evidence_count, distinct_days, version FROM preferences ORDER BY subject_type, subject_key, horizon').all();
+const rows = () => personalDb().prepare('SELECT subject_type, subject_key, horizon, score, n_eff, ci_low, ci_high, evidence_count, distinct_days, version FROM preferences ORDER BY subject_type, subject_key, horizon').all();
 
 test('preference rebuild is deterministic and uses deliberate actions only', () => {
   seedHistory();
@@ -114,11 +114,13 @@ test('preference rebuild is deterministic and uses deliberate actions only', () 
 
   const r = rows() as any[];
   const find = (t: string, k: string, h: string) => r.find((x) => x.subject_type === t && x.subject_key === k && x.horizon === h);
-  assert.equal(find('ig_author', 'poet_one', 'long').score, 3); // like 1 + save 2
-  assert.equal(find('ig_author', 'poet_one', 'recent').score, 1); // the save is older than 90 days of available data
-  assert.equal(find('ig_author', 'noise_author', 'long'), undefined); // seen_in_feed and agent decisions are not taste
-  assert.equal(find('music_artist', 'band a', 'long').score, 3);
-  assert.equal(find('music_artist', 'band b', 'long').score, 1); // 5 skips not counted
+  const near = (a: number, b: number) => assert.ok(Math.abs(a - b) < 1e-9, `${a} vs ${b}`);
+  near(find('ig_author', 'poet_one', 'long').score, 2 / 3); // Beta(1,1) fallback prior + like 0.5 + save 0.5
+  assert.ok(find('ig_author', 'poet_one', 'recent').score < find('ig_author', 'poet_one', 'long').score); // the old save has decayed away
+  near(find('ig_author', 'noise_author', 'long').n_eff, 0.05); // only a weak "seen, no action" failure; the agent decision adds nothing
+  assert.ok(find('ig_author', 'noise_author', 'long').score < 0.5);
+  near(find('music_artist', 'band a', 'long').score, 1.6 / 2.6); // 3 plays x 0.2
+  near(find('music_artist', 'band b', 'long').score, 1.2 / 3.2); // 1 play 0.2 success, 5 skips x 0.2 failure
   assert.equal(find('place_category', 'good cafe', 'long').evidence_count, 1);
   assert.ok(a.length <= SUMMARY_MAX_CHARS);
   assert.ok(!/noise_author/.test(a.text));
@@ -233,15 +235,31 @@ test('this_time feedback is not a lasting dislike; item dislike is', async () =>
   assert.equal(lasting.effect, 'lasting');
   const after = await personalDiscover({}, fakes().deps);
   assert.ok(!after.items.some((i) => i.title === 'Boring Seminar'));
-  const prefs = personalPreferences({ action: 'get' }) as any;
-  assert.match(prefs.summary.text, /no to: .*boring seminar/);
+  const sem = personalDb().prepare("SELECT mean FROM preferences WHERE subject_type = 'venue' AND subject_key LIKE 'town hall%' AND horizon = 'long'").get() as any;
+  assert.ok(sem && sem.mean < 0.5, 'a lasting dislike lowers the venue estimate');
 
   // Positive owner feedback adds evidence.
   const film = r.items.find((i) => i.title === 'Great Film Night')!;
   recordFeedback({ item_id: film.item_id, type: 'want_to_go' });
   const v2 = personalPreferences({ action: 'rebuild' }) as any;
-  assert.ok(v2.counts.fb_item);
-  assert.match((personalPreferences({ action: 'get' }) as any).summary.text, /yes to: .*great film night/);
+  assert.ok(v2.counts.venue);
+  const fm = personalDb().prepare("SELECT mean FROM preferences WHERE subject_type = 'venue' AND subject_key LIKE 'the backlot%' AND horizon = 'long'").get() as any;
+  assert.ok(fm && fm.mean > 0.5, 'a want_to_go raises the venue estimate');
+});
+
+test('discover items carry stats: matched subjects after lasting feedback, null before; score blends Jev with stats', async () => {
+  const first = await personalDiscover({}, fakes().deps);
+  const film0 = first.items.find((i) => i.title === 'Great Film Night')! as any;
+  assert.equal(film0.stats, null);
+  for (let i = 0; i < 3; i++) recordFeedback({ item_id: film0.item_id, type: 'want_to_go', idempotency_key: `w${i}` });
+  const second = await personalDiscover({}, fakes().deps);
+  const film = second.items.find((i) => i.title === 'Great Film Night')! as any;
+  assert.ok(film.stats.score > 0.5);
+  assert.ok(film.stats.matched.some((m: any) => m.subject_type === 'venue' && m.ci.length === 2));
+  const base = 0.7 * 0.9 + 0.3 * 0.8;
+  // 0.6 * Jev + 0.4 * stats, plus the existing +0.1 for "you liked something similar"
+  assert.ok(Math.abs(film.score - Math.min(1, 0.6 * base + 0.4 * film.stats.score + 0.1)) < 0.002, `score ${film.score}`);
+  assert.match(film.reason, /your history/);
 });
 
 test('feedback is idempotent and validated', async () => {

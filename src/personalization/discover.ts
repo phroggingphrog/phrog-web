@@ -7,6 +7,7 @@ import { personalDb, FeedInputError } from './feed.js';
 import { preferenceSummary, scorePost, type JevScore } from './jev.js';
 import { usedToday } from './filter.js';
 import { rebuildPreferences, activeRules, lastingFeedback, topKeys } from './preferences.js';
+import { dbLookup, statsForItem, blend, publicStats, statsConfig, type StatsResult } from './stats/model.js';
 import { parseWhen, parseVenue, venueFromSnippet, looksEnded, parsePrice, looksOnline, cleanTitle, oneLine, type ParsedWhen } from './eventparse.js';
 
 export interface DiscoverRequest {
@@ -49,7 +50,7 @@ interface Cand {
 interface Ev extends Cand {
   itemId: string; description: string; when: ParsedWhen; venue: string | null; online: boolean;
   price: ReturnType<typeof parsePrice>; status: 'cancelled' | 'sold_out' | 'unknown'; fetched: boolean;
-  score: number | null; p_match: number | null; p_engage: number | null; confidence: number | null; reasons: string[]; dropped: string | null;
+  stats: StatsResult | null; score: number | null; p_match: number | null; p_engage: number | null; confidence: number | null; reasons: string[]; dropped: string | null;
 }
 
 async function pool<T>(n: number, jobs: (() => Promise<T>)[]): Promise<T[]> {
@@ -191,7 +192,7 @@ export async function personalDiscover(req: DiscoverRequest, deps: DiscoverDeps 
         insId.run(itemId, p.source, p.native);
       }
       putDetails.run(itemId, when.starts_at, 'Australia/Melbourne', when.precision, venue, price.min, price.max, price.currency, p.url, p.category, status, now.toISOString());
-      events.push({ ...p, title, itemId, description, when, venue, online, price, status, fetched: !!page, score: null, p_match: null, p_engage: null, confidence: null, reasons: [], dropped: ended ? 'ended' : null });
+      events.push({ ...p, title, itemId, description, when, venue, online, price, status, fetched: !!page, stats: null, score: null, p_match: null, p_engage: null, confidence: null, reasons: [], dropped: ended ? 'ended' : null });
     });
     d.exec('COMMIT');
   } catch (e) { d.exec('ROLLBACK'); throw e; }
@@ -248,6 +249,8 @@ export async function personalDiscover(req: DiscoverRequest, deps: DiscoverDeps 
   }));
 
   // 5. Rank. Jev probability first, then the owner's explicit rules and feedback on top.
+  const scfg = statsConfig();
+  const lookup = dbLookup(d);
   const topArtists = topKeys(d, 'music_artist', 60).filter((k) => k.length >= 4);
   const topAuthors = topKeys(d, 'ig_author', 60).filter((k) => k.length >= 4);
   for (const e of live) {
@@ -268,8 +271,14 @@ export async function personalDiscover(req: DiscoverRequest, deps: DiscoverDeps 
     const author = topAuthors.find((k) => h.includes(k));
     if (author) e.reasons.push(`mentions "${author}", an Instagram account you like`);
     if (!e.when.starts_at) adj -= 0.1;
+    // Jev part (match with a share of want-to-see), blended with the statistical model's evidence-weighted posterior mean when any subject matches.
+    e.stats = statsForItem(d, lookup, e.itemId, scfg);
+    if (e.stats) {
+      const top = e.stats.matched[0];
+      e.reasons.push(`your history: ${e.stats.score.toFixed(2)} from ${e.stats.matched.length} matched ${e.stats.matched.length === 1 ? 'subject' : 'subjects'}${top ? ` (strongest: ${top.subject_type} "${top.key}")` : ''}`);
+    }
     const base = s ? 0.7 * s.p_match + 0.3 * (s.p_engage ?? s.p_match) : 0.25;
-    e.score = Math.min(1, Math.max(0, base + adj));
+    e.score = Math.min(1, Math.max(0, blend(base, e.stats, scfg) + adj));
   }
   live.sort((a, b) => (b.score ?? 0) - (a.score ?? 0) || (a.when.starts_at ?? '9').localeCompare(b.when.starts_at ?? '9') || a.title.localeCompare(b.title));
   const top = live.slice(0, limit);
@@ -296,7 +305,7 @@ export async function personalDiscover(req: DiscoverRequest, deps: DiscoverDeps 
       starts_at: e.when.starts_at, time_precision: e.when.precision, timezone: 'Australia/Melbourne',
       venue: e.venue, price: { min: e.price.min, max: e.price.max, currency: e.price.currency, free: e.price.free || null },
       status: e.status, score: e.score === null ? null : Math.round(e.score * 1000) / 1000,
-      p_match: e.p_match, p_engage: e.p_engage, confidence: e.confidence, reason, uncertainty: unc,
+      p_match: e.p_match, p_engage: e.p_engage, confidence: e.confidence, stats: publicStats(e.stats), reason, uncertainty: unc,
     };
   });
 
