@@ -151,6 +151,13 @@ export function personalConfig(): { dbPath: string; token: string | null; collec
   };
 }
 
+/** RSS/RSSHub feed settings. PHROG_RSSHUB_URL is the local RSSHub base (the only private address feeds may reach). */
+export function rssConfig(): { rsshubUrl: string | null; timeoutMs: number } {
+  const t = Number(process.env.PHROG_RSS_TIMEOUT_S);
+  const u = (process.env.PHROG_RSSHUB_URL || '').trim();
+  return { rsshubUrl: /^https?:\/\//i.test(u) ? u : null, timeoutMs: (Number.isFinite(t) && t > 0 ? t : 25) * 1000 };
+}
+
 /** Central-import settings: read-only source DB paths (no defaults), account label map, actions that train preferences. */
 export function importConfig(): { paths: Record<'social' | 'music' | 'activity' | 'media', string | null>; accountMap: Map<string, string>; learnActions: Set<string> } {
   const e = process.env;
