@@ -21,7 +21,7 @@ Hermes already runs a cron, "Daily discovery (doomscroll replacement)" (id fc55f
 - keeps to about 50 km of Melbourne CBD;
 - appends `events.jsonl` and sends one short numbered message ending "book N".
 
-Phase 1 reproduces this inside phrog-web. The old cron stays as fallback until the new version is proven side by side.
+Phase 1 turns the Instagram part into a scrollable `feed` command Hermes can call; Phase 2 adds ranked discovery on top. The old cron stays as fallback until the new version is proven side by side.
 
 Paths here are discovery pointers only. Code reads them from config; no host paths are hardcoded.
 
@@ -60,14 +60,21 @@ Separate SQLite file (`node:sqlite`), not the wiki index. Path from config.
 
 Auth: one owner bearer token from config (for example `PHROG_PERSONAL_TOKEN`), required by the personal tools and routes only. Anonymous tools are unchanged.
 
-MCP tools (small):
+Feed tools come first. They are plain commands any agent can run, like a CLI: ask for a feed, get a page of posts, ask for the next page to keep scrolling. Hermes stores nothing; phrog-web records what was fetched.
+
+- CLI: `phrog-web feed instagram --account <name> [--source home|explore] [--limit 20] [--cursor <c>]`. Same shape later for `x`, `rss <route>`, `youtube`.
+- MCP: `feed(provider, account, source, limit, cursor)`.
+- Each page returns: items (author, caption, image/video URLs, post link, posted time when known), `next_cursor`, and status (`ok`/`auth_required`/`challenge`/`unsupported`/`end`). The feed is raw: no judging or ranking. The caller (Hermes) reads the posts and decides what is interesting.
+- Optional per-item extras on request: `--ocr`, `--describe` (image text and description), so a caller without vision can still read posters.
+
+Ranked discovery sits on top of the feed tools (Phase 2):
 
 - `personal_discover(intent, constraints, limit)`: numbered ranked items with links, reasons, uncertainty, failed sources and delivery ids.
 - `personal_feedback`: feedback, plus a "shown" acknowledgement Hermes sends when it actually delivers a message.
 - `personal_status`: sources, last runs, auth-needed accounts.
 - `personal_preferences`: read and set rules.
 
-Matching REST under `/api/personal/`. Hermes cron becomes: call `personal_discover`, send the message, call `personal_feedback(shown)`. Booking stays a Hermes action ("book N").
+Matching REST under `/api/personal/`. The Hermes cron can either scroll with `feed` and judge the posts itself, or call `personal_discover` for a ranked list. Either way it sends the message and reports `personal_feedback(shown)`. Booking stays a Hermes action ("book N").
 
 ## 6. Phases
 
@@ -79,21 +86,22 @@ Matching REST under `/api/personal/`. Hermes cron becomes: call `personal_discov
 - Write the field mapping. Report private numbers only in private storage.
 - Exit: every input has a source, a mapping and a known gap list; no personal-data writes.
 
-**Phase 1, about 1 to 1.5 days.**
+**Phase 1, feed tools, about 1 day.**
 
-- DB and migrations.
-- Collectors: wrap `ig_scroll` for both accounts; Humanitix and Eventbrite through existing phrog-web search and fetch.
-- Ranking owned by phrog-web: port the `jev_score` logic from Hermes (`jev_mcp.py`) into phrog-web rather than calling Hermes, plus rules and read-only historical taste.
-- Move the Instagram collector (`ig_scroll.py`) under phrog-web ownership (under `engines/` or wrapped via a configured path) and import the taste files (`lanes.md`, `taste.md`) once into `preference_rules`, so phrog-web no longer depends on files on the Hermes host.
-- `personal_discover` over MCP and REST, deliveries, owner token.
-- Exit: shadow run next to the old cron for 3 days; the owner compares the two messages.
+- DB and migrations (`source_accounts`, `collection_runs`, `items`, `item_ids`, `observations`).
+- Split `ig_scroll.py`: its feed-reading part moves under phrog-web ownership (under `engines/` or a configured path); its built-in image-judging prompt does not, because judging belongs to the caller or to Phase 2 ranking.
+- `phrog-web feed instagram` CLI + `feed` MCP tool with cursor paging for both accounts, owner token, honest status when login is needed.
+- Every fetched post is saved as an item plus a `seen_in_feed` observation, so repeated scrolls do not duplicate it.
+- Exit: Hermes runs `feed` on both accounts, pages through 3 pages, and gets the same posts as the old script; re-running adds no duplicate items.
 
-**Phase 2, about half a day.**
+**Phase 2, ranked discovery, about 1 to 1.5 days.**
 
-- Feedback and preference rebuild (long vs recent), scoped feedback.
-- Exit: a "not interested in X" changes the next run.
+- Humanitix and Eventbrite through existing phrog-web search and fetch.
+- Ranking owned by phrog-web: port the `jev_score` logic from Hermes (`jev_mcp.py`), plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
+- `personal_discover` over MCP and REST, deliveries, feedback, preference rebuild (long vs recent).
+- Exit: shadow run next to the old cron for 3 days; the owner compares the two messages; a "not interested in X" changes the next run.
 
-**Phase 3, pilots, one at a time.**
+**Phase 3, more feeds and pilots, one at a time.**
 
 - RSSHub selected routes.
 - X comparison (X Signal vs socai vs social-media-research-cli) on one fixed task; pick one default.
