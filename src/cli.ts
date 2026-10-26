@@ -15,7 +15,9 @@ const USAGE = `phrog-web <command> [options]
   books <query> [--limit N]
   transcript <url> [--lang xx]
   agent <url> "<goal>" [--schema ...]
-  feed instagram --account <name> [--limit N] [--cursor C]   (needs PHROG_PERSONAL_TOKEN)
+  feed instagram --account <name> [--limit N] [--cursor C] [--filter jev] [--include-filtered] [--order feed|predicted] [--exploration 0..1]
+  feed decide <item_id> --decision interesting|not_interesting|send_to_owner|save_event [--reason "..."] [--key K]
+                                                         (feed commands need PHROG_PERSONAL_TOKEN)
   personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
         --out <path>  write full result there (default ./phrog-web-out/<cmd>-<ts>.<ext>)
@@ -27,7 +29,8 @@ const { values: v, positionals: pos } = parseArgs({
     url: { type: 'string' }, out: { type: 'string' }, stdout: { type: 'boolean' }, json: { type: 'boolean' },
     mode: { type: 'string' }, limit: { type: 'string' }, format: { type: 'string' },
     'max-pages': { type: 'string' }, depth: { type: 'string' }, schema: { type: 'string' },
-    sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
+    sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' }, filter: { type: 'string' }, 'include-filtered': { type: 'boolean' }, order: { type: 'string' }, exploration: { type: 'string' },
+    decision: { type: 'string' }, reason: { type: 'string' }, key: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
   },
 });
 
@@ -141,12 +144,20 @@ async function run(): Promise<{ data: any; ext: 'json' | 'md' }> {
       return { data: await call('POST', '/api/agent', { url: a[0], goal: a.slice(1).join(' '), schema: v.schema ? schemaArg(v.schema) : undefined }), ext: 'json' };
     }
     case 'feed': {
-      if (a[0] !== 'instagram') die('feed: provider must be "instagram"\n\n' + USAGE);
-      if (!v.account) die('feed: --account is required');
+      if (a[0] !== 'instagram' && a[0] !== 'decide') die('feed: provider must be "instagram" (or use "feed decide")\n\n' + USAGE);
       loadConfig();
       const token = personalConfig().token;
       if (!token) die('feed: PHROG_PERSONAL_TOKEN is not set');
-      return { data: await call('GET', '/api/personal/feed', undefined, { provider: 'instagram', account: v.account, limit: v.limit, cursor: v.cursor }, { authorization: `Bearer ${token}` }), ext: 'json' };
+      const headers = { authorization: `Bearer ${token}` };
+      if (a[0] === 'decide') {
+        if (!a[1] || !v.decision) die('feed decide: <item_id> and --decision are required');
+        return { data: await call('POST', '/api/personal/feed/decide', { item_id: a[1], decision: v.decision, reason: v.reason, idempotency_key: v.key, client: 'cli' }, undefined, headers), ext: 'json' };
+      }
+      if (!v.account) die('feed: --account is required');
+      return { data: await call('GET', '/api/personal/feed', undefined, {
+        provider: 'instagram', account: v.account, limit: v.limit, cursor: v.cursor, filter: v.filter,
+        include_filtered: v['include-filtered'] ? 'true' : undefined, order: v.order, exploration: v.exploration,
+      }, headers), ext: 'json' };
     }
     default:
       return die(USAGE);
@@ -157,8 +168,9 @@ if (v.help || pos.length === 0) { console.log(USAGE); process.exit(pos.length ==
 const { data, ext } = await run();
 const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
 if (v.json) { console.log(JSON.stringify(data)); process.exit(0); }
+if (pos[0] === 'feed' && pos[1] === 'decide') { console.log(`decision ${data.decision} for ${data.item_id}${data.duplicate ? ' (already recorded)' : ''}`); process.exit(0); }
 if (pos[0] === 'feed') {
-  console.log(`feed ${data.provider}/${data.account}: status ${data.status}${data.error ? ` (${data.error})` : ''}, ${data.items.length} posts`);
+  console.log(`feed ${data.provider}/${data.account}: status ${data.status}${data.error ? ` (${data.error})` : ''}, ${data.items.length} posts${data.filtered_out ? `, ${data.filtered_out} filtered out` : ''}`);
   for (const it of data.items) {
     const flags = [it.sponsored && 'sponsored', it.suggested && 'suggested', it.seen_before && 'seen-before'].filter(Boolean).join(',');
     const cap = (it.caption ?? '').replace(/\s+/g, ' ').slice(0, 80);
