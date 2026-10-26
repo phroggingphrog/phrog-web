@@ -8,6 +8,44 @@ export interface FetchResult {
   length: number;
   provider_used: string;
   statusCode?: number;
+  attempts?: FetchAttempt[];
+}
+
+export interface FetchAttempt {
+  provider: string;
+  status?: number;
+  outcome: 'ok' | 'blocked' | 'error';
+  detail?: string;
+}
+
+class ProviderError extends Error {
+  constructor(message: string, readonly status?: number, readonly blocked = false) {
+    super(message);
+  }
+}
+
+// Bot-wall / interstitial phrases. Only trusted on short bodies so articles that quote them still pass.
+const BLOCK_MARKERS = [
+  'blocked by network security',
+  'whoa there, pardner',
+  'enable javascript and cookies to continue',
+  'verify you are human',
+  'verify you are a human',
+  'just a moment...',
+  'checking your browser before accessing',
+  'attention required! | cloudflare',
+  'complete the security check',
+  'unusual traffic from your computer',
+];
+const BLOCK_MAX_CHARS = 2000;
+const BLOCK_STATUSES = [403, 429];
+
+export function detectBlocked(markdown: string, title = '', status?: number): string | null {
+  if (status !== undefined && BLOCK_STATUSES.includes(status)) return `HTTP ${status}`;
+  const body = `${title}\n${markdown}`.toLowerCase();
+  if (body.length > BLOCK_MAX_CHARS) return null;
+  const hit = BLOCK_MARKERS.find((m) => body.includes(m));
+  return hit ? `bot-wall text: "${hit}"` : null;
 }
 
 export interface FetchOptions {
@@ -62,7 +100,7 @@ async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResu
   });
 
   if (!res.ok) {
-    throw new Error(`Plain fetch HTTP ${res.status}: ${res.statusText}`);
+    throw new ProviderError(`Plain fetch HTTP ${res.status}: ${res.statusText}`, res.status, BLOCK_STATUSES.includes(res.status));
   }
 
   const ctype = res.headers.get('content-type') || '';
@@ -77,6 +115,9 @@ async function fetchPlain(url: string, options: FetchOptions): Promise<FetchResu
   const main = await extractMain(html, res.url || url);
   const title = main?.title || cleaned.title;
   const markdown = main ? main.markdown : cleaned.markdown;
+
+  const wall = detectBlocked(markdown, title);
+  if (wall) throw new ProviderError(`Plain fetch got a block page (${wall})`, res.status, true);
 
   // If text is suspiciously small, it might be a JS-only SPA
   if (markdown.length < 150 && html.includes('<script')) {
@@ -224,7 +265,8 @@ async function fetchCrawl4ai(url: string, options: FetchOptions, hops = 0): Prom
         markdown: truncated,
         length: truncated.length,
         provider_used: 'crawl4ai',
-        statusCode: 200,
+        // Upstream page status as seen by the crawler; 200 only when it reports none.
+        statusCode: typeof resultObj?.status_code === 'number' ? resultObj.status_code : 200,
       };
     } catch (err) {
       lastError = err instanceof Error ? err : new Error(String(err));
@@ -259,7 +301,7 @@ async function fetchTinyFish(url: string, options: FetchOptions): Promise<FetchR
   });
 
   if (!res.ok) {
-    throw new Error(`TinyFish Fetch HTTP ${res.status}: ${res.statusText}`);
+    throw new ProviderError(`TinyFish Fetch HTTP ${res.status}: ${res.statusText}`, res.status);
   }
 
   const data = await res.json() as any;
@@ -281,25 +323,41 @@ async function fetchTinyFish(url: string, options: FetchOptions): Promise<FetchR
 export async function executeFetch(url: string, options: FetchOptions = {}): Promise<FetchResult> {
   const config = loadConfig();
   const pipeline = options.provider ? [options.provider] : config.fetch.pipeline;
-  const errors: string[] = [];
+  const attempts: FetchAttempt[] = [];
 
   for (const provider of pipeline) {
     try {
+      let result: FetchResult;
       if (provider === 'plain') {
-        return await fetchPlain(url, options);
+        result = await fetchPlain(url, options);
       } else if (provider === 'crawl4ai') {
-        return await fetchCrawl4ai(url, options);
+        result = await fetchCrawl4ai(url, options);
       } else if (provider === 'tinyfish') {
-        return await fetchTinyFish(url, options);
+        result = await fetchTinyFish(url, options);
       } else {
         throw new Error(`Unknown fetch provider: ${provider}`);
       }
+      // A bot-wall page is not content: treat it as a failed attempt so the pipeline escalates.
+      const reason = detectBlocked(result.markdown, result.title, result.statusCode);
+      if (reason) {
+        attempts.push({ provider, status: result.statusCode, outcome: 'blocked', detail: reason });
+        continue;
+      }
+      attempts.push({ provider, status: result.statusCode, outcome: 'ok' });
+      return { ...result, attempts };
     } catch (err) {
-      errors.push(`${provider}: ${err instanceof Error ? err.message : String(err)}`);
+      const e = err instanceof ProviderError ? err : null;
+      const detail = err instanceof Error ? err.message : String(err);
+      attempts.push({ provider, status: e?.status, outcome: e?.blocked ? 'blocked' : 'error', detail });
     }
   }
 
-  throw new Error(`All fetch providers failed for ${url}. Errors: ${errors.join('; ')}`);
+  const history = attempts.map((a) => `${a.provider}: ${a.status ?? 'no status'} ${a.outcome}${a.detail ? ` (${a.detail})` : ''}`).join('; ');
+  const blocked = attempts.some((a) => a.outcome === 'blocked');
+  const msg = blocked
+    ? `Blocked: ${url} is behind bot protection and no provider got the real page; do not retry the same URL, use the site's API/OAuth or another source. Attempts: ${history}`
+    : `All fetch providers failed for ${url}. Attempts: ${history}`;
+  throw Object.assign(new Error(msg), { blocked, attempts });
 }
 
 // Links from the rendered DOM (Crawl4AI /crawl `links.internal`), for JS-built sites where plain HTML has few anchors.
