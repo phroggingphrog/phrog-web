@@ -31,3 +31,8 @@ engines/zlibrary-mcp/downloads/
 
 # CLI
 phrog-web-out/
+
+# personalization DB and its SQLite WAL/SHM files (private data)
+data/
+*.db-wal
+*.db-shm
