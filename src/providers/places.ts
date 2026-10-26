@@ -6,6 +6,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { loadConfig } from '../config.js';
+import { resolveLocation, type UserLocation } from '../location.js';
 
 export interface PlaceReview {
   by?: string;
@@ -45,7 +46,7 @@ function chromePath(): string | undefined {
   return dirs.map((d) => resolve(base, d, 'chrome-linux64/chrome')).find((p) => existsSync(p));
 }
 
-async function viaApi(query: string, limit: number, key: string): Promise<Place[]> {
+async function viaApi(query: string, limit: number, key: string, loc?: UserLocation): Promise<Place[]> {
   const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
@@ -53,7 +54,10 @@ async function viaApi(query: string, limit: number, key: string): Promise<Place[
       'X-Goog-Api-Key': key,
       'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.primaryTypeDisplayName,places.googleMapsUri,places.currentOpeningHours.openNow,places.editorialSummary,places.reviews',
     },
-    body: JSON.stringify({ textQuery: query, pageSize: limit }),
+    body: JSON.stringify({
+      textQuery: query, pageSize: limit,
+      ...(loc?.lat !== undefined && { locationBias: { circle: { center: { latitude: loc.lat, longitude: loc.lng }, radius: 15000 } } }),
+    }),
     signal: AbortSignal.timeout(15000),
   });
   if (!res.ok) throw new Error(`Places API HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -71,14 +75,15 @@ async function viaApi(query: string, limit: number, key: string): Promise<Place[
   }));
 }
 
-async function viaMaps(query: string, limit: number): Promise<Place[]> {
+async function viaMaps(query: string, limit: number, loc?: UserLocation): Promise<Place[]> {
   if (!existsSync(PUPPETEER)) throw new Error('puppeteer-core not installed (run `npm install` in engines/secondhand-mcp)');
   const { default: puppeteer } = await import(pathToFileURL(PUPPETEER).href);
   const browser = await puppeteer.launch({ executablePath: chromePath(), args: ['--no-sandbox', '--lang=en-AU'], headless: true });
   try {
     const page = await browser.newPage();
     await page.setUserAgent(UA);
-    await page.goto(`https://www.google.com/maps/search/${encodeURIComponent(query)}?hl=en`, { waitUntil: 'domcontentloaded', timeout: 30000 });
+    const at = loc?.lat !== undefined ? `/@${loc.lat},${loc.lng},15z` : '';
+    await page.goto(`https://www.google.com/maps/search/${encodeURIComponent(query)}${at}?hl=en`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     // A single exact match opens the place panel directly instead of a results list.
     await page.waitForFunction(
       () => document.querySelector('div[role="article"] a[aria-label]') || document.querySelector('div.F7nice'),
@@ -125,15 +130,19 @@ async function viaMaps(query: string, limit: number): Promise<Place[]> {
   }
 }
 
-export async function searchPlaces(query: string, opts: { limit?: number } = {}): Promise<PlacesResult> {
+export async function searchPlaces(query: string, opts: { limit?: number; near?: string } = {}): Promise<PlacesResult & { near?: string }> {
   loadConfig();
+  const loc = await resolveLocation(opts.near);
+  // Maps' signed-out search ignores the @lat,lng viewport for ranking, so name the place in the query too.
+  if (loc && !/\b(in|near|at|around)\s/i.test(query)) query = `${query} near ${loc.name}`;
   const limit = Math.min(opts.limit ?? 8, 20);
   const key = process.env.GOOGLE_PLACES_API_KEY;
-  if (key) return { query, source: 'google-places-api', results: await viaApi(query, limit, key) };
+  if (key) return { query, near: loc?.name, source: 'google-places-api', results: await viaApi(query, limit, key, loc) };
   return {
     query,
+    near: loc?.name,
     source: 'google-maps',
-    results: await viaMaps(query, limit),
+    results: await viaMaps(query, limit, loc),
     note: 'Ratings and counts only; set GOOGLE_PLACES_API_KEY to include review text.',
   };
 }

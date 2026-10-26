@@ -8,6 +8,7 @@ import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 import { loadConfig } from '../config.js';
 import { executeSearch } from './search.js';
+import { resolveLocation } from '../location.js';
 
 export type SecondhandMarket = 'facebook' | 'depop' | 'poshmark' | 'ebay';
 export const SECONDHAND_MARKETS: SecondhandMarket[] = ['facebook', 'depop', 'poshmark', 'ebay'];
@@ -73,6 +74,7 @@ async function call(name: string, args: Record<string, unknown>): Promise<string
 export interface SecondhandOptions {
   marketplaces?: SecondhandMarket[];
   location?: string;
+  radiusKm?: number;
   minPrice?: number;
   maxPrice?: number;
   limit?: number;
@@ -91,9 +93,11 @@ export async function searchSecondhand(query: string, opts: SecondhandOptions = 
   const markets = opts.marketplaces?.length
     ? opts.marketplaces
     : SECONDHAND_MARKETS.filter((m) => m !== 'ebay' || (process.env.EBAY_CLIENT_ID && process.env.EBAY_CLIENT_SECRET));
+  const place = opts.location || process.env.MARKETPLACE_LOCATION || (await resolveLocation())?.name;
   const args = {
     query,
-    ...((opts.location || process.env.MARKETPLACE_LOCATION) && { location: opts.location || process.env.MARKETPLACE_LOCATION }),
+    ...(place && { location: place }),
+    ...(opts.radiusKm !== undefined && { radiusMiles: Math.round(opts.radiusKm / 1.609) }),
     limit: opts.limit ?? 10,
     ...(opts.minPrice !== undefined && { minPrice: opts.minPrice }),
     ...(opts.maxPrice !== undefined && { maxPrice: opts.maxPrice }),

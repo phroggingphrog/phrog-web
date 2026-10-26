@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { execFile } from 'node:child_process';
 import { loadConfig } from './config.js';
 import { searchBooks, closeBooks } from './providers/books.js';
+import { geocode } from './location.js';
 
 const ENV_FILE = resolve(homedir(), '.config/phrog-web.env');
 const MARKER = resolve(homedir(), '.config/phrog-web.setup-done');
@@ -22,6 +23,7 @@ const KEYS: { key: string; secret: boolean; hint: string }[] = [
   { key: 'HARDCOVER_API_KEY', secret: true, hint: 'Hardcover API key (book ratings)' },
   { key: 'DISCOGS_TOKEN', secret: true, hint: 'Discogs token (music)' },
   { key: 'X_BEARER_TOKEN', secret: true, hint: 'X (Twitter) bearer token' },
+  { key: 'PHROG_LOCATION', secret: false, hint: 'Your suburb/city for local results, e.g. "Footscray VIC" (optional; coordinates are looked up)' },
   { key: 'REDLIB_URLS', secret: false, hint: 'Redlib base URLs, comma separated' },
 ];
 
@@ -74,6 +76,17 @@ async function prompt() {
     if (a) updates.set(k.key, a);
   }
   rl.close();
+  const place = updates.get('PHROG_LOCATION');
+  if (place) {
+    const loc = await geocode(place);
+    if (loc?.lat !== undefined) {
+      updates.set('PHROG_LAT', String(loc.lat));
+      updates.set('PHROG_LNG', String(loc.lng));
+      if (loc.state) updates.set('PHROG_STATE', loc.state);
+      if (loc.country) updates.set('PHROG_COUNTRY', loc.country);
+      console.log(`Location: ${place} -> ${loc.lat.toFixed(4)}, ${loc.lng!.toFixed(4)} (${loc.state ?? ''} ${loc.country ?? ''})`);
+    } else console.log(`Could not find coordinates for "${place}"; saving the name only.`);
+  }
   if (updates.size) {
     mkdirSync(resolve(homedir(), '.config'), { recursive: true });
     backupOnce();

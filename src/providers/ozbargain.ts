@@ -1,6 +1,7 @@
 // OzBargain deals. Its /search/ is disallowed in robots.txt (and returns 403), so deals are found through
 // web search, then read from the public RSS feeds (tag/brand/category) and deal pages.
 import { executeSearch } from './search.js';
+import { resolveLocation, stateCode } from '../location.js';
 
 const BASE = 'https://www.ozbargain.com.au';
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
@@ -20,10 +21,14 @@ export interface Deal {
   posted?: string;
   expired?: boolean;
   snippet?: string;
+  /** Only set when the deal names states: true if yours is one of them. */
+  your_state?: boolean;
+  states?: string[];
 }
 
 export interface DealsResult {
   query?: string;
+  state?: string;
   results: Deal[];
   sources: string[];
 }
@@ -85,7 +90,17 @@ async function readDealPage(url: string, fallbackTitle: string): Promise<Deal | 
 const tokens = (s: string) => s.toLowerCase().split(/[^a-z0-9]+/).filter((t) => t.length > 1);
 
 /** Latest deals (no query) or deals matching a product query, newest active and most upvoted first. */
-export async function searchDeals(query?: string, opts: { limit?: number; includeExpired?: boolean } = {}): Promise<DealsResult> {
+export async function searchDeals(query?: string, opts: { limit?: number; includeExpired?: boolean; near?: string } = {}): Promise<DealsResult> {
+  const r = await searchDealsRaw(query, opts);
+  const state = stateCode((await resolveLocation(opts.near))?.state);
+  for (const d of r.results) {
+    const states = [...new Set((d.title.match(/\b(VIC|NSW|QLD|WA|SA|TAS|ACT|NT)\b/g) || []))];
+    if (states.length) { d.states = states; if (state) d.your_state = states.includes(state); }
+  }
+  return state ? { ...r, state } : r;
+}
+
+async function searchDealsRaw(query?: string, opts: { limit?: number; includeExpired?: boolean } = {}): Promise<DealsResult> {
   const limit = opts.limit ?? 10;
   if (!query) {
     const xml = await get(`${BASE}/deals/feed`);
