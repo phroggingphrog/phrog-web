@@ -133,7 +133,7 @@ Matching REST under `/api/personal/`. The Hermes cron can either scroll with `fe
 2. Jev scores every post from its text: caption, author, type, hashtags, location. A post with almost no text (a poster with an empty caption) gets cheap OCR of its image first so Jev is not judging a blank.
 3. Posts with `p_match` at or above a configured threshold (start at medium) pass, capped at a configured number per page, highest first. Explicit `prefer`/`exclude` rules can force a post in or out.
 4. Only passing posts are rendered as a screenshot of the post as Instagram shows it (image plus caption), saved as a phrog-web artifact, and sent to Hermes with the full `feed.v1` item. Hermes then looks at the screenshot and decides.
-5. Exploration: a small configured share of filtered-out posts (for example 1 in 10) is also rendered and sent, marked `filter.reason = exploration`. Without this, Jev's misses would never be seen and the filter could not be measured or improved.
+5. Exploration is off by default (owner 2026-10-26: "currently its already working fine all of the things sent match my interest"). The setting exists so it can be switched on if picks start missing things.
 
 Every post, passed or not, keeps its Jev score in `predictions`, so the threshold can be tuned from owner reactions later.
 - Explicit rules (`exclude`, `avoid`) override Jev.
@@ -141,9 +141,7 @@ Every post, passed or not, keeps its Jev score in `predictions`, so the threshol
 **Keeping the learning honest:**
 
 - Hermes's decisions are Hermes's guesses, not the owner's taste. They are stored and evaluated but never used as training labels for the owner's preferences; otherwise the system would learn from itself.
-- Owner reactions are the truth labels. They update the preference summary and measure how good Jev and Hermes were: per decision type, hit rate, and Jev calibration (Brier score, reliability curve). `calibrated: false` until that check passes.
-- Baselines to beat: Instagram's own order and "authors liked before". If Jev ordering does not beat them on owner reactions, keep the feed in Instagram order and leave `prediction` as information only.
-- Later, only if Jev plateaus: a small local model trained on owner reactions, using Jev's score as one feature.
+- Owner reactions are the truth labels. They update the preference summary. Calibration reports, baselines and hit-rate measurement are deferred: the current picks already match the owner's interests, so the goal is parity, not improvement.
 
 ## 6. Phases
 
@@ -168,8 +166,8 @@ Every post, passed or not, keeps its Jev score in `predictions`, so the threshol
 - Humanitix and Eventbrite through existing phrog-web search and fetch.
 - Ranking owned by phrog-web: the same Jev scoring as the feed, plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
 - Jev scoring in phrog-web (section 5a): preference summary from behaviour data, per-post Jev call with budget and caching, `prediction` filled in `feed.v1`, `--order predicted`.
-- Jev filter + screenshots: threshold and per-page cap, OCR fallback for text-less posts, screenshot rendering of passing posts only (via the existing browser session), exploration share, `render`/`filter` fields. Exit: on a 3-page sample, screenshot count equals passed + exploration posts, and every post has a stored score.
-- `feed_decide` tool and `agent_decisions`; owner reactions via `personal_feedback`; weekly report of Hermes hit rate and Jev calibration against owner reactions.
+- Jev filter + screenshots: threshold and per-page cap, OCR fallback for text-less posts, screenshot rendering of passing posts only (via the existing browser session), `render`/`filter` fields. Exit: side by side with the current Hermes daily discovery for 3 days, the owner judges the picks at least as good; every post has a stored score.
+- `feed_decide` tool and `agent_decisions`; owner reactions via `personal_feedback`.
 - `personal_discover` over MCP and REST, deliveries, feedback, preference rebuild (long vs recent).
 - Exit: shadow run next to the old cron for 3 days; the owner compares the two messages; a "not interested in X" changes the next run.
 
@@ -187,7 +185,7 @@ Every post, passed or not, keeps its Jev score in `predictions`, so the threshol
 
 ## 7. Later, and non-goals
 
-Multi-user (would be one DB per user), OAuth, durable data-control jobs, entity merge and split, preference snapshots, watchlists, a GUI, copying the archive, training models.
+Multi-user (would be one DB per user), OAuth, durable data-control jobs, entity merge and split, preference snapshots, watchlists, a GUI, copying the archive, training models. Only if pick quality drops: exploration share, Jev calibration and baseline comparisons, a local model using Jev's score as a feature.
 
 ## 8. Verification
 
