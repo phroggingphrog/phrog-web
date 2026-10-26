@@ -1,0 +1,9 @@
+{
+  "status": "auth_required",
+  "account": "ykswrdn",
+  "cursor": null,
+  "next_cursor": null,
+  "fetched_at": "2026-10-26T10:00:00Z",
+  "error": "http 401 login_required",
+  "items": []
+}

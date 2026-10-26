@@ -1,0 +1,113 @@
+{
+  "status": "ok",
+  "account": "ykswrdn",
+  "cursor": null,
+  "next_cursor": "synthetic_cursor_001",
+  "fetched_at": "2026-10-26T10:00:00Z",
+  "error": null,
+  "items": [
+    {
+      "position": 1,
+      "native_id": "1000000000000000001",
+      "code": "SyntheticA1",
+      "url": "https://www.instagram.com/p/SyntheticA1/",
+      "media_type": "photo",
+      "sponsored": false,
+      "suggested": false,
+      "author": {
+        "handle": "example_author",
+        "name": "Example Author",
+        "followed": true
+      },
+      "caption": "Example caption #sample @example_friend",
+      "hashtags": [
+        "sample"
+      ],
+      "mentions": [
+        "example_friend"
+      ],
+      "taken_at": 1790000600,
+      "location": {
+        "name": "Example Hall"
+      },
+      "like_count": 120,
+      "comment_count": 4,
+      "media": [
+        {
+          "type": "image",
+          "url": "https://example.invalid/img1.jpg",
+          "width": 1080,
+          "height": 1350,
+          "alt_text": "A synthetic photo"
+        }
+      ]
+    },
+    {
+      "position": 2,
+      "native_id": "1000000000000000002",
+      "code": "SyntheticB2",
+      "url": "https://www.instagram.com/p/SyntheticB2/",
+      "media_type": "carousel",
+      "sponsored": false,
+      "suggested": true,
+      "author": {
+        "handle": "example_suggested",
+        "name": "Example Suggested",
+        "followed": false
+      },
+      "caption": "Two slides",
+      "hashtags": [],
+      "mentions": [],
+      "taken_at": 1790001200,
+      "location": null,
+      "like_count": 240,
+      "comment_count": 8,
+      "media": [
+        {
+          "type": "image",
+          "url": "https://example.invalid/img2.jpg",
+          "width": 1080,
+          "height": 1350,
+          "alt_text": null
+        },
+        {
+          "type": "video",
+          "url": "https://example.invalid/v2.mp4",
+          "width": 720,
+          "height": 1280,
+          "alt_text": null
+        }
+      ]
+    },
+    {
+      "position": 3,
+      "native_id": "1000000000000000003",
+      "code": "SyntheticC3",
+      "url": "https://www.instagram.com/p/SyntheticC3/",
+      "media_type": "reel",
+      "sponsored": true,
+      "suggested": false,
+      "author": {
+        "handle": "example_brand",
+        "name": "Example Brand",
+        "followed": false
+      },
+      "caption": null,
+      "hashtags": [],
+      "mentions": [],
+      "taken_at": 1790001800,
+      "location": null,
+      "like_count": null,
+      "comment_count": null,
+      "media": [
+        {
+          "type": "video",
+          "url": "https://example.invalid/v3.mp4",
+          "width": 720,
+          "height": 1280,
+          "alt_text": null
+        }
+      ]
+    }
+  ]
+}
