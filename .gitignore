@@ -36,3 +36,6 @@ phrog-web-out/
 data/
 *.db-wal
 *.db-shm
+
+# agent-isolated worktrees
+.claude/worktrees/
