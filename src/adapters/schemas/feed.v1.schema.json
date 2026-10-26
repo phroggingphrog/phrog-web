@@ -12,7 +12,8 @@
     "fetched_at",
     "cursor",
     "next_cursor",
-    "items"
+    "items",
+    "filtered_out"
   ],
   "properties": {
     "schema_version": {
@@ -244,16 +245,129 @@
             "type": "string"
           },
           "render": {
-            "type": "null"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "screenshot",
+                  "width",
+                  "height",
+                  "rendered_at"
+                ],
+                "properties": {
+                  "screenshot": {
+                    "type": "string",
+                    "description": "Owner-authenticated URL path of the PNG"
+                  },
+                  "width": {
+                    "type": "integer"
+                  },
+                  "height": {
+                    "type": "integer"
+                  },
+                  "rendered_at": {
+                    "type": "string"
+                  }
+                }
+              }
+            ]
           },
           "filter": {
-            "type": "null"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "passed",
+                  "reason"
+                ],
+                "properties": {
+                  "passed": {
+                    "type": "boolean"
+                  },
+                  "reason": {
+                    "enum": [
+                      "above_threshold",
+                      "exploration",
+                      "no_text",
+                      "jev_error",
+                      "below_threshold",
+                      "page_cap",
+                      "budget",
+                      null
+                    ]
+                  }
+                }
+              }
+            ]
           },
           "prediction": {
-            "type": "null"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "p_match",
+                  "p_engage",
+                  "confidence",
+                  "calibrated",
+                  "model_version",
+                  "scorer",
+                  "preference_summary_version",
+                  "cost_usd"
+                ],
+                "properties": {
+                  "p_match": {
+                    "type": "number",
+                    "description": "P(match level >= medium), 0..1"
+                  },
+                  "p_engage": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "confidence": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
+                  "calibrated": {
+                    "const": false
+                  },
+                  "model_version": {
+                    "type": "string"
+                  },
+                  "scorer": {
+                    "const": "jev"
+                  },
+                  "preference_summary_version": {
+                    "type": "string"
+                  },
+                  "cost_usd": {
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            ]
           }
         }
       }
+    },
+    "filtered_out": {
+      "type": "integer",
+      "description": "Posts held back by the filter (0 when no filter is used)"
     }
   }
 }
