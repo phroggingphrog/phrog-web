@@ -378,6 +378,10 @@
               },
               "near": {
                 "type": "string"
+              },
+              "topic": {
+                "type": "string",
+                "description": "Extra topic searched first, e.g. jazz"
               }
             }
           },
