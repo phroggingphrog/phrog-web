@@ -20,7 +20,8 @@ const USAGE = `phrog-web <command> [options]
   feed decide <item_id> --decision interesting|not_interesting|send_to_owner|save_event [--reason "..."] [--key K]
                                                          (feed commands need PHROG_PERSONAL_TOKEN)
   personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
-  personal preferences [--rebuild]                       (local; data-derived preference summary and rules)
+  personal preferences [--rebuild]                       (local; Beta-posterior preference model, summary and rules)
+  personal evaluate [--json]                             (local; chronological Brier / log loss of the stats model, counts only)
   personal discover [--intent "..."] [--days N] [--near place] [--radius-km N] [--limit N]
   personal feedback <item_id|delivery_id> --type like|dislike|save|not_now|too_far|too_expensive|want_to_go|shown [--scope this_time|item|creator|topic|venue] [--reason "..."] [--key K]
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
@@ -51,6 +52,14 @@ if (pos[0] === 'personal' && pos[1] === 'preferences') {
   else console.log(r.summary ? `${r.summary.text}\n\n(version ${r.summary.version}, ${r.summary.length} chars, computed ${r.summary.computed_at}; ${r.rules.length} active rules)` : 'no summary yet: run with --rebuild');
   process.exit(0);
 }
+if (pos[0] === 'personal' && pos[1] === 'evaluate') {
+  loadConfig();
+  const { evaluate, formatEvaluate } = await import('./personalization/stats/evaluate.js');
+  const { personalDb } = await import('./personalization/feed.js');
+  const r = evaluate(personalDb());
+  console.log(v.json ? JSON.stringify(r) : formatEvaluate(r));
+  process.exit(0);
+}
 if (pos[0] === 'personal' && (pos[1] === 'discover' || pos[1] === 'feedback')) {
   loadConfig();
   const token = personalConfig().token;
@@ -79,7 +88,7 @@ if (pos[0] === 'personal' && (pos[1] === 'discover' || pos[1] === 'feedback')) {
   process.exit(0);
 }
 if (pos[0] === 'personal') {
-  if (pos[1] !== 'import') die('personal: use import, preferences, discover or feedback\n\n' + USAGE);
+  if (pos[1] !== 'import') die('personal: use import, preferences, evaluate, discover or feedback\n\n' + USAGE);
   loadConfig();
   const { SOURCES, runImport, formatImport } = await import('./personalization/imports/index.js');
   const { importConfig } = await import('./config.js');

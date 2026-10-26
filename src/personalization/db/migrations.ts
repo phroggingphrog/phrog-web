@@ -309,4 +309,29 @@ CREATE TABLE preference_summary (
 );
 `,
   },
+  {
+    // Statistical preference model: Beta posteriors per subject and a record of each fit.
+    id: '006_stats_model',
+    sql: `
+ALTER TABLE preferences ADD COLUMN alpha REAL;
+ALTER TABLE preferences ADD COLUMN beta REAL;
+ALTER TABLE preferences ADD COLUMN mean REAL;
+ALTER TABLE preferences ADD COLUMN ci_low REAL;
+ALTER TABLE preferences ADD COLUMN ci_high REAL;
+ALTER TABLE preferences ADD COLUMN n_eff REAL;
+ALTER TABLE preferences ADD COLUMN model_version TEXT;
+CREATE INDEX item_ids_item ON item_ids(item_id);
+
+CREATE TABLE preference_model_runs (
+  id TEXT PRIMARY KEY,
+  model_version TEXT NOT NULL,
+  computed_at TEXT NOT NULL,
+  inputs_cutoff TEXT,
+  config_json TEXT NOT NULL,
+  counts_json TEXT NOT NULL,
+  priors_json TEXT NOT NULL,
+  runtime_ms INTEGER
+);
+`,
+  },
 ];

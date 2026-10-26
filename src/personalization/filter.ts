@@ -5,6 +5,7 @@ import type { DatabaseSync } from 'node:sqlite';
 import { jevConfig } from '../config.js';
 import { preferenceSummary, scorePost, type JevScore } from './jev.js';
 import { getRenderer, type Card } from './render.js';
+import { dbLookup, statsForItem, blend, confident, publicStats, statsConfig, type StatsResult } from './stats/model.js';
 
 export interface FilterOptions { includeFiltered: boolean; order: 'feed' | 'predicted'; exploration: number }
 
@@ -54,8 +55,8 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
   const prefs = preferenceSummary(d);
   const now = () => new Date().toISOString();
 
-  type State = { item: any; pred: Pred | null; reason: string | null; passed: boolean; fresh: boolean };
-  const states: State[] = items.map((item) => ({ item, pred: null, reason: null, passed: false, fresh: false }));
+  type State = { item: any; pred: Pred | null; stats: StatsResult | null; reason: string | null; passed: boolean; fresh: boolean };
+  const states: State[] = items.map((item) => ({ item, pred: null, stats: null, reason: null, passed: false, fresh: false }));
 
   const find = d.prepare("SELECT * FROM predictions WHERE item_id = ? AND scorer = 'jev' AND preference_summary_version = ? ORDER BY created_at DESC, rowid DESC LIMIT 1");
   const ins = d.prepare(`INSERT INTO predictions (id, item_id, collection_run_id, scorer, model_version, preference_summary_version, p_match, p_engage,
@@ -88,15 +89,23 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
     } catch { s.reason = 'jev_error'; }
   }));
 
+  // Statistical model: posterior of the author and topics the post matches. Confident intervals override the Jev threshold.
+  const scfg = statsConfig();
+  const lookup = dbLookup(d);
+  for (const s of states) s.stats = statsForItem(d, lookup, s.item.item_id, scfg);
+
   // Decide who passes. Explicit text-less and scorer-error posts pass so Hermes can judge them visually.
   for (const s of states) {
+    const conf = confident(s.stats, scfg);
+    if (conf === 'fail') { s.passed = false; s.reason = 'stats_confident_fail'; continue; }
+    if (conf === 'pass') { s.passed = true; s.reason = 'stats_confident_pass'; continue; }
     if (s.pred) {
       if (s.pred.p_match >= cfg.threshold) { s.passed = true; s.reason = 'above_threshold'; }
       else if (opts.exploration > 0 && Math.random() < opts.exploration) { s.passed = true; s.reason = 'exploration'; }
       else s.reason = 'below_threshold';
     } else if (s.reason === 'no_text' || s.reason === 'jev_error') s.passed = true;
   }
-  const rank = (s: State) => s.pred?.p_match ?? cfg.threshold;
+  const rank = (s: State) => blend(s.pred?.p_match ?? cfg.threshold, s.stats, scfg);
   const passed = states.filter((s) => s.passed).sort((a, b) => rank(b) - rank(a));
   for (const s of passed.slice(cfg.maxPassPerPage)) { s.passed = false; s.reason = 'page_cap'; }
 
@@ -140,14 +149,20 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
     s.item.prediction = s.pred && {
       p_match: s.pred.p_match, p_engage: s.pred.p_engage, confidence: s.pred.confidence, calibrated: false,
       model_version: s.pred.model_version, scorer: 'jev', preference_summary_version: s.pred.preference_summary_version, cost_usd: s.pred.cost_usd,
+      stats: publicStats(s.stats),
     };
+    if (!s.item.prediction && s.stats) {
+      s.item.prediction = { p_match: null, p_engage: null, confidence: null, calibrated: false, model_version: null, scorer: 'stats',
+        preference_summary_version: null, cost_usd: null, stats: publicStats(s.stats) };
+    }
     if (art) s.item.render = { screenshot: ARTIFACT_URL_PREFIX + art.id, ...pngSize(art.png), rendered_at: art.created_at };
   }
 
   const filteredOut = states.filter((s) => !s.passed).length;
   let kept = opts.includeFiltered ? states : states.filter((s) => s.passed);
   if (opts.order === 'predicted') {
-    kept = [...kept].sort((a, b) => (b.pred?.p_match ?? -1) - (a.pred?.p_match ?? -1));
+    const key = (s: State) => (s.pred || s.stats ? blend(s.pred?.p_match ?? 0, s.stats, scfg) : -1);
+    kept = [...kept].sort((a, b) => key(b) - key(a));
   }
   return { items: kept.map((s) => s.item), filteredOut };
 }
