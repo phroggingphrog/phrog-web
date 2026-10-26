@@ -340,12 +340,12 @@ fastify.get('/api/social', async (req, reply) => {
 });
 
 fastify.post('/api/transcript', async (req, reply) => {
-  const { url, lang, max_chars } = (req.body || {}) as { url?: string; lang?: string; max_chars?: number };
+  const { url, lang, max_chars, stt } = (req.body || {}) as { url?: string; lang?: string; max_chars?: number; stt?: 'auto' | 'off' | 'force' };
   if (!url) {
     return reply.status(400).send({ error: 'Missing or invalid parameters for /api/transcript' });
   }
   try {
-    return await getTranscript(url, { lang, maxChars: max_chars });
+    return await getTranscript(url, { lang, maxChars: max_chars, stt });
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
