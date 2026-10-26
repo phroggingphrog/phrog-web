@@ -572,10 +572,10 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
 
 const MAX_FEED_IMAGES = 8;
 
-server.tool('feed', 'Personal Instagram home feed as feed.v1 (owner bearer token required). Posts come in the order Instagram served them; pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. With filter "jev" each post is scored first; only passing posts are returned (the rest are counted in filtered_out) and their screenshots follow the JSON as images, so look at them and record your call with feed_decide.', {
-  provider: z.enum(['instagram']).default('instagram'),
-  account: z.string().describe('Account name, [A-Za-z0-9._]{1,30}'),
-  source: z.enum(['home']).default('home'),
+server.tool('feed', 'Personal feed as feed.v1 (owner bearer token required). provider instagram: the home feed in the order Instagram served it (needs account). provider rss: an RSS/Atom/JSON feed or RSSHub route in source (e.g. /youtube/channel/UC...); no account needed; later pages come from the stored list. Pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. With filter "jev" each post is scored first; only passing posts are returned (the rest are counted in filtered_out) and their screenshots follow the JSON as images, so look at them and record your call with feed_decide.', {
+  provider: z.enum(['instagram', 'rss']).default('instagram'),
+  account: z.string().optional().describe('Instagram account name, [A-Za-z0-9._]{1,30} (not used for rss)'),
+  source: z.string().max(500).optional().describe('instagram: "home" (default). rss: RSSHub route starting with "/" or an http(s) feed URL'),
   limit: z.number().int().min(1).max(50).default(20),
   cursor: z.string().optional().describe('next_cursor from the previous page'),
   filter: z.enum(['jev']).optional().describe('Score posts with Jev and return only those worth a look, with screenshots'),

@@ -5,6 +5,8 @@ import { chromePath } from '../providers/places.js';
 
 export interface Card {
   author: string | null;
+  /** author is a display name, not a handle (no @ prefix) */
+  named?: boolean;
   caption: string | null;
   type: string | null;
   url: string | null;
@@ -25,7 +27,7 @@ export function cardHtml(c: Card): string {
   const img = safeUrl(c.imageUrl);
   return `<!doctype html><meta charset="utf-8"><body style="margin:0;background:#fff;font:15px/1.4 system-ui,sans-serif;color:#111">
 <div id="card" style="width:${WIDTH}px;box-sizing:border-box">
-<div style="padding:12px 16px;display:flex;justify-content:space-between"><b>@${esc(c.author ?? 'unknown')}</b><span style="color:#666">${esc(c.type ?? '')}</span></div>
+<div style="padding:12px 16px;display:flex;justify-content:space-between"><b>${c.named ? '' : '@'}${esc(c.author ?? 'unknown')}</b><span style="color:#666">${esc(c.type ?? '')}</span></div>
 ${img ? `<img src="${img}" referrerpolicy="no-referrer" style="display:block;width:${WIDTH}px;max-height:800px;object-fit:contain;background:#eee">` : ''}
 <div style="padding:12px 16px;white-space:pre-wrap;word-break:break-word">${esc((c.caption ?? '').slice(0, 1200))}</div>
 <div style="padding:0 16px 12px;color:#666;font-size:12px">${esc(c.url ?? '')}</div></div>`;

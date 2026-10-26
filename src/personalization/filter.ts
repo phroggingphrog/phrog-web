@@ -112,7 +112,7 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
   }
   if (need.length) {
     const cards: Card[] = need.map((s) => ({
-      author: s.item.author?.handle ?? s.item.author?.name ?? null, caption: s.item.caption, type: s.item.type, url: s.item.url,
+      author: s.item.author?.handle ?? s.item.author?.name ?? null, named: !s.item.author?.handle, caption: s.item.caption, type: s.item.type, url: s.item.url,
       imageUrl: (s.item.media.find((m: any) => m?.url) ?? {}).url ?? null,
     }));
     let rendered: Awaited<ReturnType<ReturnType<typeof getRenderer>>> = [];
