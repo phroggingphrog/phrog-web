@@ -1,5 +1,9 @@
 # Phrog Web — Project Handover
 
+## Personal discovery handoff (2026-10-26)
+
+Read the [implementation handoff](docs/plans/personal-discovery-handoff.md) and [full execution plan](docs/plans/personal-discovery-execution-plan.md) before continuing personalization work. Phrog-web owns shared collection, preference learning and ranking; Hermes is a client. This feature is planned, not implemented. Start with Phase 0's read-only canonical-source/coverage audit. The historical gateway status below is not evidence that the new feature is deployed.
+
 > **Repository**: [https://github.com/phroggingphrog/phrog-web](https://github.com/phroggingphrog/phrog-web)  
 > **Status**: Live, tested, and fully functional on `main`  
 > **Backlog**: TASK-308 (Done)
