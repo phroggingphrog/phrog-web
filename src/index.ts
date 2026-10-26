@@ -4,7 +4,7 @@ import { loadConfig } from './config.js';
 import { executeSearch, SearchOptions } from './providers/search.js';
 import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
-import { searchGithubRepos } from './providers/github.js';
+import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
@@ -277,6 +277,33 @@ fastify.get('/api/books', async (req, reply) => {
   }
   try {
     return await searchBooks(q, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/github/download', async (req, reply) => {
+  const b = (req.body || {}) as { repo?: string; ref?: string; extract?: boolean };
+  if (!b.repo) return reply.status(400).send({ error: '"repo" (owner/repo) is required' });
+  try {
+    return await downloadGithubRepo(b.repo, { ref: b.ref, extract: b.extract });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/github/patch', async (req, reply) => {
+  const q = req.query as { repo?: string; number?: string; kind?: string; max_chars?: string };
+  if (!q.repo || !q.number) return reply.status(400).send({ error: '"repo" and "number" are required' });
+  try {
+    return await fetchGithubPatch(
+      q.repo,
+      Number(q.number),
+      q.kind === 'patch' ? 'patch' : 'diff',
+      q.max_chars ? Number(q.max_chars) : undefined,
+    );
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });

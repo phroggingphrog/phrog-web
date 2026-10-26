@@ -6,7 +6,7 @@ import { z } from 'zod';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
-import { searchGithubRepos } from '../../providers/github.js';
+import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
@@ -321,6 +321,41 @@ server.tool(
   async (args) => {
     try {
       return text(await searchBooks(args.query, { limit: args.limit, sources: args.sources }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'github_download',
+  'Download a PUBLIC GitHub repo (no API key) as a tarball into the gateway downloads folder and extract it; returns the local paths. Use ref for a branch, tag or commit (default: default branch).',
+  {
+    repo: z.string().describe('"owner/repo" or a github.com URL'),
+    ref: z.string().optional().describe('Branch, tag or commit SHA (default HEAD)'),
+    extract: z.boolean().optional().describe('Extract the tarball (default true)'),
+  },
+  async (args) => {
+    try {
+      return text(await downloadGithubRepo(args.repo, { ref: args.ref, extract: args.extract }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'github_patch',
+  'Fetch the diff or patch of a PUBLIC GitHub pull request (no API key).',
+  {
+    repo: z.string().describe('"owner/repo" or a github.com URL'),
+    number: z.number().int().positive().describe('Pull request number'),
+    kind: z.enum(['diff', 'patch']).optional().describe('Format (default diff)'),
+    max_chars: z.number().optional().describe('Truncate output (default 100000)'),
+  },
+  async (args) => {
+    try {
+      return text(await fetchGithubPatch(args.repo, args.number, args.kind, args.max_chars));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }
