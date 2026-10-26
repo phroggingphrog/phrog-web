@@ -1,0 +1,200 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "discover.v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "status",
+    "items",
+    "failed_sources",
+    "counts",
+    "cost_usd"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "discover.v1"
+    },
+    "run_id": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "partial",
+        "failed"
+      ]
+    },
+    "intent": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "constraints": {
+      "type": "object"
+    },
+    "preference_summary_version": {
+      "type": "string"
+    },
+    "counts": {
+      "type": "object"
+    },
+    "cost_usd": {
+      "type": "number"
+    },
+    "failed_sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "step": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rank",
+          "delivery_id",
+          "item_id",
+          "title",
+          "url",
+          "reason",
+          "uncertainty"
+        ],
+        "properties": {
+          "rank": {
+            "type": "integer"
+          },
+          "delivery_id": {
+            "type": "string"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "humanitix",
+              "eventbrite"
+            ]
+          },
+          "category": {
+            "type": "string"
+          },
+          "starts_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "UTC; null when the page does not state a date"
+          },
+          "time_precision": {
+            "enum": [
+              "minute",
+              "day",
+              "unknown"
+            ]
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "venue": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "price": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "max": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "currency": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "free": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "status": {
+            "enum": [
+              "sold_out",
+              "unknown",
+              "cancelled"
+            ]
+          },
+          "score": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "p_match": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "p_engage": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "confidence": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "uncertainty": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}
