@@ -19,7 +19,7 @@ One JSON object on stdout, exit 0 for every status: `ok|end|auth_required|challe
 
 ## Behaviour notes
 - `busy` is returned at once (no waiting) when `~/.cache/phrog-web/ig-browser.lock` is held or `ig_scroll.py` / `igswitch.py` is running. The lock only guards phrog-web runs against each other; the cron does not take it, so a cron run starting mid-call is not prevented.
-- Instagram serves pages of a few posts (3 observed). `next_cursor` is Instagram's `next_max_id`. `--limit` truncates the page; posts cut off by the limit are not served again by `next_cursor`.
+- Instagram serves a few posts per request (2-3 observed). The wrapper keeps requesting (max 8 requests) until `--limit` posts are collected and never truncates, so `next_cursor` never skips posts; a page can hold slightly more than `--limit`.
 - `sponsored` = `ad_id` or paid-partnership flag. Ads are kept. Nothing was seen live with this flag set yet.
 - `suggested`: the response has no suggested marker (`inventory_source` is always `media_or_ad`). Proxy: not sponsored and author `followed == false`. `followed` comes from `user.friendship_status.following`; if absent it is `null` and `suggested` is `false`.
 - `media_type`: `carousel` (type 8), `reel` (product_type `clips`), `video`, `photo`. `hashtags` and `mentions` are parsed from the full caption, without the `#`/`@`.

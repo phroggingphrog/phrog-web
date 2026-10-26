@@ -122,16 +122,25 @@ def main():
                                 str(OPENCLI_DIR / "igswitch.py"), acct], cwd="/tmp", capture_output=True, timeout=120)
             if r.returncode != 0:
                 out("failed", acct, cursor, error="account switch failed")
-        p, err = run_opencli(cursor)
-        if p is None:
-            out("failed", acct, cursor, error=err)
-        if p.get("http") != 200:
-            st = classify(p)
-            out(st, acct, cursor, error=f"http {p.get('http')} {p.get('error_type') or p.get('reason') or ''}".strip())
-        items = [build(i) for i in p.get("items", [])]
-        if a.limit > 0:
-            items = items[:a.limit]
-        nxt = p.get("next_cursor")
+        # Instagram serves 2-3 posts per request: keep requesting until --limit is reached.
+        # Never truncate a request's posts, or next_cursor would skip them for good.
+        items, nxt, req = [], cursor, 0
+        while True:
+            p, err = run_opencli(nxt)
+            req += 1
+            if p is None or p.get("http") != 200:
+                if items:  # keep what we have; the caller continues from nxt
+                    break
+                if p is None:
+                    out("failed", acct, cursor, error=err)
+                st = classify(p)
+                out(st, acct, cursor, error=f"http {p.get('http')} {p.get('error_type') or p.get('reason') or ''}".strip())
+            items += [build(i) for i in p.get("items", [])]
+            nxt = p.get("next_cursor")
+            if not nxt or a.limit <= 0 or len(items) >= a.limit or req >= 8:
+                break
+        for n, it in enumerate(items, 1):
+            it["position"] = n
         if not items and not nxt:
             out("end", acct, cursor)
         out("ok", acct, cursor, nxt, items)
