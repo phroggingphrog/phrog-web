@@ -11,6 +11,12 @@ export interface DeepWikiStructure {
   provider_used: 'deepwiki';
 }
 
+export interface DeepWikiContents {
+  repo: string;
+  contents: string;
+  provider_used: 'deepwiki';
+}
+
 const DEEPWIKI_MCP_URL = process.env.DEEPWIKI_MCP_URL || 'https://mcp.deepwiki.com/mcp';
 const TIMEOUT_MS = 60000;
 
@@ -77,6 +83,17 @@ export async function askDeepWiki(repo: string, question: string): Promise<DeepW
     repo: cleanRepo,
     question,
     answer,
+    provider_used: 'deepwiki',
+  };
+}
+
+export async function readDeepWikiContents(repo: string, maxChars = 60000): Promise<DeepWikiContents> {
+  const cleanRepo = repo.replace(/^https?:\/\/github\.com\//, '').replace(/\.git$/, '');
+  const raw = await callDeepWiki('read_wiki_contents', { repoName: cleanRepo });
+  const contents = raw.length > maxChars ? `${raw.slice(0, maxChars)}\n\n[truncated: ${raw.length - maxChars} more chars]` : raw;
+  return {
+    repo: cleanRepo,
+    contents,
     provider_used: 'deepwiki',
   };
 }

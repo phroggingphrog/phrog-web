@@ -7,7 +7,7 @@ import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
 import { searchGithubRepos } from '../../providers/github.js';
-import { askDeepWiki, getDeepWikiStructure } from '../../providers/deepwiki.js';
+import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchDeals } from '../../providers/ozbargain.js';
@@ -247,6 +247,23 @@ server.tool(
   async ({ repo }) => {
     try {
       const res = await getDeepWikiStructure(repo);
+      return text(res);
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'deepwiki_read',
+  'Read the full generated documentation pages (wiki contents) for a public GitHub repo indexed by DeepWiki. Large output: prefer deepwiki_structure first, then deepwiki_ask for targeted questions.',
+  {
+    repo: z.string().describe('GitHub repository name in "owner/repo" format (e.g. "facebook/react")'),
+    max_chars: z.number().optional().describe('Truncate output to this many characters (default 60000)'),
+  },
+  async ({ repo, max_chars }) => {
+    try {
+      const res = await readDeepWikiContents(repo, max_chars);
       return text(res);
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
