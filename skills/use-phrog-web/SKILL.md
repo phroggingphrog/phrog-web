@@ -30,7 +30,9 @@ Escalate only when the lighter tool fails or returns incomplete content.
 | | `visual_search` | Search by photo (URL/file): identifies the item, then AliExpress + deals + secondhand. |
 
 - Location: tools use the saved location from `pnpm setup` (PHROG_LOCATION); pass `near` to override for one call.
-| | `github_search`, `deepwiki_ask` | Repos; grounded Q&A on a GitHub repo. |
+| | `github_search` | Find repos. |
+| | `deepwiki_structure`, `deepwiki_ask`, `deepwiki_read` | Any question about how a repo works, its architecture, roles or components: call `deepwiki_structure` then `deepwiki_ask` before fetching a README or cloning. `deepwiki_read` only when full pages are needed (large output). Use `fetch` on the README only if DeepWiki says the repo is not indexed or errors. |
+| | `github_download`, `github_patch` | `github_download`: public repo source, keyless, when code must be read locally. `github_patch`: a PR diff, keyless. |
 | | `research` (mode web) | Short cited answer in seconds (Vane). |
 | 2. Fetch | `fetch` | One URL to clean Markdown (plain, then headless JS, then TinyFish). |
 | | `web_crawl` | Up to 10 URLs; `actions` (click/type/scroll/wait) and `stealth` force the browser. |
