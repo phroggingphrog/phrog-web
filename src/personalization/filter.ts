@@ -20,7 +20,7 @@ function toPrediction(r: any): Pred {
     model_version: r.model_version, preference_summary_version: r.preference_summary_version, scorer: r.scorer };
 }
 
-function usedToday(d: DatabaseSync): { posts: number; usd: number } {
+export function usedToday(d: DatabaseSync): { posts: number; usd: number } {
   const start = `${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`;
   const r = d.prepare("SELECT COUNT(*) n, COALESCE(SUM(cost_usd), 0) usd FROM predictions WHERE scorer = 'jev' AND created_at >= ?").get(start) as any;
   return { posts: r.n, usd: r.usd };
@@ -51,7 +51,7 @@ export function readArtifact(d: DatabaseSync, id: string): Buffer | null {
  */
 export async function applyJev(d: DatabaseSync, runId: string, items: any[], opts: FilterOptions): Promise<{ items: any[]; filteredOut: number }> {
   const cfg = jevConfig();
-  const prefs = preferenceSummary();
+  const prefs = preferenceSummary(d);
   const now = () => new Date().toISOString();
 
   type State = { item: any; pred: Pred | null; reason: string | null; passed: boolean; fresh: boolean };

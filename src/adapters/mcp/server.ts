@@ -30,6 +30,9 @@ import { saveToBrainWiki } from '../../wiki/brain.js';
 import { getFeed, personalDb } from '../../personalization/feed.js';
 import { feedDecide, DECISIONS } from '../../personalization/decisions.js';
 import { readArtifact, ARTIFACT_URL_PREFIX } from '../../personalization/filter.js';
+import { personalDiscover } from '../../personalization/discover.js';
+import { recordFeedback } from '../../personalization/feedback.js';
+import { personalPreferences } from '../../personalization/preferences.js';
 import { stdioAuthorized, AUTH_REQUIRED_MESSAGE } from '../../personalization/auth.js';
 
 const text = (data: unknown) => ({
@@ -605,6 +608,37 @@ server.tool('feed_decide', "Record your judgement of a feed post (owner bearer t
 }, async (a: any) => {
   if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
   return safe((x) => feedDecide({ ...x, client: 'mcp' }))(a);
+});
+
+const denied = () => ({ isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] });
+
+server.tool('personal_discover', "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences (owner bearer token required). Returns numbered items with link, date (null when the page does not state it), venue, price, reason, uncertainty and delivery_id, plus failed_sources. After you message the owner, call personal_feedback with type 'shown' and the delivery_ids; pass the owner's reactions as personal_feedback too. Never books anything.", {
+  intent: z.string().max(200).optional().describe('Optional focus, e.g. "jazz". Replaces the default categories'),
+  constraints: z.object({ days: z.number().int().min(1).max(90).optional(), radius_km: z.number().positive().max(1000).optional(), near: z.string().max(60).optional() }).optional(),
+  limit: z.number().int().min(1).max(30).default(10),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return denied();
+  return safe((x) => personalDiscover({ ...x, client: 'mcp' }))(a);
+});
+
+server.tool('personal_feedback', "Record the owner's reaction to a discovery item (owner bearer token required). Owner feedback is the truth label: like/save/want_to_go are positive, dislike is negative. not_now, too_far, too_expensive and anything scoped this_time are NOT lasting dislikes. type 'shown' (with delivery_id or delivery_ids) records that you actually delivered the items; returned is not shown. Reuse idempotency_key to retry safely.", {
+  type: z.enum(['like', 'dislike', 'save', 'not_now', 'too_far', 'too_expensive', 'want_to_go', 'shown']),
+  item_id: z.string().optional(), delivery_id: z.string().optional(), delivery_ids: z.array(z.string()).max(100).optional(),
+  scope: z.enum(['this_time', 'item', 'creator', 'topic', 'venue']).optional().describe('Default: item (this_time for not_now/too_far/too_expensive). topic needs a reason naming the topic'),
+  reason: z.string().max(1000).optional(), idempotency_key: z.string().max(128).optional(),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return denied();
+  return safe(recordFeedback)(a);
+});
+
+server.tool('personal_preferences', "Read the owner's preference summary (data-derived: Instagram authors, music artists, saved places, feedback, taste text) and explicit rules, or set a rule (owner bearer token required). action 'get' (default), 'rebuild' (recompute), 'set_rule' (rule prefer|avoid|exclude + subject_key), 'remove_rule' (rule_id). Explicit rules beat derived scores.", {
+  action: z.enum(['get', 'rebuild', 'set_rule', 'remove_rule']).default('get'),
+  rule: z.enum(['prefer', 'avoid', 'exclude']).optional(), subject_key: z.string().max(80).optional(),
+  subject_type: z.string().max(24).optional().describe('keyword (default), topic, venue, creator, category'),
+  valid_until: z.string().optional().describe('ISO date; the rule stops applying after it'), note: z.string().max(500).optional(), rule_id: z.string().optional(),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return denied();
+  return safe(personalPreferences)(a);
 });
 
 server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions (click/type/press/scroll/wait/wait_for) and stealth force the browser. PDF and Office URLs are converted to text.', {

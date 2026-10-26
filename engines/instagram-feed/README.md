@@ -23,7 +23,7 @@ One JSON object on stdout, exit 0 for every status: `ok|end|auth_required|challe
 - `sponsored` = `ad_id` or paid-partnership flag. Ads are kept. Nothing was seen live with this flag set yet.
 - `suggested`: the response has no suggested marker (`inventory_source` is always `media_or_ad`). Proxy: not sponsored and author `followed == false`. `followed` comes from `user.friendship_status.following`; if absent it is `null` and `suggested` is `false`.
 - `media_type`: `carousel` (type 8), `reel` (product_type `clips`), `video`, `photo`. `hashtags` and `mentions` are parsed from the full caption, without the `#`/`@`.
-- First call after a Chrome start may hit "Navigation rejected"; the wrapper retries once after 3 s, then returns `failed`. It never restarts Chrome.
+- First call after a Chrome start may hit "Navigation rejected"; the wrapper retries once after 3 s. If it is still rejected, it restarts Chrome once (`systemctl --user restart opencli-chrome`, then waits 20 s) and tries once more, then returns `failed`. The restart only happens while the wrapper holds the lock and `ig_scroll.py` / `igswitch.py` are not running (checked again just before the restart). A restart can disturb a Hermes cron run that starts in that moment, like the account switch.
 - Account switch restarts the shared Chrome (existing `igswitch.py` behaviour).
 
 ## Undo
