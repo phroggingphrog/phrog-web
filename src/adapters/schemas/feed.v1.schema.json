@@ -1,0 +1,259 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phrog-web/schemas/feed.v1.json",
+  "title": "feed.v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "provider",
+    "account",
+    "source",
+    "status",
+    "fetched_at",
+    "cursor",
+    "next_cursor",
+    "items"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "feed.v1"
+    },
+    "provider": {
+      "enum": [
+        "instagram"
+      ]
+    },
+    "account": {
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "home"
+      ]
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "end",
+        "auth_required",
+        "challenge",
+        "rate_limited",
+        "busy",
+        "unsupported",
+        "failed"
+      ]
+    },
+    "fetched_at": {
+      "type": "string"
+    },
+    "cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "next_cursor": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "error": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "position",
+          "item_id",
+          "native_id",
+          "url",
+          "type",
+          "sponsored",
+          "suggested",
+          "author",
+          "caption",
+          "hashtags",
+          "mentions",
+          "media",
+          "posted_at",
+          "posted_precision",
+          "location",
+          "like_count",
+          "comment_count",
+          "seen_before",
+          "first_seen_at",
+          "render",
+          "filter",
+          "prediction"
+        ],
+        "properties": {
+          "position": {
+            "type": "integer"
+          },
+          "item_id": {
+            "type": "string"
+          },
+          "native_id": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "type": {
+            "enum": [
+              "photo",
+              "carousel",
+              "video",
+              "reel",
+              null
+            ]
+          },
+          "sponsored": {
+            "type": "boolean"
+          },
+          "suggested": {
+            "type": "boolean"
+          },
+          "author": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "handle": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "followed": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              }
+            }
+          },
+          "caption": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hashtags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mentions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "media": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "width": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "height": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "alt_text": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "posted_at": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "posted_precision": {
+            "enum": [
+              "exact",
+              "unknown"
+            ]
+          },
+          "location": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "properties": {
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          },
+          "like_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "comment_count": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "seen_before": {
+            "type": "boolean"
+          },
+          "first_seen_at": {
+            "type": "string"
+          },
+          "render": {
+            "type": "null"
+          },
+          "filter": {
+            "type": "null"
+          },
+          "prediction": {
+            "type": "null"
+          }
+        }
+      }
+    }
+  }
+}
