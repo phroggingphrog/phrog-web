@@ -11,7 +11,7 @@ import { parseWhen, parseVenue, venueFromSnippet, looksEnded, parsePrice, looksO
 
 export interface DiscoverRequest {
   intent?: string;
-  constraints?: { days?: number; radius_km?: number; near?: string };
+  constraints?: { days?: number; radius_km?: number; near?: string; topic?: string };
   limit?: number;
   client?: string;
 }
@@ -114,9 +114,11 @@ export async function personalDiscover(req: DiscoverRequest, deps: DiscoverDeps 
     if (f) f.count++; else failures.set(k, { source, step, error: msg, count: 1 });
   };
 
-  // 1. Search: category x source (or the intent alone x source).
+  // 1. Search: the owner's categories x month x source. Intent is recorded, not searched (a generic intent made poor queries);
+  // an explicit constraints.topic is searched first, in addition to the categories.
   const queries: Array<{ source: string; category: string; q: string }> = [];
-  const cats = intent ? [{ id: 'intent', q: intent }] : [...CATEGORIES];
+  const topic = typeof c.topic === 'string' && /^[\p{L}\p{N} .,'&-]{2,60}$/u.test(c.topic.trim()) ? c.topic.trim() : null;
+  const cats = topic ? [{ id: 'topic', q: topic }, ...CATEGORIES] : [...CATEGORIES];
   // Search engines cannot filter by event date, so the month names of the window go into the query.
   const monthName = (t: number) => new Date(t).toLocaleString('en-AU', { month: 'long', year: 'numeric', timeZone: 'Australia/Melbourne' });
   const months = [...new Set([monthName(now.getTime()), monthName(now.getTime() + days * DAY)])];
