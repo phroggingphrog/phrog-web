@@ -339,7 +339,7 @@ test('MCP: personal_discover, personal_feedback and personal_preferences are lis
   assert.equal(JSON.parse(p.content[0].text).rule.rule, 'prefer');
   const bad: any = await authed.callTool({ name: 'personal_feedback', arguments: { type: 'like' } });
   assert.equal(bad.isError, true);
-  assert.match(bad.content[0].text, /item_id or delivery_id/);
+  assert.match(bad.content[0].text, /item_id, delivery_id or url/);
 });
 
 test('a generic intent never replaces the owner categories; a topic is searched first', async () => {

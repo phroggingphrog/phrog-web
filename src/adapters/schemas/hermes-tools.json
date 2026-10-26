@@ -415,6 +415,10 @@
           "item_id": {
             "type": "string"
           },
+          "url": {
+            "type": "string",
+            "description": "Alternative to item_id: the link of the post or event the owner means"
+          },
           "delivery_id": {
             "type": "string"
           },
@@ -444,6 +448,24 @@
         "required": [
           "type"
         ]
+      }
+    }
+  },
+  {
+    "type": "function",
+    "function": {
+      "name": "personal_recent",
+      "description": "What the owner was actually shown recently, in message order. Needs the owner bearer token. Use when the owner replies in a new conversation and you lack ids: discovery_runs[].items[] has number, title, url, delivery_id, item_id (only deliveries acknowledged with personal_feedback type 'shown'); sent_posts[] has feed posts you decided send_to_owner. Then call personal_feedback with the ids or url.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "hours": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 336,
+            "default": 48
+          }
+        }
       }
     }
   },

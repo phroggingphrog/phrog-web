@@ -7,6 +7,8 @@ const SITUATIONAL = new Set(['not_now', 'too_far', 'too_expensive']);
 
 export interface FeedbackRequest {
   item_id?: string;
+  /** Alternative to item_id: the post or event link (items.canonical_url or a known native id in the path). */
+  url?: string;
   delivery_id?: string;
   /** For type "shown": acknowledge several deliveries at once. */
   delivery_ids?: string[];
@@ -16,7 +18,25 @@ export interface FeedbackRequest {
   idempotency_key?: string;
 }
 
-const DELIVERY_RE = /^dlv_[0-9a-f-]{36}$/;
+/** Resolve a link to one item: canonical_url (query and fragment ignored, trailing slash either way), then a native id such as /p/<code>. */
+function resolveUrl(d: ReturnType<typeof personalDb>, raw: string): string {
+  let u: URL;
+  try { u = new URL(String(raw)); } catch { throw new FeedInputError('url must be a valid link'); }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new FeedInputError('url must be http(s)');
+  const bare = `${u.origin}${u.pathname}`.replace(/\/$/, '');
+  const hits = new Set<string>();
+  for (const r of d.prepare('SELECT id FROM items WHERE canonical_url IN (?, ?)').all(bare, `${bare}/`) as any[]) hits.add(r.id);
+  if (!hits.size) {
+    const m = /\/(?:p|reel|reels|tv)\/([A-Za-z0-9_-]+)/.exec(u.pathname);
+    const native = m?.[1] ?? u.pathname.split('/').filter(Boolean).pop();
+    if (native) for (const r of d.prepare('SELECT item_id FROM item_ids WHERE native_id = ?').all(native) as any[]) hits.add(r.item_id);
+  }
+  if (hits.size === 0) throw new FeedInputError('no known item for that url');
+  if (hits.size > 1) throw new FeedInputError('url matches more than one item; use item_id');
+  return [...hits][0];
+}
+
+const DELIVERY_RE =/^dlv_[0-9a-f-]{36}$/;
 const ITEM_RE = /^it_[0-9a-f-]{36}$/;
 
 /**
@@ -64,7 +84,8 @@ export function recordFeedback(req: FeedbackRequest) {
     if (itemId && itemId !== dl.item_id) throw new FeedInputError('delivery_id belongs to a different item');
     itemId = dl.item_id;
   }
-  if (!itemId) throw new FeedInputError('item_id or delivery_id is required');
+  if (!itemId && req.url !== undefined) itemId = resolveUrl(d, req.url);
+  if (!itemId) throw new FeedInputError('item_id, delivery_id or url is required');
   if (!d.prepare('SELECT 1 FROM items WHERE id = ?').get(itemId)) throw new FeedInputError('unknown item_id');
 
   const key = req.idempotency_key ?? `fb_${randomUUID()}`;
