@@ -11,6 +11,7 @@ import { setupDone } from './setup.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
+import { visualSearch } from './providers/visual.js';
 import { resolveLocation, localizeQuery } from './location.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct, type SecondhandMarket } from './providers/marketplace.js';
 import { searchSocial } from './providers/social.js';
@@ -193,6 +194,17 @@ fastify.get('/api/media', async (req, reply) => {
   }
   try {
     return await searchMedia(q, type as MediaType, { limit: limit ? parseInt(limit, 10) : undefined });
+  } catch (err) {
+    req.log.error(err);
+    return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/visual', { bodyLimit: 12 * 1024 * 1024 }, async (req, reply) => {
+  const b = (req.body || {}) as { image?: string; hint?: string; shop?: boolean; limit?: number; near?: string };
+  if (!b.image) return reply.status(400).send({ error: 'Provide image (URL, file path or data:image/ URL)' });
+  try {
+    return await visualSearch(b.image, b);
   } catch (err) {
     req.log.error(err);
     return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });

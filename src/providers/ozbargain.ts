@@ -14,6 +14,7 @@ export interface Deal {
   url: string;
   price?: string;
   store_url?: string;
+  image?: string;
   votes_up?: number;
   votes_down?: number;
   clicks?: number;
@@ -58,6 +59,7 @@ function parseFeed(xml: string): Deal[] {
       url: it.match(/<link>([^<]+)<\/link>/)?.[1] || '',
       price: priceOf(title),
       store_url: attr(meta, 'url') ? decode(attr(meta, 'url')!) : undefined,
+      image: attr(meta, 'image') ? decode(attr(meta, 'image')!) : undefined,
       votes_up: num(attr(meta, 'votes-pos')),
       votes_down: num(attr(meta, 'votes-neg')),
       clicks: num(attr(meta, 'click-count')),
@@ -79,6 +81,7 @@ async function readDealPage(url: string, fallbackTitle: string): Promise<Deal | 
     url,
     price: priceOf(title),
     store_url: undefined,
+    image: html.match(/og:image" content="([^"]*)"/)?.[1],
     votes_up: num(html.match(/nvb voteup"><i[^>]*><\/i><span>(\d+)/)?.[1]),
     votes_down: num(html.match(/nvb votedown"><i[^>]*><\/i><span>(\d+)/)?.[1]),
     posted: posted ? `${posted[3]}-${posted[2]}-${posted[1]}` : undefined,

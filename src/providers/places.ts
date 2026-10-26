@@ -38,7 +38,7 @@ const REPO_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 const PUPPETEER = resolve(REPO_ROOT, 'engines/secondhand-mcp/node_modules/puppeteer-core/lib/esm/puppeteer/puppeteer-core.js');
 const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36';
 
-function chromePath(): string | undefined {
+export function chromePath(): string | undefined {
   if (process.env.CHROME_PATH) return process.env.CHROME_PATH;
   const base = resolve(homedir(), '.cache/ms-playwright');
   if (!existsSync(base)) return undefined;

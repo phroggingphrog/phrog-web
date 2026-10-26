@@ -12,6 +12,7 @@ import { searchMedia } from '../../providers/media.js';
 import { searchBooks, downloadBook } from '../../providers/books.js';
 import { searchDeals } from '../../providers/ozbargain.js';
 import { searchPlaces } from '../../providers/places.js';
+import { visualSearch } from '../../providers/visual.js';
 import { resolveLocation, localizeQuery } from '../../location.js';
 import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduct } from '../../providers/marketplace.js';
 import { searchSocial } from '../../providers/social.js';
@@ -442,6 +443,25 @@ server.tool(
   async (args) => {
     try {
       return text(await searchPlaces(args.query, { limit: args.limit, near: args.near }));
+    } catch (err) {
+      return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
+    }
+  }
+);
+
+server.tool(
+  'visual_search',
+  'Search by photo: identifies the item (vision model; Bing Visual Search too for public image URLs), then checks AliExpress, OzBargain deals and secondhand listings. image = URL, local file path, or data: URL.',
+  {
+    image: z.string().describe('Image URL, absolute file path on the gateway host, or data:image/... URL'),
+    hint: z.string().optional().describe('Extra context, e.g. "the shoes, not the bag"'),
+    shop: z.boolean().optional().describe('Also search shops/deals/secondhand (default true)'),
+    limit: z.number().int().min(1).max(10).optional(),
+    near: z.string().optional(),
+  },
+  async (args) => {
+    try {
+      return text(await visualSearch(args.image, args));
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
     }

@@ -6,6 +6,8 @@ export interface SearchResult {
   snippet: string;
   engine?: string;
   score?: number;
+  image?: string;
+  thumbnail?: string;
   raw?: Record<string, unknown>;
   metadata?: {
     studyType?: string;
@@ -92,6 +94,7 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<{ r
     snippet: r.content || '',
     engine: r.engine,
     score: r.score,
+    ...((r as any).img_src && { image: (r as any).img_src, thumbnail: (r as any).thumbnail_src || undefined }),
     raw: r as Record<string, unknown>,
   }));
   return { results, envelope };

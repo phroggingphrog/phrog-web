@@ -27,6 +27,9 @@ Escalate only when the lighter tool fails or returns incomplete content.
 | | `marketplace_search` / `marketplace_product` | New items on AliExpress: price, shipping, store, ratings, reviews. |
 | | `deals_search` | OzBargain AU deals + past prices (votes, expired). Cross-check before buying. |
 | | `place_search` | Google Maps rating, review count, address, open status for places. |
+| | `visual_search` | Search by photo (URL/file): identifies the item, then AliExpress + deals + secondhand. |
+
+- Location: tools use the saved location from `pnpm setup` (PHROG_LOCATION); pass `near` to override for one call.
 | | `github_search`, `deepwiki_ask` | Repos; grounded Q&A on a GitHub repo. |
 | | `research` (mode web) | Short cited answer in seconds (Vane). |
 | 2. Fetch | `fetch` | One URL to clean Markdown (plain, then headless JS, then TinyFish). |
