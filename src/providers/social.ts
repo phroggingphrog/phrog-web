@@ -106,7 +106,36 @@ async function reddit(q: string, limit: number, t?: string): Promise<SocialPost[
     }
     }
   }
+  try {
+    const posts = await redditRss(q, limit, t);
+    if (posts.length) return posts;
+    errs.push('reddit rss: no posts');
+  } catch (e: any) {
+    errs.push(`reddit rss: ${e?.message}`);
+  }
   throw new Error(`redlib failed (${errs.join('; ')})`);
+}
+
+/** Reddit's own public Atom search feed: no score/comment counts, but works when Redlib instances are blocked. */
+async function redditRss(q: string, limit: number, t?: string): Promise<SocialPost[]> {
+  const res = await fetch(`https://www.reddit.com/search.rss?q=${encodeURIComponent(q)}&sort=relevance${t ? `&t=${t}` : ''}&limit=${limit}`, {
+    headers: { 'User-Agent': UA, Accept: 'application/atom+xml' },
+    signal: AbortSignal.timeout(REDDIT_TIMEOUT_MS),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const xml = await res.text();
+  const dec = (x: string) => x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&')
+    .replace(/&#x([0-9a-f]+);/gi, (_, h) => String.fromCodePoint(parseInt(h, 16))).replace(/&#(\d+);/g, (_, d) => String.fromCodePoint(Number(d)));
+  return xml.split('<entry>').slice(1).map((e) => ({
+    source: 'reddit',
+    title: dec(e.match(/<title>([\s\S]*?)<\/title>/)?.[1] || ''),
+    text: dec(dec(e.match(/<content type="html">([\s\S]*?)<\/content>/)?.[1] || '')).replace(/<[^>]+>/g, ' ').replace(/[\s\u200b]+/g, ' ').replace(/\s*submitted by\s+\/u\/.*$/, '').trim().slice(0, 500),
+    url: e.match(/<link href="([^"]+)"/)?.[1] || '',
+    author: e.match(/<name>\/u\/([^<]+)<\/name>/)?.[1],
+    community: e.match(/<category term="([^"]+)"/)?.[1],
+    created_at: e.match(/<published>([^<]+)<\/published>/)?.[1] || e.match(/<updated>([^<]+)<\/updated>/)?.[1],
+    instance: 'reddit.com/rss',
+  })).filter((p) => p.url).slice(0, limit);
 }
 
 async function xSearch(q: string, limit: number): Promise<SocialPost[]> {
