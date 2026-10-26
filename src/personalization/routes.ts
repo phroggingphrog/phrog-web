@@ -4,6 +4,7 @@ import { getFeed, personalDb, FeedInputError } from './feed.js';
 import { feedDecide } from './decisions.js';
 import { readArtifact } from './filter.js';
 import { recordFeedback } from './feedback.js';
+import { personalRecent } from './recent.js';
 import { personalDiscover } from './discover.js';
 import { personalPreferences, PreferenceInputError } from './preferences.js';
 
@@ -69,6 +70,10 @@ export function registerPersonalRoutes(fastify: FastifyInstance) {
   fastify.post('/api/personal/discover', guarded('discover', (req) => {
     const b = (req.body ?? {}) as Record<string, any>;
     return personalDiscover({ intent: b.intent, constraints: b.constraints, limit: b.limit, client: b.client ?? 'rest' });
+  }));
+  fastify.get('/api/personal/recent', guarded('recent', (req) => {
+    const h = (req.query as Record<string, string | undefined>).hours;
+    return personalRecent({ hours: h !== undefined ? Number(h) : undefined });
   }));
   fastify.get('/api/personal/preferences', guarded('preferences', () => personalPreferences({ action: 'get' })));
   fastify.post('/api/personal/preferences', guarded('preferences', (req) => personalPreferences((req.body ?? {}) as any)));

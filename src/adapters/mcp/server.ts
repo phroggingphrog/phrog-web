@@ -32,6 +32,7 @@ import { feedDecide, DECISIONS } from '../../personalization/decisions.js';
 import { readArtifact, ARTIFACT_URL_PREFIX } from '../../personalization/filter.js';
 import { personalDiscover } from '../../personalization/discover.js';
 import { recordFeedback } from '../../personalization/feedback.js';
+import { personalRecent } from '../../personalization/recent.js';
 import { personalPreferences } from '../../personalization/preferences.js';
 import { stdioAuthorized, AUTH_REQUIRED_MESSAGE } from '../../personalization/auth.js';
 
@@ -623,12 +624,19 @@ server.tool('personal_discover', "Ranked Melbourne events for the next N days fr
 
 server.tool('personal_feedback', "Record the owner's reaction to a discovery item (owner bearer token required). Owner feedback is the truth label: like/save/want_to_go are positive, dislike is negative. not_now, too_far, too_expensive and anything scoped this_time are NOT lasting dislikes. type 'shown' (with delivery_id or delivery_ids) records that you actually delivered the items; returned is not shown. Reuse idempotency_key to retry safely.", {
   type: z.enum(['like', 'dislike', 'save', 'not_now', 'too_far', 'too_expensive', 'want_to_go', 'shown']),
-  item_id: z.string().optional(), delivery_id: z.string().optional(), delivery_ids: z.array(z.string()).max(100).optional(),
+  item_id: z.string().optional(), url: z.string().max(500).optional().describe('Alternative to item_id: the link of the post or event the owner means'), delivery_id: z.string().optional(), delivery_ids: z.array(z.string()).max(100).optional(),
   scope: z.enum(['this_time', 'item', 'creator', 'topic', 'venue']).optional().describe('Default: item (this_time for not_now/too_far/too_expensive). topic needs a reason naming the topic'),
   reason: z.string().max(1000).optional(), idempotency_key: z.string().max(128).optional(),
 }, async (a: any) => {
   if (!ctx.personalAuthorized) return denied();
   return safe(recordFeedback)(a);
+});
+
+server.tool('personal_recent', "What the owner was actually shown recently, in message order (owner bearer token required). Use it when the owner replies in a new conversation and you do not have the ids: discovery_runs[].items[] has the number the owner saw, title, url, delivery_id and item_id (only deliveries acknowledged with personal_feedback type 'shown'); sent_posts[] has feed posts you decided send_to_owner. Pass the ids (or the url) to personal_feedback.", {
+  hours: z.number().min(1).max(336).default(48),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return denied();
+  return safe(personalRecent)(a);
 });
 
 server.tool('personal_preferences', "Read the owner's preference summary (data-derived: Instagram authors, music artists, saved places, feedback, taste text) and explicit rules, or set a rule (owner bearer token required). action 'get' (default), 'rebuild' (recompute), 'set_rule' (rule prefer|avoid|exclude + subject_key), 'remove_rule' (rule_id). Explicit rules beat derived scores.", {
