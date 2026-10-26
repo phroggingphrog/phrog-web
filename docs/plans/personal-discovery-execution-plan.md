@@ -54,7 +54,7 @@ Separate SQLite file (`node:sqlite`), not the wiki index. Path from config.
 - `deliveries`: id, discovery_run_id, item_id, position, reason, returned_at, displayed_at (NULL until shown). Returned is not shown; unshown is not disliked.
 - `feedback`: id, item_id, delivery_id (NULL ok), type (like/dislike/save/not_now/too_far/too_expensive/want_to_go), scope (this_time/item/creator/topic/venue), reason, created_at, idempotency_key UNIQUE. "Too expensive this time" is not a lasting dislike.
 - `preference_rules`: id, subject_type, subject_key, rule (prefer/avoid/exclude/radius/budget), value, valid_until, note, created_at. Explicit rules beat derived scores.
-- `predictions`: item_id, collection_run_id, scorer (jev), model_version, preference_summary_version, p_match, p_engage, confidence, cost_usd, calibrated, created_at. Kept so owner reactions can check how good past predictions were.
+- `predictions`: item_id, collection_run_id, scorer (jev), passed_filter, filter_reason, screenshot_ref, model_version, preference_summary_version, p_match, p_engage, confidence, cost_usd, calibrated, created_at. Kept so owner reactions can check how good past predictions were.
 - `agent_decisions`: id, item_id, collection_run_id, prediction_id, client (hermes), decision (interesting/not_interesting/send_to_owner/save_event), reason, created_at, idempotency_key UNIQUE. Never used as owner-taste labels.
 - `preferences` (derived, rebuilt from scratch each run, no history): subject_type, subject_key, horizon (long/recent), score, evidence_count, distinct_days, computed_at, ranker_version. Explanations are computed on demand from source tables, not stored per row.
 
@@ -67,6 +67,7 @@ Feed tools come first. They are plain commands any agent can run, like a CLI: as
 - CLI: `phrog-web feed instagram --account <name> [--source home|explore] [--limit 20] [--cursor <c>]`. Same shape later for `x`, `rss <route>`, `youtube`.
 - MCP: `feed(provider, account, source, limit, cursor)`.
 - The feed behaves like the real app: posts come in the order Instagram served them, with the same mix (photos, carousels, reels, sponsored posts, suggested accounts you don't follow). Scrolling with `cursor` continues the same session, like swiping down; it does not restart from the top. `--order predicted` re-sorts a page by the prediction below; the default keeps Instagram's order.
+- `--filter jev` (Phase 2): Jev scores every post from its text first; only posts that pass are rendered as screenshots and returned in full to Hermes. The rest stay in the DB and appear only as a count (`filtered_out`), or in full with `--include-filtered`.
 - Optional per-item extras on request: `--ocr`, `--describe` (image text and description), so a caller without vision can still read posters.
 
 Output is one versioned JSON schema (published as a JSON Schema file and in the MCP tool definition), the same for every provider:
@@ -88,6 +89,8 @@ Output is one versioned JSON schema (published as a JSON Schema file and in the 
     "posted_at": "UTC time | null", "posted_precision": "exact | day | unknown",
     "location": null, "like_count": null, "comment_count": null,
     "seen_before": false, "first_seen_at": "UTC time",
+    "render": { "screenshot": "artifact URL | null", "width": 1080, "height": 1350, "rendered_at": "UTC time" },
+    "filter": { "passed": true, "reason": "above_threshold | exploration | rule_override" },
     "prediction": {
       "p_match": 0.0, "p_engage": 0.0, "confidence": 0.0,
       "calibrated": false, "model_version": "...",
@@ -123,6 +126,16 @@ Matching REST under `/api/personal/`. The Hermes cron can either scroll with `fe
 - State sent: the post (caption, author, type, OCR/description text, event date/place if found) and a short preference summary built from personal behaviour data (top authors, topics, places and recent changes from the social/behaviour DBs, `taste.md` and explicit rules). Raw history, messages and account credentials are never sent.
 - Questions: one `score` question ("how well does this match the owner's preferences": none/low/medium/high) and one `noul` question ("would the owner want to see this today?"). Jev's probabilities fill `prediction.p_match` and `prediction.p_engage`, with its confidence and cost.
 - Budget: configured max posts and dollars per day; skip Jev for posts already scored with the same preference-summary version.
+
+**Jev is the filter before screenshots.** Rendering a post visually is the expensive step, so Jev decides which posts are worth it:
+
+1. Fetch the page (text and media links only; no screenshots yet).
+2. Jev scores every post from its text: caption, author, type, hashtags, location. A post with almost no text (a poster with an empty caption) gets cheap OCR of its image first so Jev is not judging a blank.
+3. Posts with `p_match` at or above a configured threshold (start at medium) pass, capped at a configured number per page, highest first. Explicit `prefer`/`exclude` rules can force a post in or out.
+4. Only passing posts are rendered as a screenshot of the post as Instagram shows it (image plus caption), saved as a phrog-web artifact, and sent to Hermes with the full `feed.v1` item. Hermes then looks at the screenshot and decides.
+5. Exploration: a small configured share of filtered-out posts (for example 1 in 10) is also rendered and sent, marked `filter.reason = exploration`. Without this, Jev's misses would never be seen and the filter could not be measured or improved.
+
+Every post, passed or not, keeps its Jev score in `predictions`, so the threshold can be tuned from owner reactions later.
 - Explicit rules (`exclude`, `avoid`) override Jev.
 
 **Keeping the learning honest:**
@@ -155,6 +168,7 @@ Matching REST under `/api/personal/`. The Hermes cron can either scroll with `fe
 - Humanitix and Eventbrite through existing phrog-web search and fetch.
 - Ranking owned by phrog-web: the same Jev scoring as the feed, plus rules and read-only historical taste. Import `lanes.md` and `taste.md` once into `preference_rules`.
 - Jev scoring in phrog-web (section 5a): preference summary from behaviour data, per-post Jev call with budget and caching, `prediction` filled in `feed.v1`, `--order predicted`.
+- Jev filter + screenshots: threshold and per-page cap, OCR fallback for text-less posts, screenshot rendering of passing posts only (via the existing browser session), exploration share, `render`/`filter` fields. Exit: on a 3-page sample, screenshot count equals passed + exploration posts, and every post has a stored score.
 - `feed_decide` tool and `agent_decisions`; owner reactions via `personal_feedback`; weekly report of Hermes hit rate and Jev calibration against owner reactions.
 - `personal_discover` over MCP and REST, deliveries, feedback, preference rebuild (long vs recent).
 - Exit: shadow run next to the old cron for 3 days; the owner compares the two messages; a "not interested in X" changes the next run.
