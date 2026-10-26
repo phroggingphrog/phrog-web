@@ -613,8 +613,8 @@ server.tool('feed_decide', "Record your judgement of a feed post (owner bearer t
 const denied = () => ({ isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] });
 
 server.tool('personal_discover', "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences (owner bearer token required). Returns numbered items with link, date (null when the page does not state it), venue, price, reason, uncertainty and delivery_id, plus failed_sources. After you message the owner, call personal_feedback with type 'shown' and the delivery_ids; pass the owner's reactions as personal_feedback too. Never books anything.", {
-  intent: z.string().max(200).optional().describe('Optional focus, e.g. "jazz". Replaces the default categories'),
-  constraints: z.object({ days: z.number().int().min(1).max(90).optional(), radius_km: z.number().positive().max(1000).optional(), near: z.string().max(60).optional() }).optional(),
+  intent: z.string().max(200).optional().describe('Why the owner wants discovery (recorded only). The owner\'s categories are always searched'),
+  constraints: z.object({ days: z.number().int().min(1).max(90).optional(), radius_km: z.number().positive().max(1000).optional(), near: z.string().max(60).optional(), topic: z.string().max(60).optional().describe('Extra topic searched first, e.g. "jazz"') }).optional(),
   limit: z.number().int().min(1).max(30).default(10),
 }, async (a: any) => {
   if (!ctx.personalAuthorized) return denied();

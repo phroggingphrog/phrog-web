@@ -341,3 +341,16 @@ test('MCP: personal_discover, personal_feedback and personal_preferences are lis
   assert.equal(bad.isError, true);
   assert.match(bad.content[0].text, /item_id or delivery_id/);
 });
+
+test('a generic intent never replaces the owner categories; a topic is searched first', async () => {
+  const seen: string[] = [];
+  const f = fakes();
+  const base = f.deps.search;
+  const deps = { ...f.deps, search: (async (q: string, o: any) => { seen.push(q); return base(q, o); }) as any };
+  await personalDiscover({ intent: 'Melbourne events next 14 days for the owner', limit: 3, client: 'test' }, deps);
+  assert.ok(seen.some((q) => q.includes('writing group')) && seen.some((q) => q.includes('film screening')));
+  assert.ok(!seen.some((q) => q.includes('for the owner')));
+  seen.length = 0;
+  await personalDiscover({ limit: 3, client: 'test', constraints: { topic: 'jazz' } }, deps);
+  assert.ok(seen[0].includes('jazz'));
+});
