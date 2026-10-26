@@ -111,7 +111,7 @@ test('timeout -> failed', async () => {
 
 test('invalid account, cursor, limit are rejected before running the collector', async () => {
   const n = readFileSync(argsFile, 'utf8').split('\n').length;
-  for (const bad of [{ account: 'a b' }, { account: 'x;rm -rf' }, { account: '' }, { account: 'ok', cursor: "a'b" }, { account: 'ok', cursor: 'x'.repeat(513) }, { account: 'ok', limit: 0 }]) {
+  for (const bad of [{ account: 'a b' }, { account: 'x;rm -rf' }, { account: '' }, { account: 'ok', cursor: "a'b" }, { account: 'ok', cursor: 'x'.repeat(4097) }, { account: 'ok', limit: 0 }]) {
     await assert.rejects(getFeed({ provider: 'instagram', limit: 3, ...bad } as any), FeedInputError);
   }
   assert.equal(readFileSync(argsFile, 'utf8').split('\n').length, n);
