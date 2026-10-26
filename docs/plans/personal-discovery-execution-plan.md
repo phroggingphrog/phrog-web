@@ -72,7 +72,7 @@ Matching REST under `/api/personal/`. Hermes cron becomes: call `personal_discov
 **Phase 0, about half a day, read-only.**
 
 - Verify `ig_scroll.py` still runs and note its JSON shape.
-- Read the cron's inputs: `events.jsonl` format, `behaviour_results.json`, `lanes.md`, where `jev_score` lives.
+- Read the cron's inputs: `events.jsonl` format, `behaviour_results.json`, `lanes.md`, where `jev_score` lives. Also `taste.md`, which `ig_scroll.py` reads but the cron prompt does not mention. These live on the Hermes host (`~/.hermes/` is not on the phrog-web host); `lanes.md` was not found locally.
 - List which existing-DB tables feed preferences (music plays, social platform events and follows, activity saved places) with date ranges and null rates.
 - Write the field mapping. Report private numbers only in private storage.
 - Exit: every input has a source, a mapping and a known gap list; no personal-data writes.
