@@ -26,6 +26,8 @@ import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
 import { registerSearxngCompat } from './searxng-compat.js';
+import { registerPersonalRoutes, isPersonalRoute } from './personalization/routes.js';
+import { checkBearer } from './personalization/auth.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
@@ -34,7 +36,13 @@ await fastify.register(cors, { origin: true });
 
 // Run log: one JSON-lines record per /api/* call (payload captured in onSend for size/provider info).
 fastify.addHook('onSend', async (req: any, reply, payload) => {
-  if (req.url.startsWith('/api/')) {
+  if (isPersonalRoute(req.url)) {
+    // Personal routes: log counts and status only, never captions, cursors or tokens.
+    req.runInfo = { bytes: typeof payload === 'string' ? Buffer.byteLength(payload) : 0 };
+    if (typeof payload === 'string' && reply.statusCode < 400) {
+      try { const o = JSON.parse(payload); req.runInfo.feed_status = o.status; req.runInfo.items = Array.isArray(o.items) ? o.items.length : 0; } catch { /* not JSON */ }
+    } else if (reply.statusCode >= 400) req.runInfo.error = `HTTP ${reply.statusCode}`;
+  } else if (req.url.startsWith('/api/')) {
     req.runInfo = { bytes: typeof payload === 'string' ? Buffer.byteLength(payload) : Buffer.isBuffer(payload) ? payload.length : 0 };
     if (typeof payload === 'string' && payload.length < 2_000_000) {
       Object.assign(req.runInfo, resultInfo(payload));
@@ -46,7 +54,8 @@ fastify.addHook('onSend', async (req: any, reply, payload) => {
 fastify.addHook('onResponse', async (req: any, reply) => {
   const route = req.routeOptions?.url ?? req.url.split('?')[0];
   if (!route.startsWith('/api/') || route === '/api/runs') return;
-  const args = req.method === 'GET' ? req.query : req.body;
+  const personal = isPersonalRoute(route);
+  const args = personal ? { account: req.query?.account, limit: req.query?.limit, has_cursor: !!req.query?.cursor } : req.method === 'GET' ? req.query : req.body;
   const { bytes, ...info } = req.runInfo ?? {};
   writeRun({ kind: 'rest', tool: `${req.method} ${route}`, args: summarize(args), status: reply.statusCode, duration_ms: Math.round(reply.elapsedTime), ok: reply.statusCode < 400, ...info, result_bytes: bytes ?? 0 });
 });
@@ -59,6 +68,7 @@ fastify.get('/api/runs', async (req) => {
 fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', version: '0.1.0' }));
 
 registerSearxngCompat(fastify);
+registerPersonalRoutes(fastify);
 
 fastify.get('/api/search', async (req, reply) => {
   const query = req.query as {
@@ -487,7 +497,7 @@ const mcpHandler = async (req: any, reply: any) => {
       writeRun({ kind: 'rest', tool: `${req.method} /mcp`, args: summarize({ rpc_method: b?.method, id: b?.id, accept: req.headers.accept, content_type: req.headers['content-type'], protocol: req.headers['mcp-protocol-version'], has_session: !!req.headers['mcp-session-id'] }), status: reply.raw.statusCode, duration_ms: Date.now() - t0, ok: false, error: `HTTP ${reply.raw.statusCode} on /mcp` });
     }
   });
-  const server = createMcpServer();
+  const server = createMcpServer({ personalAuthorized: checkBearer(req.headers.authorization) === 'ok' });
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   reply.hijack();
   reply.raw.on('close', () => { transport.close(); server.close(); });

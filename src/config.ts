@@ -108,3 +108,14 @@ export function jevPaths(): { jevDir: string; runner: string } {
   const runner = process.env.JEV_RUNNER || fileURLToPath(new URL('../engines/jev_run.py', import.meta.url));
   return { jevDir, runner };
 }
+
+/** Personal discovery settings, read from the environment at call time. No defaults for secrets. */
+export function personalConfig(): { dbPath: string; token: string | null; collectorCmd: string | null; collectorTimeoutMs: number } {
+  const t = Number(process.env.PHROG_IG_COLLECTOR_TIMEOUT_S);
+  return {
+    dbPath: process.env.PHROG_PERSONAL_DB || fileURLToPath(new URL('../data/personal.db', import.meta.url)),
+    token: process.env.PHROG_PERSONAL_TOKEN || null,
+    collectorCmd: process.env.PHROG_IG_COLLECTOR_CMD || null,
+    collectorTimeoutMs: (Number.isFinite(t) && t > 0 ? t : 240) * 1000,
+  };
+}

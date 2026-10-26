@@ -27,12 +27,16 @@ import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } 
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 import { logged, recentRuns } from '../../runlog.js';
 import { saveToBrainWiki } from '../../wiki/brain.js';
+import { getFeed } from '../../personalization/feed.js';
+import { stdioAuthorized, AUTH_REQUIRED_MESSAGE } from '../../personalization/auth.js';
 
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
 });
 
-export function createMcpServer(): McpServer {
+export interface McpContext { personalAuthorized?: boolean }
+
+export function createMcpServer(ctx: McpContext = {}): McpServer {
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 // Log every tool call: wrap the handler (always the last argument) of each server.tool registration.
 const origTool = server.tool.bind(server) as (...a: any[]) => unknown;
@@ -561,6 +565,17 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
   catch (err) { return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] }; }
 };
 
+server.tool('feed', 'Personal Instagram home feed as feed.v1 (owner bearer token required). Posts come in the order Instagram served them; pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed.', {
+  provider: z.enum(['instagram']).default('instagram'),
+  account: z.string().describe('Account name, [A-Za-z0-9._]{1,30}'),
+  source: z.enum(['home']).default('home'),
+  limit: z.number().int().min(1).max(50).default(20),
+  cursor: z.string().optional().describe('next_cursor from the previous page'),
+}, async (a: any) => {
+  if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
+  return safe(getFeed)(a);
+});
+
 server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions (click/type/press/scroll/wait/wait_for) and stealth force the browser. PDF and Office URLs are converted to text.', {
   urls: z.array(z.string()), max_chars: z.number().int().optional(), mode: z.string().optional(),
   actions: z.array(z.record(z.any())).optional(), stealth: z.boolean().optional(),
@@ -649,5 +664,5 @@ return server;
 
 // Stdio entry: `node dist/adapters/mcp/server.js`
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await createMcpServer().connect(new StdioServerTransport());
+  await createMcpServer({ personalAuthorized: stdioAuthorized() }).connect(new StdioServerTransport());
 }
