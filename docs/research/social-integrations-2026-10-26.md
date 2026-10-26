@@ -38,6 +38,8 @@ The 2026-10-12 owner intent is recorded in `~/phrogvps/hermes-assistant/INTENT.m
 
 The October 12 pipeline note, `~/brain/wiki/inbox/2026-10-12-capture-sorter-hermes-instagram-pipeline.md`, distinguishes Instagram home-feed acquisition from Explore. It records an OpenCLI feed command preserving image, link, date, and place; image analysis; saved account sessions; and conservative collection frequency. That is historical documentation, not a fresh verification of the running system.
 
+A follow-up search located primary implementation evidence: `~/phrogvps/hermes/scripts/ig_scroll.py` explicitly calls itself "Instagram doomscroll replacement for Hermes" and records the owner's October 12 request to check images as a doomscroller replacement. The code defaults to `source=home`, invokes OpenCLI's Instagram feed reader, analyzes image plus caption, reads a personal `taste.md`, extracts events, saves discovered events to an archive, and prints events first followed by up to eight other worthwhile posts and a skipped count. Its October 13 comments record the correction to use real taste rather than career/admin interests. This recovers the actual old workflow, not just the project-summary wording. The file is a local source snapshot; it was read, not executed or verified against the current VM.
+
 The September-plan reconstruction in `~/projects/hermes-revamp/docs/sept-plan-map-A.md`, rows 25-29, connects the idea to:
 
 - event discovery from Instagram/TikTok/Humanitix using interests and radius;
@@ -53,6 +55,8 @@ That reconstruction mentions `collect_social.py`, `social_radar.py`, `ig_scroll.
 `~/projects/hermes-revamp/INTENT.md` records the October 23-24 direction: understand the owner's behavior and preferences, navigate as the owner, use Jev and an Android VM where appropriate, and learn repeatable navigation from recordings. The same record separates Pictho and clone/emulation work from the assistant project, while documenting later voice/emulation integration.
 
 This broader idea includes acting as well as reading. The current exploration authorizes neither social posting nor messaging. Existing DMs/communication bridges should be evaluated separately from feed acquisition; none of these seven repositories supplies a verified replacement for the existing Instagram/WhatsApp messaging pipeline.
+
+The broader social-replacement implementation is also recorded in `~/projects/hermes-revamp/hermes/skills/social-initiative/SKILL.md` and local script snapshots under `~/phrogvps/hermes/scripts/`. `collect_social.py` combines Instagram/Beeper and WhatsApp conversation history into a private local store for communication-style/cadence analysis. `social_radar.py` identifies quiet friendships relative to their own conversation rhythm. The skill describes source-grounded check-in drafts, fresh conversation checks, and a separate opt-in cover mode; `proxy_gate.py` distinguishes send/draft/skip for selected chats. These are concrete components of the older social-media replacement idea, beyond event discovery. Reading these source files does not authorize running collection or sending messages, and does not establish current runtime health.
 
 I recovered explicit doomscroll-replacement requirements in the Hermes records. I did not locate a separate project repository or authoritative project card named `Doomscroller`. T3 searches were project-scoped; connected board searches returned no matching record. The Hermes requirement should not silently be relabeled as a separately recovered app.
 
