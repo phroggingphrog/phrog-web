@@ -119,3 +119,25 @@ export function personalConfig(): { dbPath: string; token: string | null; collec
     collectorTimeoutMs: (Number.isFinite(t) && t > 0 ? t : 240) * 1000,
   };
 }
+
+/** Central-import settings: read-only source DB paths (no defaults), account label map, actions that train preferences. */
+export function importConfig(): { paths: Record<'social' | 'music' | 'activity' | 'media', string | null>; accountMap: Map<string, string>; learnActions: Set<string> } {
+  const e = process.env;
+  const map = new Map<string, string>();
+  // "instagram:ig-account1=ykswrdn,instagram:ig-account2=phroggingphrog"
+  for (const part of (e.PHROG_IMPORT_ACCOUNT_MAP || '').split(',')) {
+    const i = part.indexOf('=');
+    if (i > 0) map.set(part.slice(0, i).trim(), part.slice(i + 1).trim());
+  }
+  const learn = (e.PHROG_IMPORT_LEARN_ACTIONS || 'like,save,comment,share,play,skip,not_interested,dislike').split(',').map((s) => s.trim()).filter(Boolean);
+  return {
+    paths: {
+      social: e.PHROG_IMPORT_SOCIAL_DB || null,
+      music: e.PHROG_IMPORT_MUSIC_DB || null,
+      activity: e.PHROG_IMPORT_ACTIVITY_DB || null,
+      media: e.PHROG_IMPORT_MEDIA_DB || null,
+    },
+    accountMap: map,
+    learnActions: new Set(learn),
+  };
+}
