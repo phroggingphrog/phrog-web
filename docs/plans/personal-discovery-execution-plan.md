@@ -45,15 +45,16 @@ Separate SQLite file (`node:sqlite`), not the wiki index. Path from config.
 - `schema_migrations`
 - `source_accounts`: id, provider, handle, label, credential_ref (a reference only, no secrets), collect_enabled, learn_enabled, status (ok/auth_required/challenge/disabled), last_verified_at. Public feeds (RSSHub route, website) are rows with no credential.
 - `collection_runs`: id, source_account_id, collector, collector_version, started_at, finished_at, status (success/partial/auth_required/challenge/rate_limited/unsupported/failed), items_seen, items_new, checkpoint, error, coverage_note. "unsupported" is never an empty success. Never substitute keyword search for a requested personal feed.
-- `items`: id, kind (post/video/track/event/venue/creator/article/feed_entry), title, description, canonical_url, creator_item_id, published_at, published_precision, duration_ms (NULL if unknown), availability, first_seen_at, updated_at.
+- `items`: id, kind (post/video/track/event/venue/creator/article/feed_entry), title, description, canonical_url, creator_item_id, published_at, published_precision, duration_ms (NULL if unknown), media_type (photo/carousel/video/reel), availability, first_seen_at, updated_at.
 - `item_ids`: item_id, provider, native_id. UNIQUE(provider, native_id). Name matches are never auto-merged.
 - `event_details`: item_id, starts_at, ends_at, timezone, time_precision, venue_text, venue_item_id, distance_km, price_min, price_max, currency, booking_url, status (scheduled/cancelled/sold_out/unknown), last_checked_at. Post time is not event time.
 - `annotations`: item_id, type (topic/ocr/caption_summary/event_extraction), value_json, confidence, model_version, created_at.
-- `observations` (new live data only): id, source_account_id, collection_run_id, item_id, action (seen_in_feed/like/save/follow/play/skip/open), occurred_at, time_precision, purpose (discovery/research/enquiry/unknown), learn (bool), raw_ref, dedupe_key UNIQUE. Re-collection is idempotent; genuine repeat plays stay separate.
+- `observations` (new live data only): id, source_account_id, collection_run_id, item_id, action (seen_in_feed/like/save/follow/play/skip/open), feed_position, sponsored, suggested (as shown in that feed session), occurred_at, time_precision, purpose (discovery/research/enquiry/unknown), learn (bool), raw_ref, dedupe_key UNIQUE. Re-collection is idempotent; genuine repeat plays stay separate.
 - `discovery_runs`: id, client, intent, constraints_json, ranker_version, started_at, finished_at, status, failed_sources_json.
 - `deliveries`: id, discovery_run_id, item_id, position, reason, returned_at, displayed_at (NULL until shown). Returned is not shown; unshown is not disliked.
 - `feedback`: id, item_id, delivery_id (NULL ok), type (like/dislike/save/not_now/too_far/too_expensive/want_to_go), scope (this_time/item/creator/topic/venue), reason, created_at, idempotency_key UNIQUE. "Too expensive this time" is not a lasting dislike.
 - `preference_rules`: id, subject_type, subject_key, rule (prefer/avoid/exclude/radius/budget), value, valid_until, note, created_at. Explicit rules beat derived scores.
+- `predictions`: item_id, collection_run_id, p_engage, p_save, calibrated, model_version, reasons_json, created_at. Kept so later behaviour can check how good past predictions were.
 - `preferences` (derived, rebuilt from scratch each run, no history): subject_type, subject_key, horizon (long/recent), score, evidence_count, distinct_days, computed_at, ranker_version. Explanations are computed on demand from source tables, not stored per row.
 
 ## 5. Interfaces
