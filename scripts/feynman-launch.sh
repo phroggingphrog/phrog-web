@@ -1,0 +1,2 @@
+#!/bin/sh
+exec "$PHROG_FEYNMAN_NODE" "$PHROG_FEYNMAN_ENGINE" "$@"
