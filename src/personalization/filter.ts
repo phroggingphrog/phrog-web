@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import type { DatabaseSync } from 'node:sqlite';
 import { jevConfig } from '../config.js';
 import { preferenceSummary, scorePost, type JevScore } from './jev.js';
-import { getRenderer, type Card } from './render.js';
+import { getRenderer, sniffImage, type Card } from './render.js';
 import { dbLookup, statsForItem, blend, confident, publicStats, statsConfig, type StatsResult } from './stats/model.js';
 
 export interface FilterOptions { includeFiltered: boolean; order: 'feed' | 'predicted'; exploration: number }
@@ -109,42 +109,11 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
   const passed = states.filter((s) => s.passed).sort((a, b) => rank(b) - rank(a));
   for (const s of passed.slice(cfg.maxPassPerPage)) { s.passed = false; s.reason = 'page_cap'; }
 
-  // Screenshots: passed posts only.
-  const todo = states.filter((s) => s.passed);
-  const findArt = d.prepare("SELECT id, path, created_at FROM artifacts WHERE item_id = ? AND kind = 'post_card' ORDER BY created_at DESC, rowid DESC LIMIT 1");
-  const need: State[] = [];
-  const have = new Map<State, { id: string; created_at: string; png: Buffer }>();
-  for (const s of todo) {
-    const a = findArt.get(s.item.item_id) as any;
-    if (a && existsSync(a.path)) have.set(s, { id: a.id, created_at: a.created_at, png: readFileSync(a.path) });
-    else need.push(s);
-  }
-  if (need.length) {
-    const cards: Card[] = need.map((s) => ({
-      author: s.item.author?.handle ?? s.item.author?.name ?? null, named: !s.item.author?.handle, caption: s.item.caption, type: s.item.type, url: s.item.url,
-      imageUrl: (s.item.media.find((m: any) => m?.url) ?? {}).url ?? null,
-    }));
-    let rendered: Awaited<ReturnType<ReturnType<typeof getRenderer>>> = [];
-    try { rendered = await getRenderer()(cards); } catch { /* render stays null */ }
-    mkdirSync(cfg.artifactsDir, { recursive: true, mode: 0o700 });
-    const insArt = d.prepare('INSERT INTO artifacts (id, kind, item_id, path, created_at) VALUES (?, ?, ?, ?, ?)');
-    need.forEach((s, i) => {
-      const r = rendered[i];
-      if (!r) return;
-      const id = `art_${randomUUID()}`;
-      const path = join(cfg.artifactsDir, `${id}.png`);
-      writeFileSync(path, r.png, { mode: 0o600 });
-      chmodSync(path, 0o600);
-      const at = now();
-      insArt.run(id, 'post_card', s.item.item_id, path, at);
-      have.set(s, { id, created_at: at, png: r.png });
-    });
-  }
-
+  await renderFeedItems(d, states.filter((s) => s.passed).map((s) => s.item));
   const upd = d.prepare('UPDATE predictions SET passed_filter = ?, filter_reason = ?, screenshot_ref = COALESCE(?, screenshot_ref) WHERE id = ?');
   for (const s of states) {
-    const art = have.get(s);
-    if (s.pred) upd.run(s.passed ? 1 : 0, s.reason, art?.id ?? null, s.pred.id);
+    const artifactId = s.item.render?.screenshot?.split("/").pop() ?? null;
+    if (s.pred) upd.run(s.passed ? 1 : 0, s.reason, artifactId, s.pred.id);
     s.item.filter = { passed: s.passed, reason: s.reason };
     s.item.prediction = s.pred && {
       p_match: s.pred.p_match, p_engage: s.pred.p_engage, confidence: s.pred.confidence, calibrated: false,
@@ -155,7 +124,6 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
       s.item.prediction = { p_match: null, p_engage: null, confidence: null, calibrated: false, model_version: null, scorer: 'stats',
         preference_summary_version: null, cost_usd: null, stats: publicStats(s.stats) };
     }
-    if (art) s.item.render = { screenshot: ARTIFACT_URL_PREFIX + art.id, ...pngSize(art.png), rendered_at: art.created_at };
   }
 
   const filteredOut = states.filter((s) => !s.passed).length;
@@ -165,4 +133,54 @@ export async function applyJev(d: DatabaseSync, runId: string, items: any[], opt
     kept = [...kept].sort((a, b) => key(b) - key(a));
   }
   return { items: kept.map((s) => s.item), filteredOut };
+}
+
+export async function renderFeedItems(d: DatabaseSync, items: any[]) {
+  const todo = items.map((item) => ({ item }));
+  const findArt = d.prepare("SELECT id, path, created_at FROM artifacts WHERE item_id = ? AND kind = 'post_card' ORDER BY created_at DESC, rowid DESC LIMIT 1");
+  const need: { item: any }[] = [];
+  const have = new Map<{ item: any }, { id: string; created_at: string; image: Buffer }>();
+  for (const s of todo) {
+    const a = findArt.get(s.item.item_id) as any;
+    if (a && existsSync(a.path)) have.set(s, { id: a.id, created_at: a.created_at, image: readFileSync(a.path) });
+    else need.push(s);
+  }
+  if (need.length) {
+    const cards: Card[] = need.map((s) => ({
+      author: s.item.author?.handle ?? s.item.author?.name ?? null, named: !s.item.author?.handle, caption: s.item.caption, type: s.item.type, url: s.item.url,
+      imageUrl: (s.item.media.find((m: any) => m?.url) ?? {}).url ?? null,
+    }));
+    let rendered: Awaited<ReturnType<ReturnType<typeof getRenderer>>> = [];
+    try { rendered = await getRenderer()(cards); } catch { /* render stays null */ }
+    mkdirSync(jevConfig().artifactsDir, { recursive: true, mode: 0o700 });
+    const insArt = d.prepare('INSERT INTO artifacts (id, kind, item_id, path, created_at) VALUES (?, ?, ?, ?, ?)');
+    need.forEach((s, i) => {
+      const r = rendered[i];
+      if (!r) return;
+      const image = r.image ?? r.png;
+      if (!image) return;
+      const id = `art_${randomUUID()}`;
+      const path = join(jevConfig().artifactsDir, `${id}.${sniffImage(image)?.ext ?? 'png'}`);
+      writeFileSync(path, image, { mode: 0o600 });
+      chmodSync(path, 0o600);
+      const at = new Date().toISOString();
+      insArt.run(id, 'post_card', s.item.item_id, path, at);
+      have.set(s, { id, created_at: at, image });
+    });
+  }
+
+  const upd = d.prepare('UPDATE predictions SET passed_filter = ?, filter_reason = ?, screenshot_ref = COALESCE(?, screenshot_ref) WHERE id = ?');
+  for (const s of todo) {
+    const a = have.get(s);
+    if (!a) continue;
+    const size = sniffImage(a.image);
+    s.item.render = { screenshot: `${ARTIFACT_URL_PREFIX}${a.id}`, width: size?.width ?? null, height: size?.height ?? null, rendered_at: a.created_at };
+  }
+}
+
+export function readArtifactImage(d: DatabaseSync, id: string) {
+  const data = readArtifact(d, id);
+  if (!data) return null;
+  const info = sniffImage(data);
+  return info ? { data, mime: info.mime } : null;
 }
