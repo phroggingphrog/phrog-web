@@ -1,6 +1,6 @@
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StreamableHTTPClientTransport } from '@modelcontextprotocol/sdk/client/streamableHttp.js';
-import { loadConfig } from '../config.js';
+import { embeddedFeynmanUrl } from './feynman-runtime.js';
 
 export interface VaultArgs {
   action: string;
@@ -14,8 +14,7 @@ export interface VaultArgs {
 }
 
 export async function call(tool: string, args: Record<string, any>, timeoutMs = 90000): Promise<any> {
-  loadConfig();
-  const url = process.env.WEB_AGENT_FEYNMAN_URL || 'http://127.0.0.1:8910/mcp';
+  const url = await embeddedFeynmanUrl();
   const client = new Client({ name: 'phrog-web', version: '1.0.0' });
   try {
     await client.connect(new StreamableHTTPClientTransport(new URL(url)));
