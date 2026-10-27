@@ -27,7 +27,6 @@ import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
 import { registerSearxngCompat } from './searxng-compat.js';
 import { registerPersonalRoutes, isPersonalRoute } from './personalization/routes.js';
-import { checkBearer } from './personalization/auth.js';
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
@@ -497,7 +496,7 @@ const mcpHandler = async (req: any, reply: any) => {
       writeRun({ kind: 'rest', tool: `${req.method} /mcp`, args: summarize({ rpc_method: b?.method, id: b?.id, accept: req.headers.accept, content_type: req.headers['content-type'], protocol: req.headers['mcp-protocol-version'], has_session: !!req.headers['mcp-session-id'] }), status: reply.raw.statusCode, duration_ms: Date.now() - t0, ok: false, error: `HTTP ${reply.raw.statusCode} on /mcp` });
     }
   });
-  const server = createMcpServer({ personalAuthorized: checkBearer(req.headers.authorization) === 'ok' });
+  const server = createMcpServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   reply.hijack();
   reply.raw.on('close', () => { transport.close(); server.close(); });
