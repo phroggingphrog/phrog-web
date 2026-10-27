@@ -1,7 +1,6 @@
 # Personal discovery: execution plan
 
-Status: proposed, not implemented. Date: 2026-10-26.
-Writing this plan changes no code, data, login or live service.
+Status: historical execution plan, written 2026-10-26. Implementation through preference modelling is committed at `db50492`; release verification and Hermes cutover remain tracked in TASK-338. Phase descriptions below are the original plan, not proof of deployment.
 
 ## 1. What this is
 
