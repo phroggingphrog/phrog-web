@@ -4,7 +4,7 @@ A TypeScript gateway for web search, page extraction, research and feeds. Client
 
 ## Requirements and setup
 
-Use Node.js 22.22 or newer and pnpm (the embedded Feynman engine requires 22.22). Embedded engines live under `engines/`; provider availability depends on engine setup and credentials.
+Use Node.js 22.20 or newer and pnpm for the gateway. The embedded Feynman engine requires Node.js 22.22 or newer; set `PHROG_FEYNMAN_NODE` to a supported Node executable if the gateway uses an older version. Feynman operations fail with a diagnostic if the selected executable is unsupported or unavailable. Embedded engines live under `engines/`; provider availability depends on engine setup and credentials.
 
 ```bash
 pnpm install

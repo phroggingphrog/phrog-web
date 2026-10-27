@@ -1,7 +1,7 @@
 # Phrog Web — Agent Guidelines
 
 ## 1. Project Principles
-- **Language & Runtime**: TypeScript / Node.js (>=22.22), ES Modules (`type: "module"`).
+- **Language & Runtime**: TypeScript / Node.js (>=22.20), ES Modules (`type: "module"`).
 - **Core Engine**: Fastify framework on port `8890`.
 - **Zero-Symlink Rule**: All embedded dependencies and engines live inside `engines/` directly. Never create absolute host symlinks that break when cloned on another machine.
 - **Secrets Policy**: Never commit `.env` or secret tokens. Keys are auto-loaded from `~/.config/phrog-web.env` or local `.env`.

@@ -130,7 +130,7 @@ export function dispatchDeepResearch(
   mkdirSync(outputsDir, { recursive: true });
 
   try {
-    const child = spawn(process.execPath, [feynmanBin, workflow, topic], {
+    const child = spawn(runtime.node, [feynmanBin, workflow, topic], {
       cwd: runtime.root,
       env: { ...runtime.env, CI: 'true', NONINTERACTIVE: 'true' },
       detached: false,
