@@ -1,4 +1,4 @@
-import { spawn, type ChildProcess } from 'node:child_process';
+import { spawn, spawnSync, type ChildProcess } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { Socket } from 'node:net';
 import { homedir } from 'node:os';
@@ -7,21 +7,32 @@ import { fileURLToPath } from 'node:url';
 import { loadConfig } from '../config.js';
 
 const engine = fileURLToPath(new URL('../../engines/feynman/bin/feynman.js', import.meta.url));
+const launcher = fileURLToPath(new URL('../../scripts/feynman-launch.sh', import.meta.url));
 let starting: Promise<string> | undefined;
 let child: ChildProcess | undefined;
 
 export function feynmanRuntime() {
   loadConfig();
   const root = resolve(process.env.PHROG_FEYNMAN_DATA_DIR || resolve(process.env.XDG_DATA_HOME || resolve(homedir(), '.local/share'), 'phrog-web/feynman'));
-  return { root, engine, env: { ...process.env, FEYNMAN_HOME: root, FEYNMAN_CLI: engine } };
+  const node = process.env.PHROG_FEYNMAN_NODE || process.execPath;
+  const check = spawnSync(node, ['--version'], { encoding: 'utf8', timeout: 5000, maxBuffer: 1024 });
+  const match = /^v(\d+)\.(\d+)\.(\d+)\s*$/.exec(check.stdout || '');
+  if (check.error || check.status !== 0 || !match) {
+    throw new Error(`Embedded Feynman requires Node.js >=22.22.0; cannot check PHROG_FEYNMAN_NODE (${check.error?.message || 'invalid version response'}). Set PHROG_FEYNMAN_NODE to a working Node.js executable.`);
+  }
+  const [, major, minor] = match.map(Number);
+  if (major < 22 || (major === 22 && minor < 22)) {
+    throw new Error(`Embedded Feynman requires Node.js >=22.22.0; selected Node.js ${match[0].trim()} is unsupported. Set PHROG_FEYNMAN_NODE to a supported executable.`);
+  }
+  return { root, engine, node, env: { ...process.env, FEYNMAN_HOME: root, FEYNMAN_CLI: launcher, PHROG_FEYNMAN_NODE: node, PHROG_FEYNMAN_ENGINE: engine } };
 }
 
 export function embeddedFeynmanUrl(): Promise<string> {
   if (starting) return starting;
   starting = (async () => {
-    const { root, engine, env } = feynmanRuntime();
+    const { root, engine, node, env } = feynmanRuntime();
     mkdirSync(root, { recursive: true, mode: 0o700 });
-    const proc = spawn(process.execPath, [engine, 'mcp', '--mcp-host', '127.0.0.1', '--mcp-port', '0'], {
+    const proc = spawn(node, [engine, 'mcp', '--mcp-host', '127.0.0.1', '--mcp-port', '0'], {
       cwd: root, env, stdio: ['ignore', 'pipe', 'pipe'],
     });
     child = proc;
