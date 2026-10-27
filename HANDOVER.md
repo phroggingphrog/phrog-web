@@ -132,7 +132,9 @@ Environment secrets are auto-loaded from:
 | `CONSENSUS_API_KEY` | Consensus Academic API key (quota: 500 requests/month; guarded). |
 | `TINYFISH_API_KEY` | TinyFish Search & Fetch API key (free cloud fallback). |
 | `CRAWL4AI_API_TOKEN` | Bearer token for local Crawl4AI container (`127.0.0.1:11235`). |
-| `WIKI_DIR` | Optional path override for LLM Wiki root (defaults to `./wiki`). |
+| `WIKI_DIR` | Wiki root (default `./wiki`). |
+| `WIKI_INBOX_DIR` | Wiki inbox directory override. |
+| `WIKI_INDEX_PATH` | SQLite library index path override. |
 | `OPENAI_API_KEY` / `OMNIROUTE_API_KEY` | Optional embedding API key (defaults to zero-config offline TF-IDF if unset). |
 
 ---
@@ -177,7 +179,7 @@ All engines are vendored under `engines/` with zero VPS-specific symlinks:
 
 ## Web-agent parity tools
 REST: POST /api/crawl, /api/map, /api/batch, /api/browse, /api/extract, /api/vault; GET /api/batch/:id.
-MCP (same names/args as the Python web MCP): web_crawl, web_map, web_batch_start, web_crawl_status, browse, extract, research_vault, plus save_to_wiki (alias of wiki_save).
+MCP (same names/args as the Python web MCP): web_crawl, web_map, web_batch_start, web_crawl_status, browse, extract, research_vault, and the local wiki tools.
 Job status strings match Python (`running`, `completed`, `failed`).
 
 Remaining gaps:
@@ -232,8 +234,3 @@ Request `{url, goal, schema?, mode?: auto|fetch|browse|deep, max_steps?, timeout
 Verified on PORT=8899: quotes.toscrape.com stayed at fetch (5s); the-internet dynamic_loading/1 escalated to browse and returned "Hello World!" (15s); books.toscrape.com cheapest book with schema returned "Starving Hearts (Triangular Trade ...", £13.99 at fetch (7s). The deep rung is wired but not exercised.
 
 ---
-
-## Run logs and save_to_wiki (brain)
-
-- `src/runlog.ts`: JSON-lines log (default `~/.local/state/phrog-web/runs.jsonl`, `PHROG_WEB_RUNLOG`; rotates at 10MB, keeps 3). MCP tools are logged by wrapping `server.tool` handlers in `createMcpServer`; REST via Fastify onSend/onResponse hooks for `/api/*`. Keys matching key/token/secret/password/auth/cookie are redacted; strings truncated at 200 chars. Reads: `GET /api/runs?limit=&tool=`, MCP `run_log`. Failed `POST /mcp` (status >= 400) is logged with rpc method and accept/content-type headers (a client without `Accept: application/json, text/event-stream` gets 406).
-- `save_to_wiki` now matches the old Python tool (kind, urls, text, question, title, target, job_id) by running `engines/save_to_wiki_cli.py` (wraps `web_acquisition.wiki`) in `engines/.venv`. Output: `$WEB_AGENT_WIKI_INBOX` or `~/brain/wiki/inbox`. `wiki_save`/`wiki_search` stay the local vector wiki.

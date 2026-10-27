@@ -121,14 +121,7 @@ async def rpc(request: Request) -> JSONResponse:
                 "status": {"state": "working", "message": {"role": "agent", "parts": [{"kind": "text",
                            "text": "Deep research started (3-30 min). Poll tasks/get with this task id."}]}}, "artifacts": []}})
         elif mode == "wiki":
-            from . import wiki  # heavy imports only when used
-
-            meta = params.get("metadata") or message.get("metadata") or {}
-            urls = re.findall(r"https?://[^\s)>\]]+", question)
-            saved = await anyio.to_thread.run_sync(lambda: wiki.compile_to_wiki(
-                kind="note", urls=urls or None, text="" if urls else "",
-                question=question, title=str(meta.get("title", "")), target=str(meta.get("target", ""))))
-            state, text = "completed", f"Saved {saved['kind']} '{saved['title']}' to {saved['path']} ({saved['status']}). Sources: " + ", ".join(saved["sources"])
+            raise ValueError("The external brain wiki integration has been removed; use Phrog Web wiki_save")
         else:
             out = await anyio.to_thread.run_sync(lambda: deep_agent.ask(question, mode))
             state, text = "completed", out["answer"]
