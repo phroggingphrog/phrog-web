@@ -39,8 +39,6 @@ One owner can use multiple source accounts. The gateway implements feeds, ranked
 
 Configure the owner token with `PHROG_PERSONAL_TOKEN`. Personal REST routes live under `/api/personal/`; see `src/personalization/routes.ts` for authorization and request shapes. Existing source databases are read in place; use a consistent SQLite backup before deployment or migration.
 
-Hermes cutover and the side-by-side comparison are tracked in TASK-338. Preserve the legacy discovery schedule until comparison evidence supports switching, and disable duplicate schedules when cutting over.
-
 ## Verification
 
 ```bash

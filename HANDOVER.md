@@ -1,11 +1,7 @@
 # Phrog Web — Project Handover
 
-## Personal discovery handoff (2026-10-26)
-
-Phrog-web owns collection, ranking and feedback for one user (the owner), exposed to Hermes over MCP. The implementation through preference modelling is committed at `db50492`; production cutover remains tracked in TASK-338. The [implementation handoff](docs/plans/personal-discovery-handoff.md) and [execution plan](docs/plans/personal-discovery-execution-plan.md) describe the original design, not current deployment evidence. Verify the active schedule and shadow-run results before disabling the legacy discovery flow.
-
 > **Repository**: [https://github.com/phroggingphrog/phrog-web](https://github.com/phroggingphrog/phrog-web)  
-> **Status**: Gateway running locally; release reconciliation and personal-discovery cutover in progress (TASK-338). Not all providers have been verified.
+> **Status**: Gateway running locally. Not all providers have been verified.
 > **Backlog**: TASK-308 (Done)
 
 ---
