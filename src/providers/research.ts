@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
-import { existsSync, readdirSync, readFileSync, mkdirSync } from 'node:fs';
-import { resolve, join } from 'node:path';
+import { mkdirSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { loadConfig } from '../config.js';
 import { feynmanRuntime } from './feynman-runtime.js';
 
@@ -127,9 +127,7 @@ export function dispatchDeepResearch(
   jobs.set(jobId, job);
 
   const outputsDir = resolve(runtime.root, 'outputs');
-  if (!existsSync(outputsDir)) {
-    mkdirSync(outputsDir, { recursive: true });
-  }
+  mkdirSync(outputsDir, { recursive: true });
 
   try {
     const child = spawn(process.execPath, [feynmanBin, workflow, topic], {
@@ -147,16 +145,18 @@ export function dispatchDeepResearch(
     child.stdout.on('data', (d) => { stdout += d.toString(); });
     child.stderr.on('data', (d) => { stderr += d.toString(); });
 
+    let spawnError: Error | undefined;
+    child.on('error', error => { spawnError = error; });
     child.on('close', async (exitCode) => {
       job.exitCode = exitCode;
       job.finishedAt = new Date().toISOString();
 
-      if (exitCode === 0) {
+      if (exitCode === 0 && !spawnError) {
         job.status = 'completed';
-        job.deliverable = findLatestDeliverable(outputsDir) || stdout;
+        job.deliverable = stdout;
       } else {
         job.status = 'failed';
-        job.error = stderr || `Process exited with code ${exitCode}`;
+        job.error = spawnError?.message || stderr || `Process exited with code ${exitCode}`;
       }
 
       if (job.callbackUrl) {
@@ -189,12 +189,4 @@ export function dispatchDeepResearch(
 
 export function getResearchJob(jobId: string): ResearchJob | undefined {
   return jobs.get(jobId);
-}
-
-function findLatestDeliverable(dir: string): string | undefined {
-  if (!existsSync(dir)) return undefined;
-  const files = readdirSync(dir).filter(f => f.endsWith('.md') && !f.endsWith('.provenance.md'));
-  if (files.length === 0) return undefined;
-  const newest = files[files.length - 1];
-  return readFileSync(join(dir, newest), 'utf8');
 }

@@ -1,7 +1,7 @@
 import { spawn } from "node:child_process";
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
-import { access, mkdir, open, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
-import { join, resolve } from "node:path";
+import { access, mkdir, open, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { join, resolve, relative, isAbsolute } from "node:path";
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
@@ -16,7 +16,6 @@ import {
 	listResearchRuns,
 	setResearchRunStatus,
 	setResearchStep,
-	setRunArtifacts,
 } from "../vault/runs.js";
 import { getRunDir } from "../vault/runs.js";
 import type { ResearchTier } from "../vault/profiles.js";
@@ -29,6 +28,7 @@ const TIERS = ["pending", "light", "full", "dissertation"] as const;
 const MAX_WAIT_MS = 240_000;
 const MAX_DELIVERABLE_CHARS = 60_000;
 const MAX_PROVENANCE_CHARS = 8_000;
+const finalizingJobs = new Map<string, Promise<JobRecord>>();
 
 interface JobRecord {
 	id: string;
@@ -90,26 +90,20 @@ function resultText(fields: Record<string, string | number | boolean | undefined
 	].filter(Boolean).join("\n");
 }
 
-async function latestDeliverable(paths: VaultPaths, sinceMs: number): Promise<string | undefined> {
-	const candidates: string[] = [];
-	for (const directory of [join(paths.root, "outputs"), join(paths.root, "papers")]) {
-		for (const entry of await readdir(directory, { withFileTypes: true }).catch(() => [])) {
-			if (!entry.isFile() || !entry.name.endsWith(".md") || entry.name.endsWith(".provenance.md")) continue;
-			const path = join(directory, entry.name);
-			const info = await stat(path).catch(() => undefined);
-			if (info && info.mtimeMs >= sinceMs) candidates.push(path);
-		}
-	}
-	return candidates.sort((a, b) => b.localeCompare(a))[0];
-}
-
 async function finishJob(paths: VaultPaths, job: JobRecord, exitCode: number | null, error?: string): Promise<JobRecord> {
 	job.exitCode = exitCode;
 	job.finishedAt = new Date().toISOString();
 	if (error) job.error = error;
-	await saveJob(paths, job);
-	const report = await latestDeliverable(paths, job.startedAtMs);
 	let manifest = await getResearchRun(paths, job.runId);
+	const artifactPath = (value: string | undefined): string | undefined => {
+		if (!value) return undefined;
+		const path = resolve(paths.root, value);
+		const rel = relative(paths.root, path);
+		return rel && !rel.startsWith("..") && !isAbsolute(rel) ? path : undefined;
+	};
+	const reportPath = artifactPath(manifest.artifacts.report);
+	const report = reportPath && await access(reportPath).then(() => reportPath).catch(() => undefined);
+	const provenancePath = artifactPath(manifest.artifacts.provenance);
 	if (job.workflow !== "deepresearch") {
 		for (const step of manifest.stepOrder) {
 			if (!["done", "skipped"].includes(manifest.steps[step]?.status ?? "pending")) {
@@ -117,7 +111,7 @@ async function finishJob(paths: VaultPaths, job: JobRecord, exitCode: number | n
 			}
 		}
 	}
-	const provenanceExists = report ? await access(report.replace(/\.md$/i, ".provenance.md")).then(() => true).catch(() => false) : false;
+	const provenanceExists = provenancePath ? await access(provenancePath).then(() => true).catch(() => false) : false;
 	const stagesComplete = manifest.stepOrder.every((step) => ["done", "skipped"].includes(manifest.steps[step]?.status ?? "pending"));
 	const hasRequiredArtifacts = report && (job.workflow !== "deepresearch" || provenanceExists && (stagesComplete || manifest.status === "blocked"));
 	const status = hasRequiredArtifacts && exitCode === 0
@@ -125,13 +119,7 @@ async function finishJob(paths: VaultPaths, job: JobRecord, exitCode: number | n
 		: "failed";
 	await setResearchRunStatus(paths, job.runId, status, status === "blocked" ? manifest.blockedOn : undefined,
 		status === "failed" ? error ?? `Feynman exited without a complete staged report and provenance (exit status ${exitCode ?? "unknown"}).` : undefined);
-	if (report && (status === "done" || status === "blocked")) {
-		const provenance = report.replace(/\.md$/i, ".provenance.md");
-		await setRunArtifacts(paths, job.runId, {
-			report: report.slice(paths.root.length + 1),
-			...(provenanceExists ? { provenance: provenance.slice(paths.root.length + 1) } : {}),
-		});
-	}
+	await saveJob(paths, job);
 	await releaseLock(paths, job.id);
 	return job;
 }
@@ -193,7 +181,7 @@ async function launchJob(paths: VaultPaths, input: {
 	const launchTopic = [
 		input.topic,
 		"\n\nThis request comes from another agent; the research plan is pre-approved. Continue through the final report without asking a person to approve the plan. Record degraded or blocked checks in the report and provenance.",
-		`Feynman durable research run id: ${manifest.id}. Scale profile: ${manifest.profile}. Requested tier: ${manifest.tier}. Register: ${manifest.register ?? "auto"}. Inference depth: ${manifest.inferenceDepth ?? "standard"}. Domain notes: ${manifest.domainNotes ?? "none"}. Save staged artifacts under outputs/.runs/${manifest.id}/ and use the feynman_research_run_* tools to record checkpoints.`,
+		`Feynman durable research run id: ${manifest.id}. Scale profile: ${manifest.profile}. Requested tier: ${manifest.tier}. Register: ${manifest.register ?? "auto"}. Inference depth: ${manifest.inferenceDepth ?? "standard"}. Domain notes: ${manifest.domainNotes ?? "none"}. Save staged artifacts under outputs/.runs/${manifest.id}/ and use the feynman_research_run_* tools to record checkpoints. Register the final report and provenance explicitly with feynman research run artifacts ${manifest.id} --report <path> --provenance <path> using workspace-relative paths.`,
 		...(input.resumeRunId ? [`Resume the existing run from its first unfinished stage (${resumeStep ?? "finalize"}). Read its existing plan, manifest, and stage artifacts first. Do not restart completed stages.`] : []),
 	].join("\n");
 	const cli = process.env.FEYNMAN_CLI ?? "feynman";
@@ -203,17 +191,26 @@ async function launchJob(paths: VaultPaths, input: {
 		stdio: ["ignore", log.fd, log.fd],
 		detached: true,
 	});
+	const outcome = new Promise<{ code: number | null; error?: string }>((resolveOutcome) => {
+		child.once("error", (error) => resolveOutcome({ code: null, error: error.message }));
+		child.once("exit", (code, signal) => resolveOutcome({ code, error: signal ? `Feynman CLI exited after ${signal}.` : undefined }));
+	});
 	await log.close();
 	const job: JobRecord = { id: manifest.id, runId: manifest.id, workflow: input.workflow, pid: child.pid ?? -1, startedAt, startedAtMs, logPath };
 	if (child.pid === undefined) {
+		const failure = await outcome;
+		await setResearchRunStatus(paths, manifest.id, "failed", undefined, failure.error ?? "Could not start the Feynman CLI process.");
 		await releaseLock(paths, manifest.id);
-		throw new Error("Could not start the Feynman CLI process.");
+		throw new Error(failure.error ?? "Could not start the Feynman CLI process.");
 	}
 	await persistChildLock(paths, manifest.id, child.pid);
 	await saveJob(paths, job);
 	await setResearchRunStatus(paths, manifest.id, "running");
-	child.once("error", (error) => { void finishJob(paths, job, null, error.message); });
-	child.once("exit", (code, signal) => { void finishJob(paths, job, code, signal ? `Feynman CLI exited after ${signal}.` : undefined); });
+	const finalizing = outcome.then(({ code, error }) => finishJob(paths, job, code, error));
+	finalizingJobs.set(job.id, finalizing);
+	void finalizing.catch((error) => {
+		console.error("Failed to finalize Feynman job:", error);
+	}).finally(() => { if (finalizingJobs.get(job.id) === finalizing) finalizingJobs.delete(job.id); });
 	child.unref();
 	return job;
 }
@@ -227,18 +224,22 @@ async function jobStatus(paths: VaultPaths, jobId: string, waitMs = 0): Promise<
 		return resultText({ status: "running", job_id: job.id, run_id: job.runId, workflow: job.workflow,
 			elapsed_s: Math.round((Date.now() - job.startedAtMs) / 1000), latest_file: manifest.artifacts.report ?? getResumeStep(manifest) });
 	}
-	const priorManifest = await getResearchRun(paths, job.runId);
-	const updated = job.exitCode === undefined && ["done", "blocked"].includes(priorManifest.status)
-		? job
-		: job.exitCode === undefined
-			? await finishJob(paths, job, null, "Feynman process ended before the server recorded its exit.")
-			: job;
+	const finalizing = finalizingJobs.get(job.id);
+	if (finalizing) await finalizing;
+	const recordedJob = await readJob(paths, jobId);
+	const priorManifest = await getResearchRun(paths, recordedJob.runId);
+	const updated = recordedJob.exitCode === undefined && ["done", "blocked"].includes(priorManifest.status)
+		? recordedJob
+		: recordedJob.exitCode === undefined
+			? await finishJob(paths, recordedJob, null, "Feynman process ended before the server recorded its exit.")
+			: recordedJob;
 	const manifest = await getResearchRun(paths, updated.runId);
 	if (["done", "blocked"].includes(manifest.status) && manifest.artifacts.report) {
 		const reportPath = resolve(paths.root, manifest.artifacts.report);
 		const content = await readFile(reportPath, "utf8").catch(() => "");
-		const provenancePath = manifest.artifacts.provenance ? resolve(paths.root, manifest.artifacts.provenance) : reportPath.replace(/\.md$/i, ".provenance.md");
-		const provenance = await readFile(provenancePath, "utf8").catch(() => "");
+		const provenance = manifest.artifacts.provenance
+			? await readFile(resolve(paths.root, manifest.artifacts.provenance), "utf8").catch(() => "")
+			: "";
 		return resultText({ status: manifest.status, job_id: updated.id, run_id: updated.runId, workflow: updated.workflow,
 			path: reportPath, seconds: Math.round((Date.now() - updated.startedAtMs) / 1000),
 			truncated: content.length > MAX_DELIVERABLE_CHARS }, content.slice(0, MAX_DELIVERABLE_CHARS), provenance.slice(0, MAX_PROVENANCE_CHARS));
@@ -373,7 +374,9 @@ export async function runFeynmanMcpServer(options: { host?: string; port?: numbe
 		httpServer.once("error", reject);
 		httpServer.listen(port, host, resolveListen);
 	});
-	process.stdout.write(`Feynman MCP listening at http://${host}:${port}/mcp for ${workspace}\n`);
+	const address = httpServer.address();
+	if (!address || typeof address === "string") throw new Error("Feynman MCP did not bind a TCP port.");
+	process.stdout.write(`Feynman MCP listening at http://${host}:${address.port}/mcp for ${workspace}\n`);
 	const close = (): void => {
 		httpServer.close();
 		for (const mcp of activeServers) void mcp.close();

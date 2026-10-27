@@ -700,7 +700,7 @@ async function runMain(input: { here: string; appRoot: string; feynmanVersion: s
 	if (command === "mcp") {
 		const { runFeynmanMcpServer } = await import("./mcp/server.js");
 		const port = values["mcp-port"] === undefined ? undefined : Number(values["mcp-port"]);
-		if (port !== undefined && (!Number.isInteger(port) || port < 1 || port > 65_535)) throw new Error("--mcp-port must be between 1 and 65535.");
+		if (port !== undefined && (!Number.isInteger(port) || port < 0 || port > 65_535)) throw new Error("--mcp-port must be between 0 and 65535.");
 		await runFeynmanMcpServer({
 			workspace: workingDir,
 			host: typeof values["mcp-host"] === "string" ? values["mcp-host"] : undefined,
