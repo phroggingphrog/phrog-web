@@ -33,6 +33,10 @@ curl -fsS http://127.0.0.1:8890/api/fetch \
 
 Search uses SearXNG and TinyFish. Fetch supports plain extraction, rendered pages and document conversion. Research supports Vane and Feynman. Additional providers cover repositories, media, books, social content and places; a provider being implemented does not establish that its credentials or upstream service work on a given deployment.
 
+## Wiki storage
+
+`wiki_save` writes Markdown notes into the wiki inbox and indexes them immediately; `wiki_search` searches that local SQLite library index. Configure `WIKI_DIR` (default `./wiki`), `WIKI_INBOX_DIR` (default `<wiki root>/inbox`), and `WIKI_INDEX_PATH` (default `<wiki root>/.index.db`) in `pnpm setup` or the MCP server environment. Relative paths resolve from the gateway working directory. Configure the same values for each client or gateway that should use the same files. Existing notes and brain-wiki files are not moved automatically.
+
 ## Feeds
 
 The `feed` tool and `/api/personal/feed` provide Instagram and RSS feeds in source order, without preference scoring or ranking. Instagram requires a configured collector account; RSS supports RSSHub and public feeds. Feed artifacts and stored items are accessible through the gateway, so deploy behind an appropriate access boundary when using private sources.

@@ -238,7 +238,7 @@ def _run_job(service: WebAcquisitionService, job: dict[str, Any]) -> None:
 
     try:
         if kind == "deep":
-            from . import deepresearch, wiki
+            from . import deepresearch
 
             def note(msg: str, feynman_job_id: str | None = None) -> None:
                 job["note"] = msg
@@ -258,7 +258,7 @@ def _run_job(service: WebAcquisitionService, job: dict[str, Any]) -> None:
                     register=params.get("register"), inference_depth=params.get("inference_depth"),
                     domain_notes=params.get("domain_notes"))
             if params.get("to_wiki"):
-                res.update(wiki.file_deliverable(params.get("title") or params["topic"][:80], res["deliverable"], res["path"]))
+                raise ValueError("The external brain wiki integration has been removed; use Phrog Web wiki_save")
             job["result"] = res
         elif kind == "crawl":
             job["result"] = crawl_site(service, progress=progress, **params)

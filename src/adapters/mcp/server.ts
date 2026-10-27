@@ -3,6 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
 import { z } from 'zod';
+import { loadConfig } from '../../config.js';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
@@ -26,7 +27,6 @@ import { researchSearch } from '../../providers/sources.js';
 import { webSearch, deepResearchStart, deepResearchStatus, deepResearchResume } from '../../providers/compat.js';
 import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 import { logged, recentRuns } from '../../runlog.js';
-import { saveToBrainWiki } from '../../wiki/brain.js';
 import { getFeed, personalDb } from '../../personalization/feed.js';
 import { readArtifact, ARTIFACT_URL_PREFIX } from '../../personalization/filter.js';
 
@@ -113,6 +113,7 @@ export function buildFeedToolResult(feed: { items?: any[]; [k: string]: unknown 
 export interface McpContext { personalAuthorized?: boolean }
 
 export function createMcpServer(ctx: McpContext = {}): McpServer {
+loadConfig();
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 // Log every tool call: wrap the handler (always the last argument) of each server.tool registration.
 const origTool = server.tool.bind(server) as (...a: any[]) => unknown;
@@ -353,7 +354,7 @@ server.tool(
 
 server.tool(
   'wiki_save',
-  'Save a note into the LOCAL vector wiki in this repo (not the brain; for the brain wiki inbox use save_to_wiki). Distill and save research findings or notes (Karpathy markdown vault) with automatic vector embedding and frontmatter.',
+  'Save a Markdown note to the Phrog Web wiki inbox and index it immediately for wiki_search. Configure WIKI_DIR, WIKI_INBOX_DIR and WIKI_INDEX_PATH in the server environment or setup.',
   {
     title: z.string().describe('Note title (becomes filename slug)'),
     content: z.string().describe('Markdown note content with sections, summaries, and citations'),
@@ -375,7 +376,7 @@ server.tool(
 
 server.tool(
   'wiki_search',
-  'Perform semantic vector search across all notes in the LLM Wiki vault using cosine similarity.',
+  'Search the Phrog Web wiki library index, including inbox notes, using cosine similarity.',
   {
     query: z.string().describe('Natural language search query or concept'),
     limit: z.number().int().min(1).max(20).optional().describe('Maximum notes to return'),
@@ -700,11 +701,6 @@ server.tool('research_vault', 'Search/read/save reusable evidence in the Feynman
   evidence_type: z.string().optional(), stance_target: z.string().optional(), stance: z.string().optional(),
   run_id: z.string().optional(), ranked: z.boolean().optional(),
 }, safe(researchVault));
-
-server.tool('save_to_wiki', 'Save gathered web material or a completed deep-research job to the owner\'s brain wiki inbox (~/brain/wiki/inbox/) as a proposal. kind: "note" (summary, key points, details, gaps, related, sources). Give urls (read for you), text (research already gathered) or a question (researched first); or a completed deep-research job_id to file its cited report unchanged. Provide either job_id or urls/text/question.', {
-  kind: z.string().default('note'), urls: z.array(z.string()).nullable().default(null), text: z.string().default(''),
-  question: z.string().default(''), title: z.string().default(''), target: z.string().default(''), job_id: z.string().default(''),
-}, safe(saveToBrainWiki));
 
 server.tool('run_log', 'Recent phrog-web run-log records (MCP and REST calls: duration, ok, provider info), newest first. Optional tool filter.', {
   limit: z.number().int().default(50), tool: z.string().optional(),

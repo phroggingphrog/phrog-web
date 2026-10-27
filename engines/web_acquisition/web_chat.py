@@ -222,9 +222,6 @@ def _start_progress(name: str, arguments: dict[str, Any]) -> str:
         return f"{name}: checking job {_clip(arguments.get('job_id'), 80)}"
     if name == "research_vault":
         return f"{name}: vault action {_clip(arguments.get('action'), 40)}"
-    if name == "save_to_wiki":
-        job_id = _clip(arguments.get("job_id"), 80)
-        return f"{name}: preparing a wiki save" + (f" for job {job_id}" if job_id else "")
     return f"{name}: starting"
 
 
@@ -466,7 +463,6 @@ def _build_tools(state: _RunState) -> list[StructuredTool]:
             browse,
             deep_research_status,
             web_agent_server.extract,
-            web_agent_server.save_to_wiki,
             web_agent_server.parse_pages,
         )
     ]

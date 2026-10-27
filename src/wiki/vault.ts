@@ -21,7 +21,7 @@ let dbInstance: WikiDatabase | null = null;
 function getDatabase(): WikiDatabase {
   if (!dbInstance) {
     const root = getWikiRoot();
-    const dbPath = join(root, '.index.db');
+    const dbPath = process.env.WIKI_INDEX_PATH ? resolve(process.env.WIKI_INDEX_PATH) : join(root, '.index.db');
     dbInstance = new WikiDatabase(dbPath);
   }
   return dbInstance;
@@ -40,7 +40,7 @@ export async function saveToWiki(
 ): Promise<WikiNote> {
   const root = getWikiRoot();
   const subDir = options.inbox !== false ? 'inbox' : 'notes';
-  const targetDir = join(root, subDir);
+  const targetDir = options.inbox !== false && process.env.WIKI_INBOX_DIR ? resolve(process.env.WIKI_INBOX_DIR) : join(root, subDir);
   mkdirSync(targetDir, { recursive: true });
 
   const slug = slugify(title);
@@ -80,7 +80,7 @@ export async function saveToWiki(
     const db = getDatabase();
     db.upsertNote(note, vector);
   } catch (err) {
-    console.error('Failed to embed wiki note:', err);
+    throw new Error(`Wiki note saved to ${filePath}, but indexing failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   return note;

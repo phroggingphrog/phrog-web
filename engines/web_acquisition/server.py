@@ -14,9 +14,9 @@ mcp = FastMCP(
         "Self-hosted web toolbox. Fast retrieval tools: web_search, web_crawl "
         "(scrape; supports page actions), web_map, web_crawl_start/web_batch_start + web_crawl_status (background "
         "jobs), research_search, deep_search. research(question, mode='web') gives a short cited answer through Vane; "
-        "deep_research_start/status/resume runs long staged research in Feynman; save_to_wiki can file its completed "
+        "deep_research_start/status/resume runs long staged research in Feynman. "
         "report through the same wiki tool used for web material. research_vault searches and saves reusable Feynman evidence. research modes extract and social, "
-        "extract(urls, schema), and save_to_wiki use the web agent. Results are public-web only by default. Cite deep_search blocks "
+        "extract(urls, schema) uses the web agent. Results are public-web only by default. Cite deep_search blocks "
         "by id and url; pages behind bot checks are reported in skipped/blocked rather than returned as content."
     ),
 )
@@ -114,7 +114,7 @@ async def deep_research_start(topic: str, workflow: str = "deepresearch",
 
     workflow: deepresearch (thorough cited brief) | lit (literature review) | compare (source comparison) |
     review (critique) | audit (paper vs code) | summarize (a URL/PDF) | recipe | draft. topic: one self-contained
-    subject. Poll with deep_research_status. File a completed report with save_to_wiki(job_id=...).
+    subject. Poll with deep_research_status.
     profile selects source scale; tier selects light/full/dissertation stages. register, inference_depth, and
     domain_notes steer the report's voice, reasoning depth, and sourcing norms. Use research(mode="web") for a
     quick answer through Vane; this tool runs long research in Feynman.
@@ -325,9 +325,9 @@ async def deep_search(
 
 
 # ---- web research agent tools (LLM-backed), registered on this same server -------------------
-from .web_agent_server import extract, research, save_to_wiki  # noqa: E402
+from .web_agent_server import extract, research  # noqa: E402
 
-for _tool in (research, extract, save_to_wiki):
+for _tool in (research, extract):
     mcp.tool()(_tool)
 
 
