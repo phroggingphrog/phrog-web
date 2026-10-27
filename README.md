@@ -51,4 +51,4 @@ The feed tests do not cover every upstream provider. Verify the intended MCP cli
 
 The portable user-service template is `deploy/units/phrog-web.service`; `scripts/phrog-web-service.sh` renders, installs, releases and rolls back builds. Inspect the rendered unit before installation and run release commands from the checkout the service uses. Keep a database backup separately: rolling back compiled code is not a database rollback.
 
-See [HANDOVER.md](HANDOVER.md) for architecture and historical provider details. The personal-discovery documents under `docs/plans/` describe the original plan, not proof that the production schedule has switched.
+See [HANDOVER.md](HANDOVER.md) for architecture and historical provider details.
