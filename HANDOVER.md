@@ -187,7 +187,7 @@ Remaining gaps:
 - Trafilatura and PDF/Office conversion are implemented; see `src/providers/document.ts` and the current engine setup.
 - `web_crawl_start` (site crawl) is not ported.
 - `browse` needs the external Jev runner (JEV_RUNNER / JEV_DIR, see `jevPaths()` in src/config.ts) and a TYPESAFE/OPENROUTER key; it errors clearly if missing.
-- `research_vault` needs the Feynman MCP at WEB_AGENT_FEYNMAN_URL (default 127.0.0.1:8910).
+- `research_vault` uses the embedded Feynman runtime and Phrog-owned data directory; see README for setup.
 
 
 ## Crawl capabilities added (feat/http-mcp-crawl)
