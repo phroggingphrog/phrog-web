@@ -2,7 +2,7 @@ import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { checkBearer } from './auth.js';
 import { getFeed, personalDb, FeedInputError } from './feed.js';
 import { feedDecide } from './decisions.js';
-import { readArtifact } from './filter.js';
+import { readArtifactImage } from './filter.js';
 import { recordFeedback } from './feedback.js';
 import { personalRecent } from './recent.js';
 import { personalDiscover } from './discover.js';
@@ -80,8 +80,8 @@ export function registerPersonalRoutes(fastify: FastifyInstance) {
 
   fastify.get('/api/personal/artifacts/:id', async (req, reply) => {
     if (!authorize(req, reply)) return reply;
-    const png = readArtifact(personalDb(), (req.params as { id: string }).id);
-    if (!png) return reply.status(404).send({ error: 'Not found' });
-    return reply.header('cache-control', 'private, max-age=3600').type('image/png').send(png);
+    const art = readArtifactImage(personalDb(), (req.params as { id: string }).id);
+    if (!art) return reply.status(404).send({ error: 'Not found' });
+    return reply.header('cache-control', 'private, max-age=3600').type(art.mime).send(art.data);
   });
 }
