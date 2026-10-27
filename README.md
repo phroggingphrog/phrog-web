@@ -4,10 +4,11 @@ A TypeScript gateway for web search, page extraction, research and feeds. Client
 
 ## Requirements and setup
 
-Use Node.js 22.20 or newer and pnpm. Embedded engines live under `engines/`; provider availability depends on engine setup and credentials.
+Use Node.js 22.22 or newer and pnpm (the embedded Feynman engine requires 22.22). Embedded engines live under `engines/`; provider availability depends on engine setup and credentials.
 
 ```bash
 pnpm install
+(cd engines/feynman && npm ci --legacy-peer-deps=false && npm run build)
 pnpm setup
 pnpm build
 pnpm start
@@ -32,6 +33,12 @@ curl -fsS http://127.0.0.1:8890/api/fetch \
 - **Function schemas:** `src/adapters/schemas/hermes-tools.json`.
 
 Search uses SearXNG and TinyFish. Fetch supports plain extraction, rendered pages and document conversion. Research supports Vane and Feynman. Additional providers cover repositories, media, books, social content and places; a provider being implemented does not establish that its credentials or upstream service work on a given deployment.
+
+## Embedded research runtime
+
+`research_vault` and `deep_research_*` start the tracked Feynman engine on a private loopback port; they do not use a separately installed Feynman service. Set `PHROG_FEYNMAN_DATA_DIR` to an absolute or working-directory-relative path to keep the vault, research runs, outputs and Feynman agent state together. The default is `${XDG_DATA_HOME:-~/.local/share}/phrog-web/feynman`. Configure the same directory for clients that should share data. Existing Feynman vaults and credentials are not copied. Configure a model in this separate Feynman home or supply appropriate provider credentials; a usable provider and a completed report must be verified separately. The legacy `research` tool also uses this workspace.
+
+The Phrog process starts its own local engine; concurrent Phrog processes share Feynman's on-disk research lock when configured with the same data directory. Phrog's public job IDs are process-local; use the durable run ID with `deep_research_resume` after interruption. A run interrupted by a Phrog process exit may need to be resumed. The engine must be installed and built as shown above before these tools are called.
 
 ## Wiki storage
 

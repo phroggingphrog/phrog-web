@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync, mkdirSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { loadConfig } from '../config.js';
+import { feynmanRuntime } from './feynman-runtime.js';
 
 export interface ResearchCitation {
   n: number;
@@ -110,7 +111,8 @@ export function dispatchDeepResearch(
 ): ResearchJob {
   const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const workflow = options.workflow || 'deepresearch';
-  const feynmanBin = resolve(process.cwd(), 'engines/feynman/bin/feynman.js');
+  const runtime = feynmanRuntime();
+  const feynmanBin = runtime.engine;
 
   const job: ResearchJob = {
     jobId,
@@ -124,15 +126,15 @@ export function dispatchDeepResearch(
 
   jobs.set(jobId, job);
 
-  const outputsDir = resolve(process.cwd(), 'outputs');
+  const outputsDir = resolve(runtime.root, 'outputs');
   if (!existsSync(outputsDir)) {
     mkdirSync(outputsDir, { recursive: true });
   }
 
   try {
     const child = spawn(process.execPath, [feynmanBin, workflow, topic], {
-      cwd: resolve(process.cwd(), 'engines/feynman'),
-      env: { ...process.env, CI: 'true', NONINTERACTIVE: 'true' },
+      cwd: runtime.root,
+      env: { ...runtime.env, CI: 'true', NONINTERACTIVE: 'true' },
       detached: false,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
@@ -151,7 +153,7 @@ export function dispatchDeepResearch(
 
       if (exitCode === 0) {
         job.status = 'completed';
-        job.deliverable = findLatestDeliverable(resolve(process.cwd(), 'engines/feynman/outputs')) || stdout;
+        job.deliverable = findLatestDeliverable(outputsDir) || stdout;
       } else {
         job.status = 'failed';
         job.error = stderr || `Process exited with code ${exitCode}`;
