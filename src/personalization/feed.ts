@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import { personalConfig } from '../config.js';
 import { openPersonalDb } from './db/index.js';
-import { applyJev } from './filter.js';
+import { applyJev, renderFeedItems } from './filter.js';
 import { ACCOUNT_RE, CURSOR_RE, runCollector, type CollectorResult } from './collector.js';
 import { normalizeSource, readFeed } from './rss.js';
 
@@ -15,6 +15,7 @@ export interface FeedRequest {
   limit?: number;
   cursor?: string | null;
   filter?: 'jev';
+  screenshots?: boolean;
   include_filtered?: boolean;
   order?: 'feed' | 'predicted';
   /** 0..1: chance a post below the threshold is let through anyway. Default 0. */
@@ -214,6 +215,7 @@ export async function getFeed(req: FeedRequest) {
 
   let shown = out;
   let filteredOut = 0;
+  if (!req.filter && req.screenshots) await renderFeedItems(d, out);
   if (req.filter === 'jev' && out.length) {
     const r = await applyJev(d, runId, out, { includeFiltered: req.include_filtered === true, order, exploration });
     shown = r.items;

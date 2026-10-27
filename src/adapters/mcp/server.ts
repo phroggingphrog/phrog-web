@@ -40,6 +40,82 @@ const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
 });
 
+/** Max images inlined per feed call, and hard cap on the whole serialized tool result (JSON text + image envelopes). */
+export const MAX_FEED_IMAGES = 8;
+export const MAX_FEED_RESULT_BYTES = 750_000;
+const IMAGE_ENVELOPE_BYTES = 128; // {"type":"image","data":"","mimeType":"image/png"} plus separators, rounded up
+const TEXT_SLACK_BYTES = 2_000;
+
+const resultBytes = (content: unknown[]) => Buffer.byteLength(JSON.stringify({ content }));
+
+/**
+ * feed tool result: feed.v1 JSON text, then the screenshots of passed posts that fit the total byte budget.
+ * The JSON carries `mcp_output` naming which screenshots were attached and which were omitted (with their
+ * artifact refs), so omitted images are never implied to have been viewed. The budget does not guarantee any
+ * image is attached: a single screenshot larger than the budget is always omitted.
+ */
+export function buildFeedToolResult(feed: { items?: any[]; [k: string]: unknown }, readPng: (artifactId: string) => Buffer | null | undefined) {
+  type Ref = { item_id: string; artifact: string; bytes?: number; reason?: string };
+  const allItems: any[] = Array.isArray(feed.items) ? feed.items : [];
+  const render = (items: any[], included: Ref[], omitted: Ref[], itemsOmitted: number) => JSON.stringify({
+    ...feed,
+    items,
+    mcp_output: {
+      max_result_bytes: MAX_FEED_RESULT_BYTES,
+      images_attached: included,
+      images_omitted: omitted,
+      ...(itemsOmitted ? { items_omitted_for_size: itemsOmitted } : {}),
+      note: 'Only images_attached were attached to this result; images_omitted (artifact refs under /api/personal/artifacts/) were NOT shown. Screenshot fields on items are references, not proof an image was viewed.',
+    },
+  }, null, 2);
+
+  // Candidate screenshots in feed order.
+  const cands: Ref[] = [];
+  for (const it of allItems) {
+    const shot: unknown = it?.render?.screenshot;
+    if (typeof shot === 'string' && shot.startsWith(ARTIFACT_URL_PREFIX)) cands.push({ item_id: String(it.item_id), artifact: shot });
+  }
+  const asOmitted = (c: Ref[], reason: string) => c.map((r) => ({ ...r, reason }));
+
+  // 1. Text first: if it cannot fit even with every image omitted, drop trailing items.
+  let items = allItems;
+  let textAll = render(items, [], asOmitted(cands, 'image_budget'), 0);
+  while (items.length > 0 && Buffer.byteLength(textAll) + TEXT_SLACK_BYTES + 200 > MAX_FEED_RESULT_BYTES) {
+    items = items.slice(0, Math.floor(items.length / 2));
+    const kept = new Set(items.map((i) => String(i?.item_id)));
+    const live = cands.filter((c) => kept.has(c.item_id));
+    textAll = render(items, [], asOmitted(live, 'image_budget'), allItems.length - items.length);
+  }
+  const keptIds = new Set(items.map((i) => String(i?.item_id)));
+  const live = cands.filter((c) => keptIds.has(c.item_id));
+  const cutItems = allItems.length - items.length;
+  const dropped = cands.filter((c) => !keptIds.has(c.item_id));
+
+  // 2. Greedily attach images (feed order) that fit what remains after the text.
+  const chosen: { ref: Ref; data: string; mimeType: string }[] = [];
+  const omitted: Ref[] = asOmitted(dropped, 'item_omitted_for_size');
+  let used = Buffer.byteLength(textAll) + TEXT_SLACK_BYTES;
+  for (const c of live) {
+    if (chosen.length >= MAX_FEED_IMAGES) { omitted.push({ ...c, reason: 'image_count_cap' }); continue; }
+    const png = readPng(c.artifact.slice(ARTIFACT_URL_PREFIX.length));
+    if (!png) { omitted.push({ ...c, reason: 'artifact_unavailable' }); continue; }
+    const enc = Math.ceil(png.length / 3) * 4;
+    if (used + enc + IMAGE_ENVELOPE_BYTES > MAX_FEED_RESULT_BYTES) { omitted.push({ ...c, bytes: png.length, reason: 'image_budget' }); continue; }
+    used += enc + IMAGE_ENVELOPE_BYTES;
+    chosen.push({ ref: { ...c, bytes: png.length }, data: png.toString('base64'), mimeType: png[0] === 0xff && png[1] === 0xd8 ? 'image/jpeg' : 'image/png' });
+  }
+
+  // 3. Build and verify the real serialization; shed trailing images if the estimate was off.
+  for (;;) {
+    const content: any[] = [
+      { type: 'text' as const, text: render(items, chosen.map((x) => x.ref), omitted, cutItems) },
+      ...chosen.map((x) => ({ type: 'image' as const, data: x.data, mimeType: x.mimeType })),
+    ];
+    if (resultBytes(content) <= MAX_FEED_RESULT_BYTES || chosen.length === 0) return { content };
+    omitted.push({ ...chosen.pop()!.ref, reason: 'image_budget' });
+  }
+}
+
 export interface McpContext { personalAuthorized?: boolean }
 
 export function createMcpServer(ctx: McpContext = {}): McpServer {
@@ -571,9 +647,9 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
   catch (err) { return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] }; }
 };
 
-const MAX_FEED_IMAGES = 8;
 
-server.tool('feed', 'Personal feed as feed.v1 (owner bearer token required). provider instagram: the home feed in the order Instagram served it (needs account). provider rss: an RSS/Atom/JSON feed or RSSHub route in source (e.g. /youtube/channel/UC...); no account needed; later pages come from the stored list. Pass next_cursor as cursor to keep scrolling. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. With filter "jev" each post is scored first; only passing posts are returned (the rest are counted in filtered_out) and their screenshots follow the JSON as images, so look at them and record your call with feed_decide.', {
+server.tool('feed', 'Broad-interest post discovery over the owner\'s personal feed, returned as feed.v1 (owner bearer token required). provider instagram: the home feed in the order Instagram served it (needs account). provider rss: an RSS/Atom/JSON feed or RSSHub route in source (e.g. /youtube/channel/UC...); no account needed; later pages come from the stored list. Pass next_cursor as cursor to fetch more. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. By default source order is preserved with screenshots, without preference ranking or filtering. Collected preferences are data only. Legacy filter "jev" is opt-in, not used for the unranked trial. Screenshots are attached only while the total result stays under a byte budget; mcp_output in the JSON lists which images were attached and which were omitted (with artifact refs), so never assume an omitted image was seen. Use feed_decide to record your own judgement of a post.', {
+  screenshots: z.boolean().default(true).describe('Visual context without scoring/filtering; source order preserved.'),
   provider: z.enum(['instagram', 'rss']).default('instagram'),
   account: z.string().optional().describe('Instagram account name, [A-Za-z0-9._]{1,30} (not used for rss)'),
   source: z.string().max(500).optional().describe('instagram: "home" (default). rss: RSSHub route starting with "/" or an http(s) feed URL'),
@@ -587,15 +663,7 @@ server.tool('feed', 'Personal feed as feed.v1 (owner bearer token required). pro
   if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
   try {
     const feed = await getFeed(a);
-    const content: any[] = [{ type: 'text' as const, text: JSON.stringify(feed, null, 2) }];
-    for (const it of feed.items as any[]) {
-      if (content.length > MAX_FEED_IMAGES) break;
-      const shot: string | undefined = it.filter?.passed ? it.render?.screenshot : undefined;
-      if (!shot?.startsWith(ARTIFACT_URL_PREFIX)) continue;
-      const png = readArtifact(personalDb(), shot.slice(ARTIFACT_URL_PREFIX.length));
-      if (png) content.push({ type: 'image' as const, data: png.toString('base64'), mimeType: 'image/png' });
-    }
-    return { content };
+    return buildFeedToolResult(feed as any, (id) => readArtifact(personalDb(), id));
   } catch (err) {
     return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] };
   }
@@ -613,7 +681,7 @@ server.tool('feed_decide', "Record your judgement of a feed post (owner bearer t
 
 const denied = () => ({ isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] });
 
-server.tool('personal_discover', "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences (owner bearer token required). Returns numbered items with link, date (null when the page does not state it), venue, price, reason, uncertainty and delivery_id, plus failed_sources. After you message the owner, call personal_feedback with type 'shown' and the delivery_ids; pass the owner's reactions as personal_feedback too. Never books anything.", {
+server.tool('personal_discover', "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences (owner bearer token required). It is an events supplement, not full discovery: pair it with feed for broad-interest posts. Returns numbered items with link, date (null when the page does not state it), venue, price, reason, uncertainty and delivery_id, plus failed_sources. After you message the owner, call personal_feedback with type 'shown' and the delivery_ids; pass the owner's reactions as personal_feedback too. Never books anything.", {
   intent: z.string().max(200).optional().describe('Why the owner wants discovery (recorded only). The owner\'s categories are always searched'),
   constraints: z.object({ days: z.number().int().min(1).max(90).optional(), radius_km: z.number().positive().max(1000).optional(), near: z.string().max(60).optional(), topic: z.string().max(60).optional().describe('Extra topic searched first, e.g. "jazz"') }).optional(),
   limit: z.number().int().min(1).max(30).default(10),

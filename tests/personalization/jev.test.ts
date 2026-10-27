@@ -250,3 +250,13 @@ test('key file is used when configured', async () => {
   assert.equal(jevCalls[0].auth, 'Bearer file-key-not-real');
   assert.ok(existsSync(keyFile) && readFileSync(keyFile, 'utf8').startsWith('file-key'));
 });
+
+test('unranked screenshots preserve source order and do not score preferences', async () => {
+  const beforeCalls = jevCalls.length;
+  const r = await getFeed({ provider: 'instagram', account: 'test', limit: 10, screenshots: true });
+  assert.equal(jevCalls.length, beforeCalls);
+  assert.ok(r.items.length > 0);
+  assert.ok(r.items.every((it: any) => it.prediction === null && it.filter === null));
+  assert.deepEqual(r.items.map((it: any) => it.position), [...r.items.map((it: any) => it.position)].sort((a: number, b: number) => a - b));
+  assert.ok(r.items.some((it: any) => it.render?.screenshot));
+});
