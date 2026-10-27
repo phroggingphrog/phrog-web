@@ -1,0 +1,18 @@
+[Unit]
+Description=Phrog Web gateway (port 8890)
+After=network-online.target searxng.service
+StartLimitIntervalSec=300
+StartLimitBurst=5
+
+[Service]
+# Placeholders (APP_DIR, NODE) are rendered by scripts/phrog-web-service.sh install.
+# Secrets are loaded by the app itself from ~/.config/phrog-web.env (not by systemd).
+WorkingDirectory=@APP_DIR@
+ExecStart=@NODE@ dist/index.js
+Environment=PATH=%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=20
+
+[Install]
+WantedBy=default.target

@@ -2,10 +2,10 @@
 
 ## Personal discovery handoff (2026-10-26)
 
-Read the [implementation handoff](docs/plans/personal-discovery-handoff.md) and [full execution plan](docs/plans/personal-discovery-execution-plan.md) before continuing personalization work. Phrog-web owns collection, ranking and feedback for one user (the owner); Hermes calls it over MCP. This feature is planned, not implemented. Start with Phase 0: a read-only check of the existing daily-discovery inputs and data. The historical gateway status below is not evidence that the new feature is deployed.
+Phrog-web owns collection, ranking and feedback for one user (the owner), exposed to Hermes over MCP. The implementation through preference modelling is committed at `db50492`; production cutover remains tracked in TASK-338. The [implementation handoff](docs/plans/personal-discovery-handoff.md) and [execution plan](docs/plans/personal-discovery-execution-plan.md) describe the original design, not current deployment evidence. Verify the active schedule and shadow-run results before disabling the legacy discovery flow.
 
 > **Repository**: [https://github.com/phroggingphrog/phrog-web](https://github.com/phroggingphrog/phrog-web)  
-> **Status**: Live, tested, and fully functional on `main`  
+> **Status**: Gateway running locally; release reconciliation and personal-discovery cutover in progress (TASK-338). Not all providers have been verified.
 > **Backlog**: TASK-308 (Done)
 
 ---
@@ -186,7 +186,7 @@ Job status strings match Python (`running`, `completed`, `failed`).
 
 Remaining gaps:
 - `actions` and `stealth` in web_crawl only force browser mode; they are not applied.
-- No Trafilatura, PDF or Office conversion.
+- Trafilatura and PDF/Office conversion are implemented; see `src/providers/document.ts` and the current engine setup.
 - `web_crawl_start` (site crawl) is not ported.
 - `browse` needs the external Jev runner (JEV_RUNNER / JEV_DIR, see `jevPaths()` in src/config.ts) and a TYPESAFE/OPENROUTER key; it errors clearly if missing.
 - `research_vault` needs the Feynman MCP at WEB_AGENT_FEYNMAN_URL (default 127.0.0.1:8910).
