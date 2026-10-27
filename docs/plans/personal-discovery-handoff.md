@@ -1,6 +1,6 @@
 # Personal discovery implementation handoff
 
-Prepared 2026-10-26. Project: phrog-web. State: planning only; implementation has not started.
+Prepared 2026-10-26. Project: phrog-web. Historical planning handoff: implementation through preference modelling is committed at `db50492`. Current release verification, shadow comparison and Hermes cutover are tracked in TASK-338; the phase instructions below are retained as design history.
 
 ## Read first
 
