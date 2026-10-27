@@ -193,7 +193,7 @@
     "type": "function",
     "function": {
       "name": "wiki_save",
-      "description": "Save notes, articles, or research findings into the agnostic LLM Wiki vault with automatic frontmatter and vector embedding.",
+      "description": "Save a note to the configurable wiki inbox and index it for search.",
       "parameters": {
         "type": "object",
         "properties": {
@@ -228,7 +228,7 @@
     "type": "function",
     "function": {
       "name": "wiki_search",
-      "description": "Semantic vector search across all notes in the LLM Wiki vault using cosine similarity.",
+      "description": "Search the configurable wiki library index, including inbox notes.",
       "parameters": {
         "type": "object",
         "properties": {

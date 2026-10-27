@@ -58,7 +58,7 @@ Escalate only when the lighter tool fails or returns incomplete content.
 
 ## Saving
 
-`save_to_wiki` (urls, text or question; optional title, target, job_id) reads the sources, writes one proposed page into ~/brain/wiki/inbox/ and returns its path. Use it for findings worth keeping, and say what you saved. `wiki_save` is different: it writes to the local vector wiki only. `wiki_search` searches that local wiki; check it before re-researching. `research_vault` holds reusable Feynman evidence.
+`wiki_save` saves notes to the Phrog Web wiki. `wiki_search` searches its local index. `research_vault` holds reusable Feynman evidence.
 
 ## REST equivalents
 

@@ -24,6 +24,9 @@ const KEYS: { key: string; secret: boolean; hint: string }[] = [
   { key: 'DISCOGS_TOKEN', secret: true, hint: 'Discogs token (music)' },
   { key: 'X_BEARER_TOKEN', secret: true, hint: 'X (Twitter) bearer token' },
   { key: 'PHROG_LOCATION', secret: false, hint: 'Your suburb/city for local results, e.g. "Footscray VIC" (optional; coordinates are looked up)' },
+  { key: 'WIKI_DIR', secret: false, hint: 'Wiki root directory (default ./wiki)' },
+  { key: 'WIKI_INBOX_DIR', secret: false, hint: 'Wiki inbox directory (default <wiki root>/inbox)' },
+  { key: 'WIKI_INDEX_PATH', secret: false, hint: 'Wiki SQLite library index path (default <wiki root>/.index.db)' },
   { key: 'REDLIB_URLS', secret: false, hint: 'Redlib base URLs, comma separated' },
 ];
 

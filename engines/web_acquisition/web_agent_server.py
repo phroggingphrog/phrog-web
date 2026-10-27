@@ -185,56 +185,6 @@ async def extract(urls: list[str], schema: dict, instructions: str = "") -> dict
 
 
 @mcp.tool()
-async def save_to_wiki(
-    kind: str = "note",
-    urls: list[str] | None = None,
-    text: str = "",
-    question: str = "",
-    title: str = "",
-    target: str = "",
-    job_id: str = "",
-) -> dict:
-    """Save gathered web material or a completed Feynman research job to the owner's LLM wiki inbox.
-
-    kind: "note" (knowledge page: summary, key points, details, gaps, related, sources). Study plans are
-    not made here: a planner agent calls this tool for the compiled material and plans from it.
-    For new material, give urls (read for you), text (research already gathered), or a question (researched first).
-    For a completed deep-research job, give its job_id to file the original cited report without rewriting it.
-    Provide either job_id or urls/text/question. The file lands in ~/brain/wiki/inbox/ as a proposal.
-    """
-    from web_acquisition import wiki
-
-    if job_id.strip():
-        if urls or text.strip() or question.strip():
-            raise ValueError("provide job_id or urls/text/question, not both")
-
-        def save_job_report() -> dict[str, Any]:
-            from web_acquisition import sitecrawl
-
-            job = sitecrawl.job_status(job_id.strip())
-            if job.get("kind") != "deep":
-                raise ValueError(f"job '{job_id}' is not a deep-research job")
-            if job.get("status") != "completed":
-                raise ValueError(f"deep-research job '{job_id}' is {job.get('status', 'unknown')}; wait for completion first")
-            if job.get("research_status") not in {"done", "blocked"}:
-                raise ValueError(f"deep-research job '{job_id}' has no completed report")
-            origin = job.get("path")
-            if not isinstance(origin, str) or not Path(origin).is_file():
-                raise ValueError(f"deep-research job '{job_id}' has no readable report file")
-            report = Path(origin).read_text(errors="replace")
-            if not report.strip():
-                raise ValueError(f"deep-research job '{job_id}' produced an empty report")
-            page_title = title.strip() or Path(origin).stem.replace("-", " ").replace("_", " ").title()
-            return wiki.file_deliverable(page_title, report, origin, target)
-
-        return await anyio.to_thread.run_sync(save_job_report)
-
-    return await anyio.to_thread.run_sync(
-        lambda: wiki.compile_to_wiki(kind=kind, urls=urls, text=text, question=question, title=title, target=target)
-    )
-
-
-@mcp.tool()
 async def parse_pages(urls: list[str], task: str, chunk_size: int = 4, concurrency: int = 3) -> dict:
     """Extract the same thing from many known URLs, in one batched run.
 
