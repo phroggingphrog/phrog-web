@@ -18,7 +18,6 @@ const NOW = new Date('2026-10-26T12:00:00Z');
 let n = 0;
 const U = (c: string) => `it_00000000-0000-0000-0000-00000000000${c}`;
 
-before(() => { process.env.PHROG_PERSONAL_TOKEN = TOKEN; });
 beforeEach(() => { closePersonalDb(); process.env.PHROG_PERSONAL_DB = join(dir, `r${++n}.db`); });
 after(() => { closePersonalDb(); rmSync(dir, { recursive: true, force: true }); });
 
@@ -69,28 +68,9 @@ test('personal_feedback accepts a url instead of an item id', () => {
   assert.throws(() => recordFeedback({ url: 'ftp://x/y', type: 'like' }), FeedInputError);
 });
 
-test('REST and MCP: recent needs the owner token and works with it', async () => {
-  seed();
+test('historical personal history is not exposed through REST', async () => {
   const app = Fastify();
   registerPersonalRoutes(app);
-  const auth = { authorization: `Bearer ${TOKEN}` };
-  assert.equal((await app.inject({ method: 'GET', url: '/api/personal/recent' })).statusCode, 401);
-  assert.equal((await app.inject({ method: 'GET', url: '/api/personal/recent?hours=100000', headers: auth })).statusCode, 400);
-  const ok = await app.inject({ method: 'GET', url: '/api/personal/recent', headers: auth });
-  assert.equal(ok.statusCode, 200);
-  assert.equal(ok.json().schema_version, 'recent.v1');
+  assert.equal((await app.inject({ method: 'GET', url: '/api/personal/recent' })).statusCode, 404);
   await app.close();
-
-  const mk = async (ctx: any) => {
-    const [x, y] = InMemoryTransport.createLinkedPair();
-    await createMcpServer(ctx).connect(x);
-    const c = new Client({ name: 't', version: '0' });
-    await c.connect(y);
-    return c;
-  };
-  const anon: any = await (await mk({})).callTool({ name: 'personal_recent', arguments: {} });
-  assert.equal(anon.isError, true);
-  const authed: any = await (await mk({ personalAuthorized: true })).callTool({ name: 'personal_recent', arguments: { hours: 24 } });
-  assert.notEqual(authed.isError, true);
-  assert.equal(JSON.parse(authed.content[0].text).schema_version, 'recent.v1');
 });

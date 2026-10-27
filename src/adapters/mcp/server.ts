@@ -28,13 +28,7 @@ import { saveToWiki, searchWiki } from '../../wiki/vault.js';
 import { logged, recentRuns } from '../../runlog.js';
 import { saveToBrainWiki } from '../../wiki/brain.js';
 import { getFeed, personalDb } from '../../personalization/feed.js';
-import { feedDecide, DECISIONS } from '../../personalization/decisions.js';
 import { readArtifact, ARTIFACT_URL_PREFIX } from '../../personalization/filter.js';
-import { personalDiscover } from '../../personalization/discover.js';
-import { recordFeedback } from '../../personalization/feedback.js';
-import { personalRecent } from '../../personalization/recent.js';
-import { personalPreferences } from '../../personalization/preferences.js';
-import { stdioAuthorized, AUTH_REQUIRED_MESSAGE } from '../../personalization/auth.js';
 
 const text = (data: unknown) => ({
   content: [{ type: 'text' as const, text: typeof data === 'string' ? data : JSON.stringify(data, null, 2) }],
@@ -648,73 +642,18 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
 };
 
 
-server.tool('feed', 'Broad-interest post discovery over the owner\'s personal feed, returned as feed.v1 (owner bearer token required). provider instagram: the home feed in the order Instagram served it (needs account). provider rss: an RSS/Atom/JSON feed or RSSHub route in source (e.g. /youtube/channel/UC...); no account needed; later pages come from the stored list. Pass next_cursor as cursor to fetch more. Every fetched post is stored. Status other than ok/end (auth_required, challenge, ...) means no posts, not an empty feed. By default source order is preserved with screenshots, without preference ranking or filtering. Collected preferences are data only. Legacy filter "jev" is opt-in, not used for the unranked trial. Screenshots are attached only while the total result stays under a byte budget; mcp_output in the JSON lists which images were attached and which were omitted (with artifact refs), so never assume an omitted image was seen. Use feed_decide to record your own judgement of a post.', {
-  screenshots: z.boolean().default(true).describe('Visual context without scoring/filtering; source order preserved.'),
+server.tool('feed', 'Read Instagram or RSS feeds in source order. Instagram requires an available collector account; RSS accepts a public feed URL or configured RSSHub route. Screenshots are attached within the result size budget.', {
+  screenshots: z.boolean().default(true),
   provider: z.enum(['instagram', 'rss']).default('instagram'),
-  account: z.string().optional().describe('Instagram account name, [A-Za-z0-9._]{1,30} (not used for rss)'),
-  source: z.string().max(500).optional().describe('instagram: "home" (default). rss: RSSHub route starting with "/" or an http(s) feed URL'),
-  limit: z.number().int().min(1).max(50).default(20),
-  cursor: z.string().optional().describe('next_cursor from the previous page'),
-  filter: z.enum(['jev']).optional().describe('Score posts with Jev and return only those worth a look, with screenshots'),
-  include_filtered: z.boolean().optional().describe('With filter: also return posts that did not pass (no screenshots)'),
-  order: z.enum(['feed', 'predicted']).optional().describe('predicted sorts by p_match (needs filter)'),
-  exploration: z.number().min(0).max(1).optional().describe('Chance 0..1 that a below-threshold post passes anyway. Default 0'),
+  account: z.string().optional(), source: z.string().max(500).optional(),
+  limit: z.number().int().min(1).max(50).default(20), cursor: z.string().optional(),
 }, async (a: any) => {
-  if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
   try {
     const feed = await getFeed(a);
     return buildFeedToolResult(feed as any, (id) => readArtifact(personalDb(), id));
   } catch (err) {
     return { isError: true, content: [{ type: 'text' as const, text: err instanceof Error ? err.message : String(err) }] };
   }
-});
-
-server.tool('feed_decide', "Record your judgement of a feed post (owner bearer token required). Stored with the feed run and the prediction shown. These are your guesses, not the owner's taste. Pass the same idempotency_key to retry safely.", {
-  item_id: z.string().describe('item_id from the feed'),
-  decision: z.enum(DECISIONS),
-  reason: z.string().max(2000).optional(),
-  idempotency_key: z.string().max(128).optional(),
-}, async (a: any) => {
-  if (!ctx.personalAuthorized) return { isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] };
-  return safe((x) => feedDecide({ ...x, client: 'mcp' }))(a);
-});
-
-const denied = () => ({ isError: true, content: [{ type: 'text' as const, text: AUTH_REQUIRED_MESSAGE }] });
-
-server.tool('personal_discover', "Ranked Melbourne events for the next N days from Humanitix and Eventbrite (gigs, film screenings, writing competitions, writing groups, book swaps/clubs, volunteering), scored by Jev against the owner's preferences (owner bearer token required). It is an events supplement, not full discovery: pair it with feed for broad-interest posts. Returns numbered items with link, date (null when the page does not state it), venue, price, reason, uncertainty and delivery_id, plus failed_sources. After you message the owner, call personal_feedback with type 'shown' and the delivery_ids; pass the owner's reactions as personal_feedback too. Never books anything.", {
-  intent: z.string().max(200).optional().describe('Why the owner wants discovery (recorded only). The owner\'s categories are always searched'),
-  constraints: z.object({ days: z.number().int().min(1).max(90).optional(), radius_km: z.number().positive().max(1000).optional(), near: z.string().max(60).optional(), topic: z.string().max(60).optional().describe('Extra topic searched first, e.g. "jazz"') }).optional(),
-  limit: z.number().int().min(1).max(30).default(10),
-}, async (a: any) => {
-  if (!ctx.personalAuthorized) return denied();
-  return safe((x) => personalDiscover({ ...x, client: 'mcp' }))(a);
-});
-
-server.tool('personal_feedback', "Record the owner's reaction to a discovery item (owner bearer token required). Owner feedback is the truth label: like/save/want_to_go are positive, dislike is negative. not_now, too_far, too_expensive and anything scoped this_time are NOT lasting dislikes. type 'shown' (with delivery_id or delivery_ids) records that you actually delivered the items; returned is not shown. Reuse idempotency_key to retry safely.", {
-  type: z.enum(['like', 'dislike', 'save', 'not_now', 'too_far', 'too_expensive', 'want_to_go', 'shown']),
-  item_id: z.string().optional(), url: z.string().max(500).optional().describe('Alternative to item_id: the link of the post or event the owner means'), delivery_id: z.string().optional(), delivery_ids: z.array(z.string()).max(100).optional(),
-  scope: z.enum(['this_time', 'item', 'creator', 'topic', 'venue']).optional().describe('Default: item (this_time for not_now/too_far/too_expensive). topic needs a reason naming the topic'),
-  reason: z.string().max(1000).optional(), idempotency_key: z.string().max(128).optional(),
-}, async (a: any) => {
-  if (!ctx.personalAuthorized) return denied();
-  return safe(recordFeedback)(a);
-});
-
-server.tool('personal_recent', "What the owner was actually shown recently, in message order (owner bearer token required). Use it when the owner replies in a new conversation and you do not have the ids: discovery_runs[].items[] has the number the owner saw, title, url, delivery_id and item_id (only deliveries acknowledged with personal_feedback type 'shown'); sent_posts[] has feed posts you decided send_to_owner. Pass the ids (or the url) to personal_feedback.", {
-  hours: z.number().min(1).max(336).default(48),
-}, async (a: any) => {
-  if (!ctx.personalAuthorized) return denied();
-  return safe(personalRecent)(a);
-});
-
-server.tool('personal_preferences', "Read the owner's preference summary (data-derived: Instagram authors, music artists, saved places, feedback, taste text) and explicit rules, or set a rule (owner bearer token required). action 'get' (default), 'rebuild' (recompute), 'set_rule' (rule prefer|avoid|exclude + subject_key), 'remove_rule' (rule_id). Explicit rules beat derived scores.", {
-  action: z.enum(['get', 'rebuild', 'set_rule', 'remove_rule']).default('get'),
-  rule: z.enum(['prefer', 'avoid', 'exclude']).optional(), subject_key: z.string().max(80).optional(),
-  subject_type: z.string().max(24).optional().describe('keyword (default), topic, venue, creator, category'),
-  valid_until: z.string().optional().describe('ISO date; the rule stops applying after it'), note: z.string().max(500).optional(), rule_id: z.string().optional(),
-}, async (a: any) => {
-  if (!ctx.personalAuthorized) return denied();
-  return safe(personalPreferences)(a);
 });
 
 server.tool('web_crawl', 'Scrape up to 10 URLs to markdown (mode auto|plain|browser). actions (click/type/press/scroll/wait/wait_for) and stealth force the browser. PDF and Office URLs are converted to text.', {
@@ -805,5 +744,5 @@ return server;
 
 // Stdio entry: `node dist/adapters/mcp/server.js`
 if (process.argv[1] && realpathSync(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  await createMcpServer({ personalAuthorized: stdioAuthorized() }).connect(new StdioServerTransport());
+  await createMcpServer().connect(new StdioServerTransport());
 }

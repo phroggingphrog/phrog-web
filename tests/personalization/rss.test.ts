@@ -1,9 +1,8 @@
 import { test, before, beforeEach, after } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { createServer, type Server } from 'node:http';
 import { DatabaseSync } from 'node:sqlite';
 import Fastify from 'fastify';
 import { getFeed, closePersonalDb, FeedInputError } from '../../src/personalization/feed.js';
@@ -12,13 +11,10 @@ import { setCardRenderer } from '../../src/personalization/render.js';
 import { parseFeed, setRssFetch, isPrivateIp, normalizeSource } from '../../src/personalization/rss.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'phrog-rss-'));
-const TOKEN = 'test-token-not-real';
 const HUB = 'http://127.0.0.1:1200';
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64');
 let n = 0;
 let dbPath = '';
-let jevServer: Server;
-let jevCalls: any[] = [];
 let rendered: { author: string | null; imageUrl: string | null }[] = [];
 
 const RSS = (count: number, extra = '') => `<?xml version="1.0"?><rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:media="http://search.yahoo.com/mrss/">
@@ -49,26 +45,8 @@ const fakeFetch = (async (url: any) => {
 const publicResolve = async (h: string) => (h === 'evil.example' ? ['10.0.0.5'] : h === 'mixed.example' ? ['93.184.216.34', '127.0.0.1'] : ['93.184.216.34']);
 
 before(async () => {
-  jevServer = createServer((req, res) => {
-    let body = '';
-    req.on('data', (c) => (body += c));
-    req.on('end', () => {
-      const b = JSON.parse(body);
-      jevCalls.push(b);
-      const great = String(b.state.post.caption).includes('great');
-      const probs = great ? { 0: 0, 1: 0.1, 2: 0.2, 3: 0.7 } : { 0: 0.8, 1: 0.1, 2: 0.1, 3: 0 };
-      res.setHeader('content-type', 'application/json');
-      res.end(JSON.stringify({ model: 'typesafe/jev-test-1', usage: { cost: 0.01 }, answers: { match: { type: 'score', score: 1, probabilities: probs, confidence: 0.9 }, engage: { type: 'noul', noul: 0.5 } } }));
-    });
-  });
-  await new Promise<void>((r) => jevServer.listen(0, '127.0.0.1', r));
-  process.env.PHROG_JEV_URL = `http://127.0.0.1:${(jevServer.address() as any).port}/decisions`;
-  process.env.OPENROUTER_API_KEY = 'fake-key-not-real';
-  process.env.PHROG_PERSONAL_TOKEN = TOKEN;
   process.env.PHROG_RSSHUB_URL = HUB;
   process.env.PHROG_PERSONAL_ARTIFACTS_DIR = join(dir, 'artifacts');
-  process.env.PHROG_TASTE_FILE = join(dir, 'taste.md');
-  writeFileSync(process.env.PHROG_TASTE_FILE, 'likes jazz');
 });
 beforeEach(() => {
   closePersonalDb();
@@ -76,12 +54,11 @@ beforeEach(() => {
   process.env.PHROG_PERSONAL_DB = dbPath;
   routes = { [`${HUB}/venue/news`]: { body: RSS(5) } };
   fetchLog = [];
-  jevCalls = [];
   rendered = [];
   setRssFetch(fakeFetch, publicResolve);
   setCardRenderer(async (cards) => { rendered.push(...cards.map((c) => ({ author: c.author, imageUrl: c.imageUrl }))); return cards.map(() => ({ png: PNG, width: 1, height: 1 })); });
 });
-after(() => { closePersonalDb(); setRssFetch(null); setCardRenderer(null); jevServer.close(); rmSync(dir, { recursive: true, force: true }); });
+after(() => { closePersonalDb(); setRssFetch(null); setCardRenderer(null); rmSync(dir, { recursive: true, force: true }); });
 
 const q = (sql: string) => { const d = new DatabaseSync(dbPath); const r = d.prepare(sql).all() as any[]; d.close(); return r; };
 const rss = (extra: object = {}) => getFeed({ provider: 'rss', source: '/venue/news', ...extra });
@@ -256,33 +233,18 @@ test('empty feed is end with no items', async () => {
   assert.equal(f.items.length, 0);
 });
 
-test('filter jev: scores titles, filters, renders a card from title/summary/image, and stays idempotent', async () => {
-  const f = await rss({ limit: 5, filter: 'jev' });
-  assert.equal(f.items.length, 1);
-  const it = f.items[0] as any;
-  assert.match(it.caption, /^great jazz & blues night/);
-  assert.deepEqual(it.filter, { passed: true, reason: 'above_threshold' });
-  assert.equal(it.prediction.p_match, 0.9);
-  assert.match(it.render.screenshot, /^\/api\/personal\/artifacts\/art_/);
-  assert.equal(f.filtered_out, 4);
-  assert.equal(jevCalls.length, 5);
-  assert.equal(jevCalls[0].state.post.author, 'Venue Staff');
-  assert.equal(jevCalls[0].state.post.type, 'article');
-  assert.deepEqual(rendered, [{ author: 'Venue Staff', imageUrl: 'https://venue.example/img/1.jpg' }]);
-  const again = await rss({ limit: 5, filter: 'jev' });
-  assert.equal(again.items.length, 1);
-  assert.equal(jevCalls.length, 5); // cached
-  assert.equal(q('SELECT * FROM artifacts').length, 1);
-  const paged = await rss({ limit: 2, filter: 'jev', include_filtered: true });
-  const next = await rss({ limit: 2, filter: 'jev', include_filtered: true, cursor: paged.next_cursor });
-  assert.equal(next.items.length, 2);
-  assert.ok(next.items.every((i: any) => i.prediction && i.filter.passed === false));
+test('unranked RSS feed retains source order and can render screenshots', async () => {
+  const f = await rss({ limit: 5, screenshots: true });
+  assert.equal(f.items.length, 5);
+  assert.match(f.items[0].caption, /^great jazz/);
+  assert.match((f.items[0] as any).render.screenshot, /^\/api\/personal\/artifacts\/art_/);
+  assert.equal(f.filtered_out, 0);
 });
 
 test('REST: provider=rss with source and no account; invalid source is 400', async () => {
   const app = Fastify();
   registerPersonalRoutes(app);
-  const headers = { authorization: `Bearer ${TOKEN}` };
+  const headers = {};
   const ok = await app.inject({ method: 'GET', url: '/api/personal/feed?provider=rss&source=%2Fvenue%2Fnews&limit=2', headers });
   assert.equal(ok.statusCode, 200);
   assert.equal(ok.json().items.length, 2);
