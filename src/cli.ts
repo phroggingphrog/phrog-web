@@ -2,7 +2,6 @@
 import { parseArgs } from 'node:util';
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
-import { loadConfig, personalConfig } from './config.js';
 
 const USAGE = `phrog-web <command> [options]
   search <query> [--mode quick|academic|live] [--limit N]
@@ -15,15 +14,8 @@ const USAGE = `phrog-web <command> [options]
   books <query> [--limit N]
   transcript <url> [--lang xx]
   agent <url> "<goal>" [--schema ...]
-  feed instagram --account <name> [--limit N] [--cursor C] [--filter jev] [--include-filtered] [--order feed|predicted] [--exploration 0..1]
-  feed rss --source </rsshub/route|https://feed.url> [--limit N] [--cursor C] [--filter jev] [--include-filtered] [--order feed|predicted] [--exploration 0..1]
-  feed decide <item_id> --decision interesting|not_interesting|send_to_owner|save_event [--reason "..."] [--key K]
-                                                         (feed commands need PHROG_PERSONAL_TOKEN)
-  personal import [--source social|music|activity|media|all] [--dry-run]   (local; reads PHROG_IMPORT_*_DB read-only)
-  personal preferences [--rebuild]                       (local; Beta-posterior preference model, summary and rules)
-  personal evaluate [--json]                             (local; chronological Brier / log loss of the stats model, counts only)
-  personal discover [--intent "..."] [--days N] [--near place] [--radius-km N] [--limit N]
-  personal feedback <item_id|delivery_id> --type like|dislike|save|not_now|too_far|too_expensive|want_to_go|shown [--scope this_time|item|creator|topic|venue] [--reason "..."] [--key K]
+  feed instagram --account <name> [--limit N] [--cursor C]
+  feed rss --source </rsshub/route|https://feed.url> [--limit N] [--cursor C]
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
         --out <path>  write full result there (default ./phrog-web-out/<cmd>-<ts>.<ext>)
         --stdout      print full output     --json  print raw JSON`;
@@ -34,7 +26,7 @@ const { values: v, positionals: pos } = parseArgs({
     url: { type: 'string' }, out: { type: 'string' }, stdout: { type: 'boolean' }, json: { type: 'boolean' },
     mode: { type: 'string' }, limit: { type: 'string' }, format: { type: 'string' },
     'max-pages': { type: 'string' }, depth: { type: 'string' }, schema: { type: 'string' },
-    sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' }, filter: { type: 'string' }, 'include-filtered': { type: 'boolean' }, order: { type: 'string' }, exploration: { type: 'string' },
+    sources: { type: 'string' }, source: { type: 'string' }, 'dry-run': { type: 'boolean' }, account: { type: 'string' }, cursor: { type: 'string' },
     intent: { type: 'string' }, days: { type: 'string' }, near: { type: 'string' }, 'radius-km': { type: 'string' }, rebuild: { type: 'boolean' }, scope: { type: 'string' },
     decision: { type: 'string' }, reason: { type: 'string' }, key: { type: 'string' }, type: { type: 'string' }, lang: { type: 'string' }, help: { type: 'boolean', short: 'h' },
   },
@@ -42,67 +34,6 @@ const { values: v, positionals: pos } = parseArgs({
 
 const base = (v.url || process.env.PHROG_WEB_URL || 'http://127.0.0.1:8890').replace(/\/$/, '');
 const die = (msg: string): never => { console.error(msg); process.exit(1); };
-
-if (pos[0] === 'personal' && pos[1] === 'preferences') {
-  loadConfig();
-  const { personalPreferences } = await import('./personalization/preferences.js');
-  const r: any = personalPreferences({ action: v.rebuild ? 'rebuild' : 'get' });
-  if (v.json) console.log(JSON.stringify(r));
-  else if (r.rebuilt) console.log(`rebuilt: summary ${r.length} chars, version ${r.version}\n` + Object.entries(r.counts as Record<string, { long: number; recent: number }>).map(([k, c]) => `  ${k}: ${c.long} long, ${c.recent} recent`).join('\n'));
-  else console.log(r.summary ? `${r.summary.text}\n\n(version ${r.summary.version}, ${r.summary.length} chars, computed ${r.summary.computed_at}; ${r.rules.length} active rules)` : 'no summary yet: run with --rebuild');
-  process.exit(0);
-}
-if (pos[0] === 'personal' && pos[1] === 'evaluate') {
-  loadConfig();
-  const { evaluate, formatEvaluate } = await import('./personalization/stats/evaluate.js');
-  const { personalDb } = await import('./personalization/feed.js');
-  const r = evaluate(personalDb());
-  console.log(v.json ? JSON.stringify(r) : formatEvaluate(r));
-  process.exit(0);
-}
-if (pos[0] === 'personal' && (pos[1] === 'discover' || pos[1] === 'feedback')) {
-  loadConfig();
-  const token = personalConfig().token;
-  if (!token) die('personal: PHROG_PERSONAL_TOKEN is not set');
-  const headers = { authorization: `Bearer ${token}` };
-  let data: any;
-  if (pos[1] === 'discover') {
-    data = await call('POST', '/api/personal/discover', {
-      intent: v.intent, limit: v.limit ? Number(v.limit) : undefined, client: 'cli',
-      constraints: { days: v.days ? Number(v.days) : undefined, near: v.near, radius_km: v['radius-km'] ? Number(v['radius-km']) : undefined },
-    }, undefined, headers);
-  } else {
-    if (!pos[2] || !v.type) die('personal feedback: <item_id|delivery_id> and --type are required');
-    const id = pos[2]!;
-    data = await call('POST', '/api/personal/feedback', {
-      type: v.type, scope: v.scope, reason: v.reason, idempotency_key: v.key,
-      ...(id.startsWith('dlv_') ? { delivery_id: id } : { item_id: id }),
-    }, undefined, headers);
-  }
-  if (v.json) console.log(JSON.stringify(data));
-  else if (pos[1] === 'feedback') console.log(data.type === 'shown' ? `shown: ${data.updated} deliveries updated` : `${data.type} (${data.scope}, ${data.effect}) for ${data.item_id}${data.duplicate ? ' (already recorded)' : ''}`);
-  else {
-    console.log(`discover ${data.run_id}: ${data.status}, ${data.items.length} items, ${data.counts.with_exact_date} with a date, cost $${data.cost_usd}${data.failed_sources.length ? `, ${data.failed_sources.length} failed sources` : ''}`);
-    for (const it of data.items) console.log(`${it.rank}. ${it.title} | ${it.starts_at ?? 'date unknown'} | ${it.venue ?? 'venue unknown'} | ${it.url}\n   ${it.reason} [${it.delivery_id}]`);
-  }
-  process.exit(0);
-}
-if (pos[0] === 'personal') {
-  if (pos[1] !== 'import') die('personal: use import, preferences, evaluate, discover or feedback\n\n' + USAGE);
-  loadConfig();
-  const { SOURCES, runImport, formatImport } = await import('./personalization/imports/index.js');
-  const { importConfig } = await import('./config.js');
-  const { openPersonalDb } = await import('./personalization/db/index.js');
-  const want = v.source ?? 'all';
-  if (want !== 'all' && !(SOURCES as readonly string[]).includes(want)) die(`personal import: --source must be one of ${SOURCES.join('|')}|all`);
-  const cfg = importConfig();
-  const db = openPersonalDb(personalConfig().dbPath);
-  const results = await runImport(db, cfg.paths, want === 'all' ? [...SOURCES] : [want as (typeof SOURCES)[number]], { accountMap: cfg.accountMap, learnActions: cfg.learnActions }, !!v['dry-run']);
-  db.close();
-  console.log(v.json ? JSON.stringify(results) : formatImport(results));
-  process.exit(results.some((r) => r.status === 'failed') ? 1 : 0);
-}
-
 
 async function call(method: 'GET' | 'POST', path: string, body?: unknown, params?: Record<string, string | undefined>, headers?: Record<string, string>): Promise<any> {
   const u = new URL(base + path);
@@ -194,20 +125,9 @@ async function run(): Promise<{ data: any; ext: 'json' | 'md' }> {
       return { data: await call('POST', '/api/agent', { url: a[0], goal: a.slice(1).join(' '), schema: v.schema ? schemaArg(v.schema) : undefined }), ext: 'json' };
     }
     case 'feed': {
-      if (a[0] !== 'instagram' && a[0] !== 'rss' && a[0] !== 'decide') die('feed: provider must be "instagram" or "rss" (or use "feed decide")\n\n' + USAGE);
-      loadConfig();
-      const token = personalConfig().token;
-      if (!token) die('feed: PHROG_PERSONAL_TOKEN is not set');
-      const headers = { authorization: `Bearer ${token}` };
-      if (a[0] === 'decide') {
-        if (!a[1] || !v.decision) die('feed decide: <item_id> and --decision are required');
-        return { data: await call('POST', '/api/personal/feed/decide', { item_id: a[1], decision: v.decision, reason: v.reason, idempotency_key: v.key, client: 'cli' }, undefined, headers), ext: 'json' };
-      }
+      if (a[0] !== 'instagram' && a[0] !== 'rss') die('feed: provider must be instagram or rss');
       if (a[0] === 'rss' ? !v.source : !v.account) die(a[0] === 'rss' ? 'feed rss: --source is required' : 'feed: --account is required');
-      return { data: await call('GET', '/api/personal/feed', undefined, {
-        provider: a[0], account: v.account, source: v.source, limit: v.limit, cursor: v.cursor, filter: v.filter,
-        include_filtered: v['include-filtered'] ? 'true' : undefined, order: v.order, exploration: v.exploration,
-      }, headers), ext: 'json' };
+      return { data: await call('GET', '/api/personal/feed', undefined, { provider: a[0], account: v.account, source: v.source, limit: v.limit, cursor: v.cursor }), ext: 'json' };
     }
     default:
       return die(USAGE);
@@ -218,7 +138,6 @@ if (v.help || pos.length === 0) { console.log(USAGE); process.exit(pos.length ==
 const { data, ext } = await run();
 const text = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
 if (v.json) { console.log(JSON.stringify(data)); process.exit(0); }
-if (pos[0] === 'feed' && pos[1] === 'decide') { console.log(`decision ${data.decision} for ${data.item_id}${data.duplicate ? ' (already recorded)' : ''}`); process.exit(0); }
 if (pos[0] === 'feed') {
   console.log(`feed ${data.provider}/${data.account}: status ${data.status}${data.error ? ` (${data.error})` : ''}, ${data.items.length} posts${data.filtered_out ? `, ${data.filtered_out} filtered out` : ''}`);
   for (const it of data.items) {

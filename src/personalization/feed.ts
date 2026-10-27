@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { DatabaseSync } from 'node:sqlite';
 import { personalConfig } from '../config.js';
 import { openPersonalDb } from './db/index.js';
-import { applyJev, renderFeedItems } from './filter.js';
+import { renderFeedItems } from './filter.js';
 import { ACCOUNT_RE, CURSOR_RE, runCollector, type CollectorResult } from './collector.js';
 import { normalizeSource, readFeed } from './rss.js';
 
@@ -14,12 +14,7 @@ export interface FeedRequest {
   source?: string;
   limit?: number;
   cursor?: string | null;
-  filter?: 'jev';
   screenshots?: boolean;
-  include_filtered?: boolean;
-  order?: 'feed' | 'predicted';
-  /** 0..1: chance a post below the threshold is let through anyway. Default 0. */
-  exploration?: number;
 }
 
 const MAX_LIMIT = 50;
@@ -74,12 +69,7 @@ export async function getFeed(req: FeedRequest) {
   }
   const limit = req.limit ?? DEFAULT_LIMIT;
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) throw new FeedInputError(`limit must be an integer 1..${MAX_LIMIT}`);
-  if (req.filter !== undefined && req.filter !== 'jev') throw new FeedInputError('filter must be "jev"');
-  const order = req.order ?? 'feed';
-  if (order !== 'feed' && order !== 'predicted') throw new FeedInputError('order must be "feed" or "predicted"');
-  if (order === 'predicted' && req.filter !== 'jev') throw new FeedInputError('order "predicted" needs filter "jev"');
-  const exploration = req.exploration ?? 0;
-  if (typeof exploration !== 'number' || !(exploration >= 0 && exploration <= 1)) throw new FeedInputError('exploration must be a number 0..1');
+  if (['filter', 'include_filtered', 'order', 'exploration'].some((key) => key in req)) throw new FeedInputError('Feed ranking and filtering are no longer supported');
   const given = req.cursor || null;
   if (given !== null && !CURSOR_RE.test(given)) throw new FeedInputError('cursor has invalid characters or length');
 
@@ -213,14 +203,7 @@ export async function getFeed(req: FeedRequest) {
     d.exec('COMMIT');
   } catch (e) { d.exec('ROLLBACK'); throw e; }
 
-  let shown = out;
-  let filteredOut = 0;
-  if (!req.filter && req.screenshots) await renderFeedItems(d, out);
-  if (req.filter === 'jev' && out.length) {
-    const r = await applyJev(d, runId, out, { includeFiltered: req.include_filtered === true, order, exploration });
-    shown = r.items;
-    filteredOut = r.filteredOut;
-  }
+  if (req.screenshots) await renderFeedItems(d, out);
 
   return {
     schema_version: 'feed.v1',
@@ -228,8 +211,8 @@ export async function getFeed(req: FeedRequest) {
     status: res.status, fetched_at: fetchedAt,
     cursor: given, next_cursor: (isRss ? rssNext : res.next_cursor) ? runId : null,
     ...(res.error ? { error: res.error } : {}),
-    filtered_out: filteredOut,
-    items: shown,
+    filtered_out: 0,
+    items: out,
   };
 }
 

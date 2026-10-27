@@ -11,7 +11,6 @@ import { getFeed, closePersonalDb, FeedInputError } from '../../src/personalizat
 import { splitCommand } from '../../src/personalization/collector.js';
 import { openPersonalDb } from '../../src/personalization/db/index.js';
 import { registerPersonalRoutes } from '../../src/personalization/routes.js';
-import { checkBearer } from '../../src/personalization/auth.js';
 import { createMcpServer } from '../../src/adapters/mcp/server.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'phrog-personal-'));
@@ -30,7 +29,6 @@ const counts = () => {
 
 before(() => {
   process.env.PHROG_PERSONAL_DB = dbPath;
-  process.env.PHROG_PERSONAL_TOKEN = TOKEN;
   process.env.PHROG_IG_COLLECTOR_CMD = `${process.execPath} ${fake}`;
   process.env.FAKE_ARGS_FILE = argsFile;
   process.env.PHROG_IG_COLLECTOR_TIMEOUT_S = '30';
@@ -139,26 +137,16 @@ test('splitCommand handles quotes', () => {
   assert.deepEqual(splitCommand(`ssh h "python3 a b" 'c d'`), ['ssh', 'h', 'python3 a b', 'c d']);
 });
 
-test('REST: 401 without token, 401 wrong token, 200 with token', async () => {
+test('REST: public feed retains source order and rejects removed ranking options', async () => {
   const app = Fastify();
   registerPersonalRoutes(app);
   const url = '/api/personal/feed?provider=instagram&account=owner_two&limit=3';
-  assert.equal((await app.inject({ method: 'GET', url })).statusCode, 401);
-  assert.equal((await app.inject({ method: 'GET', url, headers: { authorization: 'Bearer wrong' } })).statusCode, 401);
-  const ok = await app.inject({ method: 'GET', url, headers: { authorization: `Bearer ${TOKEN}` } });
+  const ok = await app.inject({ method: 'GET', url });
   assert.equal(ok.statusCode, 200);
   assert.equal(ok.json().items.length, 3);
-  assert.equal((await app.inject({ method: 'GET', url: '/api/personal/feed?account=bad%20name', headers: { authorization: `Bearer ${TOKEN}` } })).statusCode, 400);
-  delete process.env.PHROG_PERSONAL_TOKEN;
-  assert.equal((await app.inject({ method: 'GET', url, headers: { authorization: `Bearer ${TOKEN}` } })).statusCode, 503);
-  process.env.PHROG_PERSONAL_TOKEN = TOKEN;
+  assert.equal((await app.inject({ method: 'GET', url: url + '&filter=jev' })).statusCode, 400);
+  assert.equal((await app.inject({ method: 'GET', url: '/api/personal/feed?account=bad%20name' })).statusCode, 400);
   await app.close();
-});
-
-test('checkBearer', () => {
-  assert.equal(checkBearer(`Bearer ${TOKEN}`), 'ok');
-  assert.equal(checkBearer(undefined), 'unauthorized');
-  assert.equal(checkBearer('Bearer nope'), 'unauthorized');
 });
 
 async function mcpClient(ctx: { personalAuthorized?: boolean }) {
@@ -169,17 +157,14 @@ async function mcpClient(ctx: { personalAuthorized?: boolean }) {
   return client;
 }
 
-test('MCP: feed without auth returns auth-required, anonymous tools still listed; with auth works', async () => {
-  const anon = await mcpClient({});
-  const tools = (await anon.listTools()).tools.map((t) => t.name);
-  assert.ok(tools.includes('quick_search') && tools.includes('web_search') && tools.includes('feed'));
-  const r: any = await anon.callTool({ name: 'feed', arguments: { account: 'owner_one', limit: 3 } });
-  assert.equal(r.isError, true);
-  assert.match(r.content[0].text, /auth_required/);
-  const authed = await mcpClient({ personalAuthorized: true });
-  const ok: any = await authed.callTool({ name: 'feed', arguments: { account: 'owner_one', limit: 3 } });
-  assert.notEqual(ok.isError, true);
-  assert.equal(JSON.parse(ok.content[0].text).schema_version, 'feed.v1');
+test('MCP: public feed is listed and works without a token', async () => {
+  const client = await mcpClient({});
+  const tools = (await client.listTools()).tools.map((t) => t.name);
+  assert.ok(tools.includes('quick_search') && tools.includes('browse') && tools.includes('feed'));
+  assert.ok(!tools.includes('personal_discover') && !tools.includes('personal_preferences'));
+  const r: any = await client.callTool({ name: 'feed', arguments: { account: 'owner_one', limit: 3, screenshots: false } });
+  assert.notEqual(r.isError, true);
+  assert.equal(JSON.parse(r.content[0].text).schema_version, 'feed.v1');
 });
 
 test('run log for personal calls holds no captions or token', () => {

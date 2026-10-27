@@ -1,6 +1,6 @@
 # Phrog Web
 
-A TypeScript gateway for web search, page extraction, research and personal discovery. Clients use REST, streamable HTTP MCP or stdio MCP.
+A TypeScript gateway for web search, page extraction, research and feeds. Clients use REST, streamable HTTP MCP or stdio MCP.
 
 ## Requirements and setup
 
@@ -33,11 +33,9 @@ curl -fsS http://127.0.0.1:8890/api/fetch \
 
 Search uses SearXNG and TinyFish. Fetch supports plain extraction, rendered pages and document conversion. Research supports Vane and Feynman. Additional providers cover repositories, media, books, social content and places; a provider being implemented does not establish that its credentials or upstream service work on a given deployment.
 
-## Personal discovery
+## Feeds
 
-One owner can use multiple source accounts. The gateway implements feeds, ranked discovery, decisions, feedback, recently shown items and preference modelling. MCP tools include `feed`, `feed_decide`, `personal_discover`, `personal_feedback`, `personal_recent` and `personal_preferences`. RSS/Atom/JSON Feed sources are supported.
-
-Configure the owner token with `PHROG_PERSONAL_TOKEN`. Personal REST routes live under `/api/personal/`; see `src/personalization/routes.ts` for authorization and request shapes. Existing source databases are read in place; use a consistent SQLite backup before deployment or migration.
+The `feed` tool and `/api/personal/feed` provide Instagram and RSS feeds in source order, without preference scoring or ranking. Instagram requires a configured collector account; RSS supports RSSHub and public feeds. Feed artifacts and stored items are accessible through the gateway, so deploy behind an appropriate access boundary when using private sources.
 
 ## Verification
 
@@ -47,7 +45,7 @@ pnpm test:personal
 curl -fsS http://127.0.0.1:8890/health
 ```
 
-The personal tests do not cover every upstream provider. Verify the intended MCP client, persistent data, restart behaviour and required credential-backed sources before release.
+The feed tests do not cover every upstream provider. Verify the intended MCP client, persistent data, restart behaviour and required credential-backed sources before release.
 
 ## Deployment
 
