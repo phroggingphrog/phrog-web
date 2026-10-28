@@ -95,8 +95,10 @@ export class WikiDatabase {
       } catch {}
     }
 
-    scored.sort((a, b) => b.similarity - a.similarity);
-    return scored.slice(0, limit);
+    return scored
+      .filter((item) => item.similarity > 0)
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, limit);
   }
 
   close() {
