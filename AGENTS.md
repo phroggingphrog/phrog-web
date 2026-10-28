@@ -55,3 +55,8 @@ node dist/adapters/mcp/server.js
 
 ## 4. Verification Check
 Use checks proportional to the changed behavior. TypeScript changes require the relevant type/build check; questions and documentation-only changes do not require a build or live health check. Before a deployment claim, trace the owner-facing gateway and loaded revision, then exercise the requested action; `/health` proves health only. Commit only this task’s reviewed files when committing, preserving unrelated work. Follow the shared limit of three check/fix rounds.
+
+## Cursor Cloud specific instructions
+- The gateway is already started on boot at `http://127.0.0.1:8890` when `/health` is down. Check `GET /health` before starting another process on that port.
+- Environment install runs `pnpm install --frozen-lockfile`, then `npm ci` and `npm run build` in `engines/feynman`, then `pnpm build`. Do not run `pnpm setup` here: it requires an interactive terminal and only prompts for optional provider keys. Wiki save/search and plain `/api/fetch` work without those keys.
+- `pnpm test:personal` is the automated check. `node dist/cli.js` talks to the local gateway.
