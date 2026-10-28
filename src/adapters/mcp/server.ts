@@ -707,7 +707,7 @@ server.tool('run_log', 'Recent phrog-web run-log records (MCP and REST calls: du
 }, safe(({ limit, tool }: any) => recentRuns(limit, tool)));
 
 // Compat tools: same names/args/defaults as the old Python `web` MCP.
-server.tool('web_search', 'Search the self-hosted SearXNG metasearch instance. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news", "images". Local-intent queries ("near me", "best cafe") get the saved location or `near` added.', {
+server.tool('web_search', 'Search the shared multi-engine provider with fused ranked results. time_range: day|week|month|year. language: e.g. "en". categories: e.g. "science", "it", "news", "images". Local-intent queries ("near me", "best cafe") get the saved location or `near` added.', {
   query: z.string(), limit: z.number().int().default(5), time_range: z.string().nullable().default(null),
   language: z.string().nullable().default(null), categories: z.string().nullable().default(null),
   near: z.string().nullable().default(null),
