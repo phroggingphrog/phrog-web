@@ -7,13 +7,16 @@ Reads the Instagram home timeline from the logged-in Chrome on the Hermes VM, wi
 - `ig_timeline.py` - wrapper: lock, busy check, account switch (via existing `igswitch.py` only if `~/.opencli/ig-current` differs), status mapping, JSON output.
 - `fixtures/` - synthetic outputs (`sample-ok`, `sample-auth_required`, `sample-end`).
 
-## Install (VM `phrog@HERMES_HOST`)
-    scp timeline.js phrog@HERMES_HOST:~/.opencli/clis/instagram/timeline.js
-    scp ig_timeline.py phrog@HERMES_HOST:~/.opencli/ig_timeline.py
-    ssh phrog@HERMES_HOST 'chmod +x ~/.opencli/ig_timeline.py'
+## Install
+
+Set `HERMES_SSH` to your existing SSH destination (user and host, or an SSH config alias); keep the value in your local environment.
+
+    scp timeline.js "$HERMES_SSH":~/.opencli/clis/instagram/timeline.js
+    scp ig_timeline.py "$HERMES_SSH":~/.opencli/ig_timeline.py
+    ssh "$HERMES_SSH" 'chmod +x ~/.opencli/ig_timeline.py'
 
 ## Run (from the phrog-web host)
-    ssh phrog@HERMES_HOST 'python3 ~/.opencli/ig_timeline.py --account ykswrdn [--limit 12] [--cursor C]'
+    ssh "$HERMES_SSH" 'python3 ~/.opencli/ig_timeline.py --account YOUR_ACCOUNT [--limit 12] [--cursor C]'
 
 One JSON object on stdout, exit 0 for every status: `ok|end|auth_required|challenge|rate_limited|busy|unsupported|failed`. Fields: see `fixtures/sample-ok.json`.
 
@@ -27,4 +30,4 @@ One JSON object on stdout, exit 0 for every status: `ok|end|auth_required|challe
 - Account switch restarts the shared Chrome (existing `igswitch.py` behaviour).
 
 ## Undo
-    ssh phrog@HERMES_HOST 'rm ~/.opencli/clis/instagram/timeline.js ~/.opencli/ig_timeline.py; rm -f ~/.cache/phrog-web/ig-browser.lock'
+    ssh "$HERMES_SSH" 'rm ~/.opencli/clis/instagram/timeline.js ~/.opencli/ig_timeline.py; rm -f ~/.cache/phrog-web/ig-browser.lock'
