@@ -1,0 +1,4 @@
+schema: spec-driven
+created: 2026-10-29
+goal: Share the Phrog Web search core over MCP and authenticated HTTP while
+  preserving discovery features

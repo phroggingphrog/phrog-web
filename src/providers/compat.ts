@@ -4,7 +4,7 @@ import { readFileSync, existsSync } from 'node:fs';
 import { executeSearch } from './search.js';
 import { call } from './vault.js';
 
-const TIME_RANGES = ['day', 'week', 'month', 'year'];
+const TIME_RANGES = ['day', 'week', 'month', 'year'] as const;
 /** Image engines that return icons or museum art, which drown out product photos. */
 export const NOISY_IMAGE_ENGINES = new Set(['lucide', 'artic', 'iconify', 'svgrepo', 'openclipart']);
 
@@ -12,29 +12,15 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
   const query = a.query.trim();
   if (!query) throw new Error('query must not be empty');
   const limit = Math.max(1, Math.min(Math.trunc(a.limit ?? 5), 20));
-  if (a.time_range && !TIME_RANGES.includes(a.time_range)) throw new Error(`time_range must be one of ${JSON.stringify(TIME_RANGES)}`);
-  const p = new URLSearchParams({ q: query, format: 'json' });
-  if (a.time_range) p.set('time_range', a.time_range);
-  if (a.language) p.set('language', a.language);
-  if (a.categories) p.set('categories', a.categories);
-  let err: unknown;
-  try {
-    const res = await fetch(`${(process.env.SEARXNG_URL || 'http://127.0.0.1:8888').replace(/\/$/, '')}/search?${p}`, { headers: { Accept: 'application/json' }, signal: AbortSignal.timeout(20000) });
-    if (!res.ok) throw new Error(`SearXNG HTTP ${res.status}`);
-    const raw: any[] = ((await res.json()) as any).results ?? [];
-    const images = /\bimages\b/.test(a.categories ?? '');
-    const results = raw.filter((r) => r?.url && !(images && NOISY_IMAGE_ENGINES.has(r.engine))).slice(0, limit).map((r) => ({
-      title: String(r.title || r.url), url: String(r.url), snippet: String(r.content || r.snippet || ''),
-      published_date: String(r.publishedDate || r.published_at || '') || null, engines: (r.engines ?? []).map(String),
-      ...(r.img_src && { image: String(r.img_src).replace(/^\/\//, 'https://'), thumbnail: r.thumbnail_src ? String(r.thumbnail_src).replace(/^\/\//, 'https://') : undefined }),
-    }));
-    if (results.length) return { query, results, count: results.length, provider: 'searxng' };
-  } catch (e) { err = e; }
-  try {
-    const fb = await executeSearch(query, { mode: 'quick', limit });
-    const results = fb.results.map((r) => ({ title: r.title || r.url, url: r.url, snippet: r.snippet, published_date: null, engines: [r.engine ?? fb.provider_used] }));
-    return { query, results, count: results.length, provider: fb.provider_used };
-  } catch (e) { throw err ?? e; }
+  if (a.time_range && !(TIME_RANGES as readonly string[]).includes(a.time_range)) throw new Error(`time_range must be one of ${JSON.stringify(TIME_RANGES)}`);
+  const timeRange = a.time_range && TIME_RANGES.includes(a.time_range as (typeof TIME_RANGES)[number]) ? a.time_range as (typeof TIME_RANGES)[number] : undefined;
+  const response = await executeSearch(query, { mode: 'quick', limit, timeRange, categories: a.categories ? a.categories.split(',').map((category) => category.trim()).filter(Boolean) : undefined, language: a.language ?? undefined });
+  const images = /\bimages\b/.test(a.categories ?? '');
+  const results = response.results.filter((r) => r.url && !(images && (r.engine ?? '').split(',').some((engine) => NOISY_IMAGE_ENGINES.has(engine)))).map((r) => ({
+    title: r.title || r.url, url: r.url, snippet: r.snippet, published_date: null, engines: r.engine ? r.engine.split(',') : [response.provider_used],
+    ...(r.image ? { image: r.image, thumbnail: r.thumbnail } : {}),
+  }));
+  return { query, results, count: results.length, provider: response.provider_used, contributingEngines: response.contributingEngines, failures: response.failures };
 }
 
 // Feynman MCP runs deep research jobs one at a time.

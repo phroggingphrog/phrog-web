@@ -38,7 +38,15 @@ export interface SearchResponse {
   provider_used: string;
   total: number;
   envelope?: Record<string, unknown>;
+  contributingEngines?: string[];
+  failures?: { engine: string; error: string }[];
 }
+
+const engineCooldowns = new Map<string, number>();
+const searchCache = new Map<string, { expires: number; value: SearchResponse }>();
+const CACHE_TTL_MS = 30_000;
+const CACHE_MAX_ENTRIES = 100;
+const RRF_K = 60;
 
 async function searchSearxng(query: string, options: SearchOptions): Promise<{ results: SearchResult[]; envelope?: Record<string, unknown> }> {
   const config = loadConfig();
@@ -236,35 +244,55 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
     pipeline = config.search.pipeline;
   }
 
-  const errors: string[] = [];
+  const limit = Math.max(1, Math.min(50, Number.isFinite(options.limit) ? Math.floor(options.limit!) : 15));
+  const cacheKey = JSON.stringify([query.trim(), { ...options, limit, provider: pipeline.join(',') }]);
+  const cached = searchCache.get(cacheKey);
+  if (cached && cached.expires > Date.now()) return { ...cached.value, results: cached.value.results.slice(0, limit) };
+  if (cached) searchCache.delete(cacheKey);
 
-  for (const provider of pipeline) {
+  const now = Date.now();
+  const eligible = pipeline.filter((id) => !engineCooldowns.has(id) || (engineCooldowns.get(id) ?? 0) <= now);
+  const engines = eligible.length ? eligible : pipeline;
+  const settled = await Promise.all(engines.map(async (engine) => {
     try {
       let results: SearchResult[] = [];
       let envelope: Record<string, unknown> | undefined;
-      if (provider === 'searxng') {
-        ({ results, envelope } = await searchSearxng(query, options));
-      } else if (provider === 'tinyfish') {
-        results = await searchTinyFish(query, options);
-      } else if (provider === 'consensus') {
-        results = await searchConsensus(query, options);
-      } else {
-        throw new Error(`Unknown search provider: ${provider}`);
+      if (engine === 'searxng') {
+        ({ results, envelope } = await searchSearxng(query, { ...options, limit: Math.max(limit, 30) }));
+        results = results.map((item) => ({ ...item, engine: item.engine || engine }));
       }
-
-      if (results.length > 0 || pipeline.length === 1) {
-        return {
-          query,
-          results,
-          provider_used: provider,
-          total: results.length,
-          envelope,
-        };
-      }
+      else if (engine === 'tinyfish') results = await searchTinyFish(query, { ...options, limit: Math.max(limit, 30) });
+      else if (engine === 'consensus') results = await searchConsensus(query, { ...options, limit: Math.max(limit, 30) });
+      else throw new Error(`Unknown search provider: ${engine}`);
+      engineCooldowns.delete(engine);
+      return { engine, results, envelope };
     } catch (err) {
-      errors.push(`${provider}: ${err instanceof Error ? err.message : String(err)}`);
+      engineCooldowns.set(engine, Date.now() + 60_000);
+      return { engine, results: [] as SearchResult[], error: err instanceof Error ? err.message : String(err) };
     }
-  }
+  }));
 
-  throw new Error(`All search providers failed for query "${query}". Errors: ${errors.join('; ')}`);
+  const failures = settled.flatMap((item) =>
+    'error' in item && typeof item.error === 'string' ? [{ engine: item.engine, error: item.error }] : [],
+  );
+  const successful = settled.filter((item) => !('error' in item));
+  if (!successful.length) throw new Error(`All search providers failed for query "${query}". Errors: ${failures.map(({ engine, error }) => `${engine}: ${error}`).join('; ')}`);
+
+  const fused = new Map<string, { result: SearchResult; score: number; engines: Set<string> }>();
+  for (const { engine, results } of successful) {
+    results.forEach((result, index) => {
+      let key = result.url;
+      try { const u = new URL(result.url); u.hash = ''; u.hostname = u.hostname.toLowerCase(); if (u.pathname.length > 1) u.pathname = u.pathname.replace(/\/$/, ''); key = u.toString(); } catch { /* keep provider URL */ }
+      const row = fused.get(key) ?? { result, score: 0, engines: new Set<string>() };
+      row.score += 1 / (RRF_K + index + 1);
+      row.engines.add(result.engine || engine);
+      if (!row.result.snippet && result.snippet) row.result = result;
+      fused.set(key, row);
+    });
+  }
+  const results = [...fused.values()].sort((a, b) => b.score - a.score).slice(0, limit).map(({ result, score, engines: contributing }) => ({ ...result, score, engine: [...contributing].join(',') }));
+  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope: successful.find(({ envelope }) => envelope)?.envelope };
+  if (searchCache.size >= CACHE_MAX_ENTRIES) searchCache.delete(searchCache.keys().next().value!);
+  searchCache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, value: response });
+  return response;
 }

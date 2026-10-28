@@ -2,6 +2,7 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { loadConfig } from './config.js';
 import { executeSearch, SearchOptions } from './providers/search.js';
+import { registerSearchRoute } from './providers/search-route.js';
 import { executeFetch, FetchOptions } from './providers/fetch.js';
 import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
 import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from './providers/github.js';
@@ -68,6 +69,9 @@ fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', versio
 
 registerSearxngCompat(fastify);
 registerPersonalRoutes(fastify);
+
+registerSearchRoute(fastify);
+
 
 fastify.get('/api/search', async (req, reply) => {
   const query = req.query as {
