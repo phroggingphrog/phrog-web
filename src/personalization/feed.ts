@@ -3,7 +3,7 @@ import type { DatabaseSync } from 'node:sqlite';
 import { personalConfig } from '../config.js';
 import { openPersonalDb } from './db/index.js';
 import { renderFeedItems } from './filter.js';
-import { ACCOUNT_RE, CURSOR_RE, runCollector, type CollectorResult } from './collector.js';
+import { CURSOR_RE, type CollectorResult } from './collector.js';
 import { normalizeSource, readFeed } from './rss.js';
 
 export class FeedInputError extends Error {}
@@ -52,30 +52,20 @@ function runStatus(s: CollectorResult['status']): string {
 const RUN_CURSOR_RE = /^run_[0-9a-f-]{36}$/;
 
 export async function getFeed(req: FeedRequest) {
-  if (req.provider !== 'instagram' && req.provider !== 'rss') throw new FeedInputError('provider must be "instagram" or "rss"');
-  const isRss = req.provider === 'rss';
-  let source: string;
-  let account: string;
-  if (isRss) {
-    const norm = normalizeSource(req.source);
-    if (!norm) throw new FeedInputError('source must be an RSSHub route starting with "/" or an http(s) feed URL');
-    source = norm;
-    account = norm; // one source_accounts row per feed
-  } else {
-    if (!ACCOUNT_RE.test(req.account ?? '')) throw new FeedInputError('account must match [A-Za-z0-9._]{1,30}');
-    source = req.source ?? 'home';
-    if (source !== 'home') throw new FeedInputError('source must be "home"');
-    account = req.account!;
-  }
+  if (req.provider !== 'rss') throw new FeedInputError('provider must be "rss"');
+  const isRss = true;
+  const norm = normalizeSource(req.source);
+  if (!norm) throw new FeedInputError('source must be an RSSHub route starting with "/" or an http(s) feed URL');
+  const source = norm;
+  const account = norm; // one source_accounts row per feed
   const limit = req.limit ?? DEFAULT_LIMIT;
   if (!Number.isInteger(limit) || limit < 1 || limit > MAX_LIMIT) throw new FeedInputError(`limit must be an integer 1..${MAX_LIMIT}`);
   if (['filter', 'include_filtered', 'order', 'exploration'].some((key) => key in req)) throw new FeedInputError('Feed ranking and filtering are no longer supported');
   const given = req.cursor || null;
   if (given !== null && !CURSOR_RE.test(given)) throw new FeedInputError('cursor has invalid characters or length');
 
-  const cfg = personalConfig();
   const d = db();
-  // next_cursor is the id of the run that fetched the previous page; the raw Instagram cursor stays in the DB.
+  // next_cursor is the id of the run that fetched the previous page; the stored checkpoint stays in the DB.
   let cursor = given;
   if (given !== null && RUN_CURSOR_RE.test(given)) {
     const row = d.prepare(`SELECT r.next_checkpoint FROM collection_runs r JOIN source_accounts a ON a.id = r.source_account_id
@@ -100,7 +90,7 @@ export async function getFeed(req: FeedRequest) {
     d.prepare('INSERT OR IGNORE INTO source_accounts (id, provider, handle) VALUES (?, ?, ?)').run(`acc_${randomUUID()}`, req.provider, account);
     accountId = (d.prepare('SELECT id FROM source_accounts WHERE provider = ? AND handle = ?').get(req.provider, account) as any).id;
     d.prepare('INSERT INTO collection_runs (id, source_account_id, collector, started_at, checkpoint) VALUES (?, ?, ?, ?, ?)')
-      .run(runId, accountId, isRss ? 'rss' : 'instagram-timeline', startedAt, isRss ? given : cursor);
+      .run(runId, accountId, 'rss', startedAt, isRss ? given : cursor);
     d.exec('COMMIT');
   } catch (e) { d.exec('ROLLBACK'); throw e; }
 
@@ -109,13 +99,11 @@ export async function getFeed(req: FeedRequest) {
   let rssNext: string | null = null;
   if (isRss && rssPage) {
     res = { status: 'ok', cursor: given, next_cursor: null, fetched_at: null, error: null, items: [] };
-  } else if (isRss) {
+  } else {
     const r = await readFeed(source);
     res = { status: r.status, cursor: null, next_cursor: null, fetched_at: r.fetched_at, error: r.error, items: r.items };
     if (r.items.length > limit) rssNext = JSON.stringify({ list: r.items.map((i) => i.native_id), offset: limit });
     if (r.items.length) res.status = rssNext ? 'ok' : 'end';
-  } else {
-    res = await runCollector(cfg.collectorCmd, cfg.collectorTimeoutMs, { account, limit, cursor });
   }
   const fetchedAt = res.fetched_at ?? now();
   const out: any[] = [];
