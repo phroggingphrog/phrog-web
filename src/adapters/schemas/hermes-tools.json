@@ -252,25 +252,20 @@
     "type": "function",
     "function": {
       "name": "feed",
-      "description": "Read Instagram or RSS feeds in source order with optional screenshots.",
+      "description": "Read RSS feeds in source order with optional screenshots.",
       "parameters": {
         "type": "object",
         "properties": {
           "provider": {
             "type": "string",
             "enum": [
-              "instagram",
               "rss"
             ],
-            "default": "instagram"
-          },
-          "account": {
-            "type": "string",
-            "description": "Instagram account name, letters, digits, dot, underscore, max 30 (instagram only)"
+            "default": "rss"
           },
           "source": {
             "type": "string",
-            "description": "instagram: \"home\" (default). rss: an RSSHub route like /youtube/channel/UC... or an http(s) feed URL (required for rss)"
+            "description": "An RSSHub route like /youtube/channel/UC... or an http(s) feed URL (required)"
           },
           "limit": {
             "type": "integer",

@@ -46,7 +46,7 @@ The Phrog process starts its own local engine; concurrent Phrog processes share 
 
 ## Feeds
 
-The `feed` tool and `/api/personal/feed` provide Instagram and RSS feeds in source order, without preference scoring or ranking. Instagram requires a configured collector account; RSS supports RSSHub and public feeds. Feed artifacts and stored items are accessible through the gateway, so deploy behind an appropriate access boundary when using private sources.
+The `feed` tool and `/api/personal/feed` provide RSS feeds (RSSHub routes and public feeds) in source order, without preference scoring or ranking. Feed artifacts and stored items are accessible through the gateway, so deploy behind an appropriate access boundary when using private sources.
 
 ## Verification
 

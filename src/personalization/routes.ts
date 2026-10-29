@@ -9,7 +9,7 @@ export function registerPersonalRoutes(fastify: FastifyInstance) {
     const q = req.query as Record<string, string | undefined>;
     try {
       return await getFeed({
-        provider: q.provider ?? 'instagram',
+        provider: q.provider ?? 'rss',
         account: q.account ?? '',
         source: q.source,
         limit: q.limit !== undefined ? Number(q.limit) : undefined,

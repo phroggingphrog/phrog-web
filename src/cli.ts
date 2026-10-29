@@ -14,7 +14,6 @@ const USAGE = `phrog-web <command> [options]
   books <query> [--limit N]
   transcript <url> [--lang xx]
   agent <url> "<goal>" [--schema ...]
-  feed instagram --account <name> [--limit N] [--cursor C]
   feed rss --source </rsshub/route|https://feed.url> [--limit N] [--cursor C]
 Global: --url <base> (or PHROG_WEB_URL; default http://127.0.0.1:8890)
         --out <path>  write full result there (default ./phrog-web-out/<cmd>-<ts>.<ext>)
@@ -125,9 +124,9 @@ async function run(): Promise<{ data: any; ext: 'json' | 'md' }> {
       return { data: await call('POST', '/api/agent', { url: a[0], goal: a.slice(1).join(' '), schema: v.schema ? schemaArg(v.schema) : undefined }), ext: 'json' };
     }
     case 'feed': {
-      if (a[0] !== 'instagram' && a[0] !== 'rss') die('feed: provider must be instagram or rss');
-      if (a[0] === 'rss' ? !v.source : !v.account) die(a[0] === 'rss' ? 'feed rss: --source is required' : 'feed: --account is required');
-      return { data: await call('GET', '/api/personal/feed', undefined, { provider: a[0], account: v.account, source: v.source, limit: v.limit, cursor: v.cursor }), ext: 'json' };
+      if (a[0] !== 'rss') die('feed: provider must be rss');
+      if (!v.source) die('feed rss: --source is required');
+      return { data: await call('GET', '/api/personal/feed', undefined, { provider: a[0], source: v.source, limit: v.limit, cursor: v.cursor }), ext: 'json' };
     }
     default:
       return die(USAGE);

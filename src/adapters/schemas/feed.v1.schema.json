@@ -21,7 +21,6 @@
     },
     "provider": {
       "enum": [
-        "instagram",
         "rss"
       ]
     },
@@ -30,7 +29,7 @@
     },
     "source": {
       "type": "string",
-      "description": "\"home\" for instagram; for rss an RSSHub route (\"/youtube/channel/UC...\") or an http(s) feed URL"
+      "description": "An RSSHub route (\"/youtube/channel/UC...\") or an http(s) feed URL"
     },
     "status": {
       "enum": [

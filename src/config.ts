@@ -114,12 +114,9 @@ export function personalArtifactsDir(): string {
 }
 
 /** Personal discovery settings, read from the environment at call time. No defaults for secrets. */
-export function personalConfig(): { dbPath: string; collectorCmd: string | null; collectorTimeoutMs: number } {
-  const t = Number(process.env.PHROG_IG_COLLECTOR_TIMEOUT_S);
+export function personalConfig(): { dbPath: string } {
   return {
     dbPath: process.env.PHROG_PERSONAL_DB || fileURLToPath(new URL('../data/personal.db', import.meta.url)),
-    collectorCmd: process.env.PHROG_IG_COLLECTOR_CMD || null,
-    collectorTimeoutMs: (Number.isFinite(t) && t > 0 ? t : 240) * 1000,
   };
 }
 

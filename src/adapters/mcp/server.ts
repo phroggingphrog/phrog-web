@@ -643,10 +643,10 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
 };
 
 
-server.tool('feed', 'Read Instagram or RSS feeds in source order. Instagram requires an available collector account; RSS accepts a public feed URL or configured RSSHub route. Screenshots are attached within the result size budget.', {
+server.tool('feed', 'Read RSS feeds in source order. Accepts a public feed URL or configured RSSHub route. Screenshots are attached within the result size budget.', {
   screenshots: z.boolean().default(true),
-  provider: z.enum(['instagram', 'rss']).default('instagram'),
-  account: z.string().optional(), source: z.string().max(500).optional(),
+  provider: z.enum(['rss']).default('rss'),
+  source: z.string().max(500).optional(),
   limit: z.number().int().min(1).max(50).default(20), cursor: z.string().optional(),
 }, async (a: any) => {
   try {
