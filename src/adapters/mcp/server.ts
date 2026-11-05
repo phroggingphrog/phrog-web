@@ -10,6 +10,7 @@ import { executeQuickResearch, dispatchDeepResearch, getResearchJob, resumeDeepR
 import { keyStatus, keysOverview, setKey, removeKey } from '../../provider-keys.js';
 import { listJars, writeJar, deleteJar, fetchWithProfile } from '../../providers/profiles.js';
 import { createMonitor, listMonitors, checkMonitor } from '../../providers/cookbook.js';
+import { readRunLog, summarizeRuns } from '../../usage.js';
 import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
@@ -809,6 +810,10 @@ server.tool('research_resume', 'Resume an interrupted or failed deep research jo
 server.tool('research_cancel', 'Stop a deep research job and the whole process tree it started. Aborts the Feynman run so it cannot be resumed by accident.', {
   job_id: z.string(),
 }, safe(async (a: { job_id: string }) => cancelDeepResearchJob(a.job_id)));
+
+server.tool('usage', 'What this service can account for over a window: calls, error rate, p50/p95 latency, busiest endpoints and metered browser sessions. Per endpoint, not per client.', {
+  days: z.number().int().min(1).max(365).default(7),
+}, safe(async (a: { days?: number }) => summarizeRuns(readRunLog(), { days: a.days ?? 7 })));
 
 return server;
 }

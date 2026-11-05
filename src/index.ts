@@ -14,7 +14,7 @@ import { setupDone } from './setup.js';
 import { keyStatus, removeKey, setKey, keysOverview } from './provider-keys.js';
 import { checkMonitor, closeBrowserSession, createBrowserSession, createMonitor, listMonitors, parseDocument } from './providers/cookbook.js';
 import { deleteJar, fetchWithProfile, listJars, writeJar } from './providers/profiles.js';
-import { scrape, shotsDir, SCRAPE_FORMATS } from './providers/scrape.js';
+import { scrape, shotsDir } from './providers/scrape.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
@@ -28,6 +28,9 @@ import { createMcpServer } from './adapters/mcp/server.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from './providers/crawl.js';
 import { extract } from './providers/extract.js';
 import { runAgent } from './providers/agent.js';
+import { CAPABILITIES } from './capabilities.js';
+import { buildOpenApi, renderDocsHtml } from './openapi.js';
+import { readRunLog, summarizeRuns } from './usage.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
@@ -36,6 +39,13 @@ import { registerPersonalRoutes, isPersonalRoute } from './personalization/route
 
 const config = loadConfig();
 const fastify = Fastify({ logger: true });
+
+// Record every registration so /openapi.json documents what the router actually serves.
+const registeredRoutes: { method: string; url: string }[] = [];
+fastify.addHook('onRoute', (route) => {
+  const methods = Array.isArray(route.method) ? route.method : [route.method];
+  for (const method of methods) registeredRoutes.push({ method, url: route.url });
+});
 
 await fastify.register(cors, { origin: true });
 
@@ -567,29 +577,21 @@ fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
 // One endpoint that documents the others, so a client can discover the whole surface at once.
 fastify.get('/api/cookbook', async () => ({
   service: 'phrog-web',
-  capabilities: [
-    { capability: 'search', path: '/api/search', method: 'GET', params: ['q', 'limit', 'mode=quick|deep', 'categories'], backed_by: ['tinyfish', 'exa', 'searxng (fallback)', 'firecrawl (deep)'], cost: 'tinyfish free tier first' },
-    { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
-    { capability: 'interact', path: '/api/browse', method: 'POST', params: ['url', 'goal'], backed_by: ['jev runner'], cost: 'local' },
-    { capability: 'scrape_formats', path: '/api/scrape', method: 'POST', params: ['url', 'formats[]: ' + SCRAPE_FORMATS.join('|'), 'jsonSchema', 'fullPage', 'screenshotInline'], backed_by: ['plain + crawl4ai + CDP render'], cost: 'free' },
-    { capability: 'profiles', path: '/api/profiles', method: 'GET|POST|DELETE', params: ['site'], backed_by: ['per-site cookie jars', 'Chromium persistent profile'], cost: 'free' },
-    { capability: 'fetch_with_login', path: '/api/fetch-profile', method: 'POST', params: ['url', 'profile', 'waitMs'], backed_by: ['CDP + jar'], cost: 'free' },
-    { capability: 'parse', path: '/api/parse', method: 'POST', params: ['url | base64+filename', 'maxChars'], backed_by: ['pdftotext', 'markitdown'], cost: 'free' },
-    { capability: 'agent', path: '/api/agent', method: 'POST', params: ['goal', 'url', 'async'], backed_by: ['tinyfish agent (Builder)'], cost: '$0.016/step' },
-    { capability: 'crawl', path: '/api/crawl/start', method: 'POST', params: ['url', 'maxDepth', 'limit'], backed_by: ['crawl4ai'], cost: 'free' },
-    { capability: 'crawl_status', path: '/api/batch/:id', method: 'GET', params: ['id', 'include_results'], backed_by: ['crawl4ai'], cost: 'free' },
-    { capability: 'map', path: '/api/map', method: 'POST', params: ['url', 'limit'], backed_by: ['sitemap + page links'], cost: 'free' },
-    { capability: 'batch_scrape', path: '/api/batch', method: 'POST', params: ['urls[] (max 50)'], backed_by: ['fetch chain'], cost: 'varies' },
-    { capability: 'monitor', path: '/api/monitor', method: 'POST', params: ['url', 'selector'], backed_by: ['fetch chain + content hash'], cost: 'free' },
-    { capability: 'monitor_check', path: '/api/monitor/:id/check', method: 'POST', params: ['id'], backed_by: ['content hash'], cost: 'free' },
-    { capability: 'browser', path: '/api/browser', method: 'POST', params: ['url', 'profile=lite|stealth'], backed_by: ['tinyfish browser (Builder)'], cost: '$0.002/min' },
-    { capability: 'browser_close', path: '/api/browser/:sessionId', method: 'DELETE', params: ['sessionId'], backed_by: ['tinyfish browser'], cost: 'closes the meter' },
-    { capability: 'research_resume', path: '/api/research/:jobId/resume', method: 'POST', params: ['jobId'], backed_by: ['feynman research run resume'], cost: 'local + llm' },
-    { capability: 'research_cancel', path: '/api/research/:jobId/cancel', method: 'POST', params: ['jobId'], backed_by: ['process tree by run id', 'feynman research run set-status aborted'], cost: 'free' },
-    { capability: 'research', path: '/api/research', method: 'POST', params: ['question|topic', 'mode=quick|deep', 'domain'], backed_by: ['search + llm (quick)', 'feynman (deep, local engine)'], cost: 'local + llm' },
-    { capability: 'keys', path: '/api/keys', method: 'GET|POST|DELETE', params: ['key', 'value'], backed_by: ['hub store'], cost: 'free' },
-  ],
+  capabilities: CAPABILITIES,
 }));
+
+
+// --- Machine-readable surface -----------------------------------------------------------------
+// Generated from the live router plus the capability table, so it cannot drift from what runs.
+fastify.get('/openapi.json', async () => buildOpenApi(registeredRoutes, CAPABILITIES));
+
+// What the service can actually account for. Per endpoint, not per client: loopback /mcp has no identity.
+fastify.get('/api/usage', async (req) => {
+  const { days } = req.query as { days?: string };
+  const parsed = days ? Number(days) : 7;
+  return summarizeRuns(readRunLog(), { days: Number.isFinite(parsed) ? parsed : 7 });
+});
+fastify.get('/docs', async (_req, reply) => reply.type('text/html; charset=utf-8').send(renderDocsHtml()));
 
 // --- Login state: per-site cookie jars exported from the persistent Chromium profile ---------
 // crawl4ai's API refuses storage_state/user_data_dir/use_persistent_context per request, so a

@@ -4,11 +4,13 @@ Every capability, grouped. Three doors into the same service:
 
 | door | count | how a client reaches it |
 |---|---|---|
-| **MCP** (`http://127.0.0.1:8890/mcp`) | 50 tools | any MCP client on loopback; **no token is required there**, so keep it bound to 127.0.0.1 |
-| **REST** (`http://127.0.0.1:8890/api/…`) | 57 routes | plain HTTP; no token on loopback |
+| **MCP** (`http://127.0.0.1:8890/mcp`) | 51 tools | any MCP client on loopback; **no token is required there**, so keep it bound to 127.0.0.1 |
+| **REST** (`http://127.0.0.1:8890/api/…`) | 60 routes | plain HTTP; no token on loopback |
 | **Hermes-native** | 2 tools | `web_search`, `web_extract` via the `web-phrog-web` backend plugin |
 
-`GET /api/cookbook` returns the capability index as JSON.
+`GET /api/cookbook` returns the capability index as JSON. `GET /openapi.json` is an OpenAPI 3.0.3 spec
+generated from the live router (59 paths / 64 operations at last count), and `GET /docs` is a
+dependency-free page that renders it — both cannot drift from what is actually served.
 
 ---
 
@@ -90,11 +92,15 @@ Routes: `GET /api/media` · `POST /api/visual` · `GET /api/social` · `POST /ap
 
 `book_availability` (query, limit, sources) · `book_download` (ref, source). Routes: `GET /api/books` · `POST /api/books/download`.
 
-## 11. Ops & introspection — 3 tools · 9 routes
+## 11. Ops & introspection — 4 tools · 12 routes
 
-`run_log` (limit, tool) · `keys` (action: list | status | set | remove, key, value — values are never returned) · `monitor` (action: list | create | check, url, selector, id).
+`run_log` (limit, tool) · `keys` (action: list | status | set | remove, key, value — values are never returned) · `monitor` (action: list | create | check, url, selector, id) · `usage` (days).
 
-Routes: `GET /health` · `GET /api/cookbook` · `GET /api/keys`, `GET /api/keys/status`, `POST /api/keys`, `DELETE /api/keys/:key` · `GET /api/runs` · `GET /api/monitor`, `POST /api/monitor`, `POST /api/monitor/:id/check` · `GET /api/profiles` · `GET /shots/:file` · `GET /i/:token`.
+Routes: `GET /health` · `GET /api/cookbook` · `GET /openapi.json` · `GET /docs` · `GET /api/usage` · `GET /api/keys`, `GET /api/keys/status`, `POST /api/keys`, `DELETE /api/keys/:key` · `GET /api/runs` · `GET /api/monitor`, `POST /api/monitor`, `POST /api/monitor/:id/check` · `GET /api/profiles` · `GET /shots/:file` · `GET /i/:token`.
+
+`GET /api/usage` separates **capability** failures from `/mcp` transport rejects (400/406/405 on a bad
+handshake). Counting them together reported a 46% error rate when the real one was 0.9% — a metric that
+flatters nothing and explains nothing is worse than no metric.
 
 ## 12. Hermes-native — 2 tools
 
