@@ -10,6 +10,7 @@ import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from './provi
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
 import { keyStatus, removeKey, setKey } from './provider-keys.js';
+import { checkMonitor, closeBrowserSession, createBrowserSession, createMonitor, listMonitors, parseDocument } from './providers/cookbook.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
@@ -532,6 +533,73 @@ fastify.post('/api/agent/stream', async (req, reply) => {
 
 fastify.post('/api/browse', wrap(browse as any, ['url', 'goal']));
 fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
+
+// --- Cookbook surface: the Firecrawl/TinyFish capability set, with the gaps filled -----------
+// One endpoint that documents the others, so a client can discover the whole surface at once.
+fastify.get('/api/cookbook', async () => ({
+  service: 'phrog-web',
+  capabilities: [
+    { capability: 'search', path: '/api/search', method: 'GET', params: ['q', 'limit', 'mode=quick|deep', 'categories'], backed_by: ['tinyfish', 'exa', 'searxng (fallback)', 'firecrawl (deep)'], cost: 'tinyfish free tier first' },
+    { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
+    { capability: 'interact', path: '/api/browse', method: 'POST', params: ['url', 'goal'], backed_by: ['jev runner'], cost: 'local' },
+    { capability: 'parse', path: '/api/parse', method: 'POST', params: ['url | base64+filename', 'maxChars'], backed_by: ['pdftotext', 'markitdown'], cost: 'free' },
+    { capability: 'agent', path: '/api/agent', method: 'POST', params: ['goal', 'url', 'async'], backed_by: ['tinyfish agent (Builder)'], cost: '$0.016/step' },
+    { capability: 'crawl', path: '/api/crawl/start', method: 'POST', params: ['url', 'maxDepth', 'limit'], backed_by: ['crawl4ai'], cost: 'free' },
+    { capability: 'crawl_status', path: '/api/batch/:id', method: 'GET', params: ['id', 'include_results'], backed_by: ['crawl4ai'], cost: 'free' },
+    { capability: 'map', path: '/api/map', method: 'POST', params: ['url', 'limit'], backed_by: ['sitemap + page links'], cost: 'free' },
+    { capability: 'batch_scrape', path: '/api/batch', method: 'POST', params: ['urls[] (max 50)'], backed_by: ['fetch chain'], cost: 'varies' },
+    { capability: 'monitor', path: '/api/monitor', method: 'POST', params: ['url', 'selector'], backed_by: ['fetch chain + content hash'], cost: 'free' },
+    { capability: 'monitor_check', path: '/api/monitor/:id/check', method: 'POST', params: ['id'], backed_by: ['content hash'], cost: 'free' },
+    { capability: 'browser', path: '/api/browser', method: 'POST', params: ['url', 'profile=lite|stealth'], backed_by: ['tinyfish browser (Builder)'], cost: '$0.002/min' },
+    { capability: 'browser_close', path: '/api/browser/:sessionId', method: 'DELETE', params: ['sessionId'], backed_by: ['tinyfish browser'], cost: 'closes the meter' },
+    { capability: 'research', path: '/api/research', method: 'POST', params: ['topic', 'depth'], backed_by: ['feynman/vane'], cost: 'local + llm' },
+    { capability: 'keys', path: '/api/keys', method: 'GET|POST|DELETE', params: ['key', 'value'], backed_by: ['hub store'], cost: 'free' },
+  ],
+}));
+
+fastify.post('/api/parse', async (req, reply) => {
+  try {
+    return await parseDocument(req.body as { url?: string; base64?: string; filename?: string; maxChars?: number });
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.post('/api/monitor', async (req, reply) => {
+  try {
+    return await createMonitor(req.body as { url?: string; selector?: string });
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.get('/api/monitor', async () => ({ monitors: listMonitors() }));
+
+fastify.post('/api/monitor/:id/check', async (req, reply) => {
+  try {
+    return await checkMonitor((req.params as { id: string }).id);
+  } catch (err) {
+    return reply.code(404).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.delete('/api/browser/:sessionId', async (req, reply) => {
+  try {
+    return await closeBrowserSession((req.params as { sessionId: string }).sessionId);
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Paid: a TinyFish remote browser session bills $0.002/min until it is closed.
+fastify.post('/api/browser', async (req, reply) => {
+  try {
+    return await createBrowserSession(req.body as { url?: string; profile?: 'lite' | 'stealth' });
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
 fastify.post('/api/vault', wrap(researchVault as any, ['action']));
 
 // Streamable HTTP MCP (stateless: one server+transport per request, like the Python web MCP)
