@@ -9,6 +9,7 @@ import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from './provi
 import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
+import { keyStatus, removeKey, setKey } from './provider-keys.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
@@ -66,6 +67,48 @@ fastify.get('/api/runs', async (req) => {
 });
 
 fastify.get('/health', async () => ({ status: 'ok', service: 'phrog-web', version: '0.1.0' }));
+
+// --- The hub's key store -------------------------------------------------------------------
+// Every upstream provider key lives in one env file (mode 0600) and nowhere else. Callers hold
+// only phrog-web's own token; these routes are how a key is added or rotated without a restart.
+// Values are never returned: GET reports configured/length only.
+fastify.get('/api/keys', async () => ({ keys: keyStatus() }));
+
+fastify.post('/api/keys', async (req, reply) => {
+  const body = (req.body ?? {}) as { key?: string; value?: string };
+  if (!body.key || !body.value) return reply.code(400).send({ error: 'key and value are required' });
+  try {
+    const status = setKey(body.key, body.value);
+    return reply.send({ saved: true, key: status.key, provider: status.provider, configured: status.configured, length: status.length });
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.delete('/api/keys/:key', async (req, reply) => {
+  try {
+    const removed = removeKey((req.params as { key: string }).key);
+    return reply.send({ removed });
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Which plan paid for the last TinyFish call is useful at the hub level too, so a caller can see
+// free-vs-paid without reading a bill.
+fastify.get('/api/keys/status', async () => {
+  const keys = keyStatus();
+  const tinyfish = keys.filter((k) => k.provider === 'tinyfish');
+  return {
+    keys: keys.filter((k) => k.provider !== 'tinyfish'),
+    tinyfish: {
+      plans: tinyfish.map((k) => ({ key: k.key, plan: k.plan, configured: k.configured })),
+      // Search spends the free plan first; a missing free key means paid credit is being spent.
+      search_plan: tinyfish.find((k) => k.plan === 'free' && k.configured) ? 'free' : 'paid',
+    },
+  };
+});
+
 
 registerSearxngCompat(fastify);
 registerPersonalRoutes(fastify);
