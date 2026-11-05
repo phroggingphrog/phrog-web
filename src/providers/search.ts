@@ -1,4 +1,5 @@
 import { loadConfig } from '../config.js';
+import { canonicalKey, fuseEngineRanks, type EngineRankedRow } from './rank.js';
 
 export interface SearchResult {
   title: string;
@@ -226,6 +227,31 @@ async function searchConsensus(query: string, options: SearchOptions): Promise<S
   });
 }
 
+/**
+ * Re-order one provider's rows by their per-engine positions (SearXNG reports `engines`
+ * and parallel `positions`). Falls back untouched when the provider gave no engine data,
+ * so non-SearXNG providers keep the previous behaviour.
+ */
+function rerankEngineLevel(results: SearchResult[], query: string): SearchResult[] {
+  if (results.length < 2) return results;
+  const rows: EngineRankedRow[] = results.map((r) => {
+    const raw = (r.raw || {}) as Record<string, unknown>;
+    return {
+      url: r.url,
+      engine: r.engine,
+      content: r.snippet,
+      engines: Array.isArray(raw.engines) ? (raw.engines as string[]) : undefined,
+      positions: Array.isArray(raw.positions) ? (raw.positions as number[]) : undefined,
+      publishedDate: typeof raw.publishedDate === 'string' ? raw.publishedDate : null,
+    };
+  });
+  if (!rows.some((r) => Array.isArray(r.positions) && r.positions.length > 0)) return results;
+  const byKey = new Map(results.map((r) => [canonicalKey(r.url), r]));
+  return fuseEngineRanks(rows, {}, undefined, query)
+    .map((f) => byKey.get(canonicalKey(f.url)))
+    .filter((r): r is SearchResult => Boolean(r));
+}
+
 export async function executeSearch(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
   const config = loadConfig();
 
@@ -279,7 +305,8 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   if (!successful.length) throw new Error(`All search providers failed for query "${query}". Errors: ${failures.map(({ engine, error }) => `${engine}: ${error}`).join('; ')}`);
 
   const fused = new Map<string, { result: SearchResult; score: number; engines: Set<string> }>();
-  for (const { engine, results } of successful) {
+  for (const { engine, results: providerResults } of successful) {
+    const results = engine === 'searxng' ? rerankEngineLevel(providerResults, query) : providerResults;
     results.forEach((result, index) => {
       let key = result.url;
       try { const u = new URL(result.url); u.hash = ''; u.hostname = u.hostname.toLowerCase(); if (u.pathname.length > 1) u.pathname = u.pathname.replace(/\/$/, ''); key = u.toString(); } catch { /* keep provider URL */ }

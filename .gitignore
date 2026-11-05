@@ -39,3 +39,4 @@ data/
 
 # agent-isolated worktrees
 .claude/worktrees/
+/node_modules
