@@ -237,7 +237,7 @@ export async function webBatchStart(args: Args): Promise<Args> {
 
 export function webCrawlStatus(jobId: string, includeResults = false, offset = 0, limit = 10): Args {
   const job = jobs.get(jobId);
-  if (!job) return { job_id: jobId, status: 'unknown', error: 'no such job' };
+  if (!job) throw new Error(`Crawl job "${jobId}" not found`);
   const out: Args = { job_id: job.id, kind: job.kind, status: job.status, completed: job.completed, total: job.total, error: job.error, count: job.results.length, stopped: job.stopped ?? (job.status === 'completed' ? 'done' : null) };
   if (includeResults) {
     out.offset = offset;

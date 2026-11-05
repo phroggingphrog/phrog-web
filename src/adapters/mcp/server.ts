@@ -217,7 +217,7 @@ server.tool(
 
 server.tool(
   'research',
-  'Research a topic. Quick mode synthesizes answers in 3-5s (Vane) across web or academic domains. Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
+  'Research a topic. Quick mode answers in about 5s from our own ranked search plus one LLM pass, across web or academic domains. Deep workflows (lit, deepresearch, compare, audit, review, draft, recipe) dispatch autonomous Feynman agent.',
   {
     question: z.string().describe('Research question or topic'),
     domain: z.enum(['web', 'academic', 'discussions', 'all']).default('web').describe('Domain target: web (general), academic (papers/arXiv/PubMed), or discussions (forums)'),
@@ -413,11 +413,11 @@ server.tool(
 
 server.tool(
   'book_availability',
-  'Search books on Z-Library and Anna\'s Archive (needs credentials from `pnpm setup`); rows include a ref for book_download.',
+  'Search books. LibGen works keyless; Anna\'s Archive depends on upstream reachability; Z-Library needs ZLIBRARY_EMAIL/ZLIBRARY_PASSWORD. Rows include a ref for book_download.',
   {
     query: z.string().describe('Book title or author'),
     limit: z.number().int().min(1).max(50).optional().describe('Maximum results'),
-    sources: z.array(z.enum(['zlibrary', 'annas', 'libgen'])).optional().describe('Sources to search (default zlibrary + annas)'),
+    sources: z.array(z.enum(['zlibrary', 'annas', 'libgen'])).optional().describe('Sources to search (default libgen + annas + zlibrary)'),
   },
   async (args) => {
     try {
@@ -649,7 +649,7 @@ const safe = (fn: (a: any) => Promise<unknown> | unknown) => async (a: any) => {
 server.tool('feed', 'Read RSS feeds in source order. Accepts a public feed URL or configured RSSHub route. Screenshots are attached within the result size budget.', {
   screenshots: z.boolean().default(true),
   provider: z.enum(['rss']).default('rss'),
-  source: z.string().max(500).optional(),
+  source: z.string().max(500).describe('Feed URL or RSSHub route starting with "/" — required by the provider'),
   limit: z.number().int().min(1).max(50).default(20), cursor: z.string().optional(),
 }, async (a: any) => {
   try {

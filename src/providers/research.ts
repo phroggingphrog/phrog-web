@@ -36,7 +36,7 @@ export interface ResearchJob {
   topic: string;
   domain?: string;
   pid?: number;
-  status: 'running' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
   startedAt: string;
   finishedAt?: string;
   exitCode?: number | null;
@@ -133,11 +133,11 @@ async function initFeynmanRun(topic: string): Promise<string | undefined> {
 }
 
 /** Read the authoritative run state back from Feynman rather than trusting our own record. */
-export async function feynmanRunStatus(runId: string): Promise<{ runStatus?: string; resumeFrom?: string; steps?: unknown }> {
+export async function feynmanRunStatus(runId: string): Promise<{ runStatus?: string; resumeFrom?: string; steps?: unknown; query?: string }> {
   const out = await runFeynman(['research', 'run', 'status', runId, '--json'], 30000);
   if (out.code !== 0) throw new Error(`feynman research run status exited ${out.code}: ${out.stderr.trim().slice(0, 200)}`);
   const manifest = parseFeynmanJson(out.stdout);
-  return { runStatus: manifest?.status, steps: manifest?.steps, resumeFrom: resumeStepOf(manifest) };
+  return { runStatus: manifest?.status, steps: manifest?.steps, resumeFrom: resumeStepOf(manifest), query: typeof manifest?.query === 'string' ? manifest.query : undefined };
 }
 
 /** Feynman stores steps as {id: status}; the first one not done is where a resume starts. */
@@ -252,6 +252,43 @@ export async function executeQuickResearch(
   return { mode: 'quick', domain: options.domain || 'web', question, answer, citations, provider_used: 'phrog-web-search' };
 }
 
+// Feynman runs one research job at a time against a single vault, so the slot is reserved synchronously
+// at dispatch: waiting for the manifest to be created first let two dispatches start together.
+let activeJob: string | undefined;
+type Waiting = { job: ResearchJob; start: () => Promise<string[]> };
+const waiting: Waiting[] = [];
+
+function failJob(job: ResearchJob, err: unknown): void {
+  job.status = 'failed';
+  job.error = err instanceof Error ? err.message : String(err);
+  job.finishedAt = new Date().toISOString();
+  persistJob(job);
+  if (activeJob === job.jobId) { activeJob = undefined; drainQueue(); }
+}
+
+/** Start a job now, or queue it behind the one that is running. */
+function enqueue(job: ResearchJob, start: () => Promise<string[]>): void {
+  if (activeJob) {
+    job.status = 'queued';
+    waiting.push({ job, start });
+    persistJob(job);
+    return;
+  }
+  activeJob = job.jobId;
+  void start().then((args) => startFeynman(job, args)).catch((err) => failJob(job, err));
+}
+
+function drainQueue(): void {
+  // A job cancelled while it was waiting must never be started by the drain.
+  while (waiting.length) {
+    const next = waiting.shift()!;
+    if (next.job.status !== 'queued') continue;
+    activeJob = next.job.jobId;
+    void next.start().then((args) => startFeynman(next.job, args)).catch((err) => failJob(next.job, err));
+    return;
+  }
+}
+
 /** Spawn the engine for a job and keep the record in step with the process. */
 function startFeynman(job: ResearchJob, args: string[]): void {
   const runtime = feynmanRuntime();
@@ -295,6 +332,7 @@ function startFeynman(job: ResearchJob, args: string[]): void {
       }
 
       persistJob(job);
+      if (activeJob === job.jobId) { activeJob = undefined; drainQueue(); }
 
       if (job.callbackUrl) {
         try {
@@ -320,6 +358,7 @@ function startFeynman(job: ResearchJob, args: string[]): void {
     job.error = err instanceof Error ? err.message : String(err);
     job.finishedAt = new Date().toISOString();
     persistJob(job);
+    if (activeJob === job.jobId) { activeJob = undefined; drainQueue(); }
   }
 }
 
@@ -345,20 +384,19 @@ export function dispatchDeepResearch(
 
   // The durable manifest is created first so the run id exists from the start: that is what makes
   // `POST /api/research/:jobId/resume` possible after a restart. Only the default workflow has a
-  // manifest; named workflows (lit, compare, audit...) are spawned directly as before.
-  void (async () => {
+  // manifest; named workflows (lit, compare, audit...) are spawned directly.
+  enqueue(job, async () => {
     if (workflow === 'deepresearch') {
       const runId = await initFeynmanRun(topic);
       if (runId) {
         job.feynmanRunId = runId;
         job.resumable = true;
         persistJob(job);
-        startFeynman(job, ['research', 'run', 'resume', runId]);
-        return;
+        return ['research', 'run', 'resume', runId];
       }
     }
-    startFeynman(job, [workflow, topic]);
-  })();
+    return [workflow, topic];
+  });
 
   return job;
 }
@@ -388,7 +426,7 @@ export async function resumeDeepResearchJob(jobId: string): Promise<ResearchJob>
   job.resumedAt = new Date().toISOString();
   job.resumable = true;
   jobs.set(jobId, job);
-  startFeynman(job, ['research', 'run', 'resume', job.feynmanRunId!]);
+  enqueue(job, async () => ['research', 'run', 'resume', job.feynmanRunId!]);
   return job;
 }
 
@@ -411,6 +449,10 @@ export async function cancelDeepResearchJob(jobId: string): Promise<ResearchJob>
   if (job.status === 'completed' || job.status === 'cancelled') {
     throw new Error(`Job "${jobId}" is already ${job.status}`);
   }
+
+  // Drop it from the queue first, so a cancelled job is never picked up by the drain.
+  const queuedAt = waiting.findIndex((w) => w.job.jobId === job.jobId);
+  if (queuedAt >= 0) waiting.splice(queuedAt, 1);
 
   const markers = [job.feynmanRunId, job.jobId].filter(Boolean) as string[];
   let killed = 0;
@@ -435,6 +477,28 @@ export async function cancelDeepResearchJob(jobId: string): Promise<ResearchJob>
   job.resumable = false;
   job.error = `Cancelled on request (${killed} process${killed === 1 ? '' : 'es'} stopped)`;
   persistJob(job);
+  return job;
+}
+
+/** Take ownership of a Feynman run id created elsewhere (e.g. the CLI) so this service can track it. */
+export async function adoptFeynmanRun(runId: string): Promise<ResearchJob> {
+  const live = await feynmanRunStatus(runId);
+  if (live.runStatus === 'done' || live.runStatus === 'aborted') {
+    throw new Error(`Feynman run '${runId}' is ${live.runStatus} and cannot be resumed`);
+  }
+  const job: ResearchJob = {
+    jobId: `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+    workflow: 'deepresearch',
+    topic: live.query || `resumed Feynman run ${runId}`,
+    status: 'queued',
+    startedAt: new Date().toISOString(),
+    resumedAt: new Date().toISOString(),
+    feynmanRunId: runId,
+    resumable: true,
+  };
+  jobs.set(job.jobId, job);
+  persistJob(job);
+  enqueue(job, async () => ['research', 'run', 'resume', runId]);
   return job;
 }
 

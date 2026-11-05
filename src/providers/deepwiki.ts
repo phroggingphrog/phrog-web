@@ -18,6 +18,15 @@ export interface DeepWikiContents {
 }
 
 const DEEPWIKI_MCP_URL = process.env.DEEPWIKI_MCP_URL || 'https://mcp.deepwiki.com/mcp';
+/**
+ * DeepWiki returns its failures as 200-status prose ("Error fetching wiki for ..."), which is the only
+ * thing distinguishing a failed read from a real one.
+ */
+export function isUpstreamError(text: string): boolean {
+  const t = text.trim();
+  return /^error\b/i.test(t) && t.length < 400;
+}
+
 const TIMEOUT_MS = 60000;
 
 async function callDeepWiki(toolName: string, args: Record<string, unknown>): Promise<string> {
@@ -43,6 +52,10 @@ async function callDeepWiki(toolName: string, args: Record<string, unknown>): Pr
     throw new Error(`DeepWiki HTTP ${res.status}: ${res.statusText}`);
   }
 
+  // DeepWiki answers 200 with the failure as text ("Error fetching wiki for repo ..."). Passing that
+  // back as a successful structure or contents read is worse than failing: the caller cannot tell.
+  const isUpstreamError = (text: string) => /^error\b/i.test(text.trim()) && text.trim().length < 400;
+
   const raw = await res.text();
 
   // Parse SSE or JSON
@@ -57,7 +70,10 @@ async function callDeepWiki(toolName: string, args: Record<string, unknown>): Pr
           throw new Error(parsed.error.message || 'DeepWiki RPC error');
         }
         const text = parsed.result?.content?.[0]?.text;
-        if (text) return text;
+        if (text) {
+          if (isUpstreamError(text)) throw new Error(`DeepWiki: ${text.trim()}`);
+          return text;
+        }
       } catch (e) {
         if (e instanceof Error && e.message !== 'Unexpected end of JSON input') {
           throw e;
@@ -70,8 +86,13 @@ async function callDeepWiki(toolName: string, args: Record<string, unknown>): Pr
   try {
     const parsed = JSON.parse(raw);
     const text = parsed.result?.content?.[0]?.text;
-    if (text) return text;
-  } catch {}
+    if (text) {
+      if (isUpstreamError(text)) throw new Error(`DeepWiki: ${text.trim()}`);
+      return text;
+    }
+  } catch (err) {
+    if (err instanceof Error && err.message.startsWith('DeepWiki:')) throw err;
+  }
 
   throw new Error('DeepWiki returned an empty response');
 }

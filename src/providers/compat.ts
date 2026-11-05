@@ -1,8 +1,13 @@
 // Drop-in compat for the old Python `web` MCP: web_search and deep_research_* (job shapes match sitecrawl.job_status).
-import { randomUUID } from 'node:crypto';
-import { readFileSync, existsSync } from 'node:fs';
 import { executeSearch } from './search.js';
-import { call } from './vault.js';
+import {
+  dispatchDeepResearch,
+  getResearchJob,
+  enrichResearchJob,
+  resumeDeepResearchJob,
+  adoptFeynmanRun,
+} from './research.js';
+import type { ResearchJob } from './research.js';
 
 const TIME_RANGES = ['day', 'week', 'month', 'year'] as const;
 /** Image engines that return icons or museum art, which drown out product photos. */
@@ -23,61 +28,54 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
   return { query, results, count: results.length, provider: response.provider_used, contributingEngines: response.contributingEngines, failures: response.failures };
 }
 
-// Feynman MCP runs deep research jobs one at a time.
+// Deep research has exactly one implementation: providers/research.ts. These compat entry points keep
+// the old job shapes for existing clients but no longer own a second, in-memory job registry — that
+// registry could not be polled by research_status, cancelled, or resumed after a restart.
 const WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'recipe', 'draft'];
-const MAX_TOTAL_MS = 12 * 3600 * 1000;
-interface DeepJob { id: string; kind: 'deep'; status: string; started_at: number; completed: number; total: null; error: string | null; note?: string; feynman_job_id?: string; result?: any }
-const jobs = new Map<string, DeepJob>();
-let gate: Promise<unknown> = Promise.resolve();
-const field = (t: string, n: string) => t.match(new RegExp(`^${n}: (.+)$`, 'm'))?.[1].trim();
-const fcall = (tool: string, args: Record<string, any>) => call(tool, args, 320000).then((r) => (typeof r === 'string' ? r : JSON.stringify(r)));
 
-async function runDeep(job: DeepJob, p: Record<string, any>) {
-  const started = Date.now();
-  const note = (m: string, fid?: string) => { job.note = m; if (fid) job.feynman_job_id = fid; };
-  let t: string;
-  if (p.resume_run_id) { note('resuming the Feynman run from its saved checkpoint', p.resume_run_id); t = await fcall('feynman_resume', { runId: p.resume_run_id }); }
-  else {
-    const args: Record<string, any> = { workflow: p.workflow, topic: p.topic };
-    if (p.profile) args.profile = p.profile;
-    if (p.tier && p.tier !== 'pending') args.tier = p.tier;
-    if (p.budget_usd != null) args.budgetUsd = p.budget_usd;
-    if (p.register) args.register = p.register;
-    if (p.inference_depth) args.inferenceDepth = p.inference_depth;
-    if (p.domain_notes) args.domainNotes = p.domain_notes;
-    t = await fcall('feynman_research', args);
-    while (field(t, 'STATUS') === 'busy' && Date.now() - started < MAX_TOTAL_MS) {
-      note('Feynman is busy with another run; retrying in 30 s');
-      await new Promise((r) => setTimeout(r, 30000));
-      t = await fcall('feynman_research', args);
-    }
-  }
-  while (field(t, 'STATUS') === 'running' && Date.now() - started < MAX_TOTAL_MS) {
-    const fid = field(t, 'JOB_ID');
-    note(`running ${Math.round((Date.now() - started) / 1000)}s, latest file ${field(t, 'LATEST_FILE')}`, fid);
-    t = await fcall('feynman_result', { job_id: fid ?? job.feynman_job_id ?? '' });
-  }
-  const status = field(t, 'STATUS');
-  if (status !== 'done' && status !== 'blocked') throw new Error(`Feynman ended with status ${status}: ${field(t, 'ERROR') ?? t.slice(0, 300)}`);
-  const path = field(t, 'PATH');
-  const body = path && existsSync(path) ? readFileSync(path, 'utf8') : '';
-  if (!body) throw new Error('Feynman finished but no deliverable file was found');
-  job.result = { status, workflow: p.workflow, run_id: field(t, 'RUN_ID'), path, seconds: Math.round((Date.now() - started) / 1000), chars: body.length, deliverable: body };
+/** Old clients read `status`; ours is the same vocabulary plus queued/interrupted/cancelled. */
+function compatStatus(job: ResearchJob): string {
+  if (job.status === 'queued') return 'queued';
+  if (job.status === 'running') return 'running';
+  if (job.status === 'completed') return 'completed';
+  if (job.status === 'cancelled') return 'cancelled';
+  return 'failed';
 }
 
-function startDeep(p: Record<string, any>) {
-  const job: DeepJob = { id: randomUUID(), kind: 'deep', status: 'queued', started_at: Date.now(), completed: 0, total: null, error: null, note: 'waiting for the Feynman slot' };
-  jobs.set(job.id, job);
-  gate = gate.then(async () => {
-    job.status = 'running'; job.note = undefined;
-    try { await runDeep(job, p); job.status = 'completed'; }
-    catch (e: any) { job.status = 'failed'; job.error = `${e?.name ?? 'Error'}: ${String(e?.message ?? e).slice(0, 300)}`; }
-  });
-  return { job_id: job.id, status: 'running', runs_in: 'this process (ends with the session)' };
+function statusView(job: ResearchJob, includeResult: boolean) {
+  const elapsed = Math.round((Date.now() - Date.parse(job.startedAt)) / 1000);
+  const out: Record<string, any> = {
+    job_id: job.jobId,
+    kind: 'deep',
+    status: compatStatus(job),
+    job_status: job.status,
+    workflow: job.workflow,
+    topic: job.topic,
+    completed: 0,
+    total: null,
+    error: job.error ?? null,
+    elapsed_s: elapsed,
+    feynman_run_id: job.feynmanRunId,
+    run_status: job.runStatus,
+    resume_from: job.resumeFrom,
+    resumable: job.resumable ?? false,
+  };
+  if (job.status === 'queued' || job.status === 'running') {
+    // Feynman runs take 5-60+ min and only one runs at a time; do not poll in a tight loop.
+    out.poll_after_s = elapsed < 120 ? 60 : elapsed < 900 ? 180 : 300;
+    out.hint = `Deep research usually takes 5-60 minutes and runs one at a time. Do not poll again for ${out.poll_after_s}s; continue other work and check back later.`;
+  }
+  if (includeResult && job.deliverable) {
+    out.deliverable = job.deliverable.slice(0, 20000);
+    out.deliverable_truncated = job.deliverable.length > 20000;
+  }
+  return out;
 }
 
 export function deepResearchStart(a: { topic: string; workflow?: string; profile?: string; tier?: string; budget_usd?: number | null; register?: string | null; inference_depth?: string | null; domain_notes?: string | null }) {
-  const workflow = a.workflow ?? 'deepresearch', profile = a.profile ?? 'full', tier = a.tier ?? 'pending';
+  const workflow = a.workflow ?? 'deepresearch';
+  const profile = a.profile ?? 'full';
+  const tier = a.tier ?? 'pending';
   if (!WORKFLOWS.includes(workflow)) throw new Error(`workflow must be one of ${WORKFLOWS.join(', ')}`);
   if (!a.topic.trim() || a.topic.length > 4000) throw new Error('topic must be 1-4000 characters');
   if (!['full', 'premier'].includes(profile)) throw new Error('profile must be full or premier');
@@ -86,36 +84,33 @@ export function deepResearchStart(a: { topic: string; workflow?: string; profile
   if (a.register != null && !['teach', 'survey', 'analyze', 'advocate'].includes(a.register)) throw new Error('register must be teach, survey, analyze, or advocate');
   if (a.inference_depth != null && !['surface', 'standard', 'deep'].includes(a.inference_depth)) throw new Error('inference_depth must be surface, standard, or deep');
   if (a.domain_notes != null && a.domain_notes.length > 2000) throw new Error('domain_notes must be at most 2000 characters');
-  return startDeep({ topic: a.topic.trim(), workflow, profile, tier, budget_usd: a.budget_usd, register: a.register, inference_depth: a.inference_depth, domain_notes: a.domain_notes });
+
+  const job = dispatchDeepResearch(a.topic.trim(), { workflow });
+  return {
+    job_id: job.jobId,
+    status: 'running',
+    kind: 'deep',
+    workflow: job.workflow,
+    runs_in: 'the phrog-web service: survives a client disconnect, and resumable with research_resume after a restart',
+    note: `Dispatched to the Feynman engine. Poll deep_research_status or research_status with job_id "${job.jobId}".`,
+  };
 }
 
 export async function deepResearchResume(a: { run_id: string }) {
   const id = a.run_id.trim();
   if (!id || a.run_id.length > 120) throw new Error('run_id must be 1-120 characters');
-  const m: any = await call('feynman_research_status', { runId: id });
-  const topic = m && typeof m === 'object' ? m.query ?? '' : '';
-  if (!topic) throw new Error(`Feynman run '${a.run_id}' did not return its original query`);
-  return startDeep({ topic, workflow: 'deepresearch', resume_run_id: id });
+  // Accepts either one of our job ids or a raw Feynman run id, so older callers keep working.
+  if (/^fey_\d+_[a-z0-9]{5}$/.test(id)) {
+    const job = await resumeDeepResearchJob(id);
+    return { job_id: job.jobId, status: 'running', note: 'resumed from the first unfinished stage' };
+  }
+  const job = await adoptFeynmanRun(id);
+  return { job_id: job.jobId, status: 'queued', note: `adopted Feynman run ${id}; resumes from its first unfinished stage` };
 }
 
-export function deepResearchStatus(a: { job_id: string; include_result?: boolean }) {
-  const job = jobs.get(a.job_id);
-  if (!job) return { job_id: a.job_id, status: 'unknown', error: 'no such job' };
-  const out: Record<string, any> = { job_id: job.id, kind: 'deep', status: job.status, completed: job.completed, total: job.total, error: job.error };
-  if (job.feynman_job_id) out.run_id = job.feynman_job_id;
-  if (job.note) out.note = job.note;
-  const elapsed = Math.round((Date.now() - job.started_at) / 1000);
-  out.elapsed_s = elapsed;
-  if (job.status === 'queued' || job.status === 'running') {
-    // Feynman runs take 5-60+ min; tell clients not to poll in a tight loop.
-    out.poll_after_s = elapsed < 120 ? 60 : elapsed < 900 ? 180 : 300;
-    out.hint = `Deep research usually takes 5-60 minutes. Do not poll again for ${out.poll_after_s}s; continue other work (or answer with what you have) and check back later.`;
-  }
-  if (job.result) {
-    const { deliverable, status, ...rest } = job.result;
-    out.research_status = status;
-    Object.assign(out, rest);
-    if (a.include_result) { out.deliverable = deliverable.slice(0, 20000); out.deliverable_truncated = deliverable.length > 20000; }
-  }
-  return out;
+export async function deepResearchStatus(a: { job_id: string; include_result?: boolean }) {
+  const job = getResearchJob(a.job_id);
+  if (!job) throw new Error(`Research job "${a.job_id}" not found`);
+  await enrichResearchJob(job);
+  return statusView(job, Boolean(a.include_result));
 }

@@ -26,7 +26,10 @@ export interface BooksResult {
 }
 
 export type BookSource = 'zlibrary' | 'annas' | 'libgen';
-const ALL_SOURCES: BookSource[] = ['zlibrary', 'annas'];
+// libgen leads because it is the only source that answers without an account: zlibrary needs
+// ZLIBRARY_EMAIL/PASSWORD and annas failed at the HTTP layer here. Omitting libgen made every book
+// lookup fail even though a working source was available.
+const ALL_SOURCES: BookSource[] = ['libgen', 'annas', 'zlibrary'];
 const CALL_TIMEOUT_MS = 12000;
 const DOWNLOAD_TIMEOUT_MS = 180000;
 
@@ -115,6 +118,11 @@ export async function searchBooks(query: string, opts: { limit?: number; sources
     }),
   );
   out.results = out.results.slice(0, limit);
+  // An empty list because nothing answered is not the same as "no such book".
+  if (!out.results.length && !out.sources_used.length && out.sources_failed.length) {
+    const why = out.sources_failed.map((f) => `${f.source}: ${f.error}`).join('; ');
+    throw new Error(`every book source failed, so this is not a "no results" answer: ${why}`);
+  }
   return out;
 }
 
