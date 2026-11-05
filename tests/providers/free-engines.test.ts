@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseAnySearch, parseExaText, parseFirecrawl, parseWikimedia } from '../../src/providers/free-engines.js';
+import { parseAnySearch, parseExaText, parseFirecrawl, parseOmnirouteSearch, parseWikimedia } from '../../src/providers/free-engines.js';
 
 test('parseExaText reads the repeated Title/URL/Highlights blocks', () => {
   const text = [
@@ -89,4 +89,22 @@ test('parseWikimedia builds article URLs and strips HTML from snippets', () => {
 test('parseWikimedia tolerates an empty query block', () => {
   assert.deepEqual(parseWikimedia({}), []);
   assert.deepEqual(parseWikimedia({ query: {} }), []);
+});
+
+test('parseOmnirouteSearch maps omniroute\'s search envelope', () => {
+  const rows = parseOmnirouteSearch({ results: [
+    { title: 'podman-systemd.unit', url: 'https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html',
+      snippet: '# DESCRIPTION [¶](https://x/#description) all users sessions' },
+    { title: 'content only', url: 'https://example.org/b', content: 'full  page\ncontent here' },
+    { title: 'no url' },
+  ] });
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].engine, 'firecrawl');
+  assert.match(rows[0].snippet, /^# DESCRIPTION/);
+  assert.equal(rows[1].snippet, 'full page content here');
+});
+
+test('parseOmnirouteSearch tolerates an error envelope', () => {
+  assert.deepEqual(parseOmnirouteSearch({}), []);
+  assert.deepEqual(parseOmnirouteSearch({ results: [] }), []);
 });

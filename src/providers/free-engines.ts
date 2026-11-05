@@ -128,12 +128,19 @@ export async function searchAnySearch(query: string, options: SearchOptions = {}
 }
 
 /**
- * Firecrawl's keyless search tier. Measured on this box: 403 direct with the body
- * "your IP address looks like a VPN or proxy", 200 through the crawl-egress tunnel
- * (privoxy at 127.0.0.1:18118 -> Tencent). dsh documents the same IP sensitivity and the same
- * direct-then-tunnel order, so the tunnel is the primary route here and direct is the fallback.
- * Node's fetch cannot be given a proxy without undici, and undici is not a dependency of this
- * service, so the tunneled call goes through curl. Verified returning real rows via the tunnel.
+ * Firecrawl search, in preference order:
+ *
+ *  1. omniroute (/v1/search, provider "firecrawl"). The owner's Firecrawl key already lives in
+ *     omniroute's provider_connections, so this spends real quota instead of scraping a keyless
+ *     tier, keeps the key out of phrog-web's env, and inherits omniroute's result cache: a cold
+ *     query measured 1.43 s, a repeat 6 ms.
+ *  2. The crawl-egress tunnel. Keyless Firecrawl answers 403 to this box directly ("your IP
+ *     address looks like a VPN or proxy") but 200 through the tunnel, which is what dsh documents.
+ *     Kept as the fallback for when omniroute is down.
+ *  3. Direct, behind PHROG_WEB_FIRECRAWL_DIRECT=1.
+ *
+ * Node's fetch cannot take a proxy without undici, which is not a dependency, so the tunnelled
+ * call goes through curl.
  */
 interface FirecrawlPayload {
   success?: boolean;
@@ -164,12 +171,57 @@ async function firecrawlViaTunnel(body: string, timeoutMs: number): Promise<stri
   return stdout;
 }
 
+interface OmnirouteSearchPayload {
+  results?: Array<{ title?: string; url?: string; snippet?: string; content?: string }>;
+}
+
+export function parseOmnirouteSearch(payload: OmnirouteSearchPayload, engine = 'firecrawl'): SearchResult[] {
+  const rows = payload?.results;
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .filter((r) => typeof r?.url === 'string' && r.url.length > 0)
+    .map((r) => ({
+      title: r.title || r.url || '',
+      url: r.url as string,
+      snippet: (r.snippet || r.content || '').replace(/\s+/g, ' ').trim().slice(0, 320),
+      engine,
+    }));
+}
+
+/** Ask omniroute to run a search provider it already holds credentials for. */
+export async function searchViaOmniroute(
+  provider: string,
+  query: string,
+  options: SearchOptions = {},
+): Promise<SearchResult[]> {
+  const key = globalThis.process?.env.OMNIROUTE_API_KEY;
+  if (!key) throw new Error('OMNIROUTE_API_KEY is not configured');
+  const base = globalThis.process?.env.OMNIROUTE_URL || 'http://127.0.0.1:20128';
+  const limit = Math.max(1, Math.min(20, options.limit || 10));
+  const res = await fetch(`${base}/v1/search`, {
+    method: 'POST',
+    signal: AbortSignal.timeout(30000),
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ provider, query, limit }),
+  });
+  if (!res.ok) throw new Error(`omniroute /v1/search ${provider} HTTP ${res.status}`);
+  return parseOmnirouteSearch(await res.json() as OmnirouteSearchPayload).slice(0, limit);
+}
+
 export async function searchFirecrawl(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
   const cfg = loadConfig().search?.providers?.firecrawl || {};
   const url = cfg.url || 'https://api.firecrawl.dev/v1/search';
   const timeoutMs = cfg.timeoutMs || 20000;
   const limit = Math.max(1, Math.min(20, options.limit || 10));
   const body = JSON.stringify({ query, limit });
+
+  // 1. omniroute holds the owner's key, so prefer it: real quota, cached repeats, no secret here.
+  if (process.env.OMNIROUTE_API_KEY && process.env.PHROG_WEB_FIRECRAWL_VIA_OMNIROUTE !== '0') {
+    try {
+      const rows = await searchViaOmniroute('firecrawl', query, { ...options, limit });
+      if (rows.length) return rows;
+    } catch { /* fall through to the tunnel route below */ }
+  }
 
   const direct = process.env.PHROG_WEB_FIRECRAWL_DIRECT === '1';
   if (direct) {
