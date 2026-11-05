@@ -1,8 +1,5 @@
 <!-- phrog-development:start -->
-For development, read `/home/phroggingphrog/.dsh/profiles/vanilla/node_modules/phrog-development/skills/using-phrog-development/SKILL.md`
-and `/home/phroggingphrog/.agents/AGENTS.md`. Use automatic upstream OpenSpec routing for substantial changes; small fixes and questions need no new spec or setup.
-Reuse existing authorization and the current project workspace before creating isolation. New worktrees belong under `~/projects/.worktrees/` through the host's workspace tools; a worktree never authorizes another deployment.
-Shared server workflow controls older workflow text below; retain repository product, security and contribution requirements. Backlog owns overall server work status; private GitHub repositories retain their issue tracking without duplicate tickets. Verify the owner's actual deployment before claiming live or fixed.
+Dev work: see ~/.agents/AGENTS.md. OpenSpec only for substantial changes (openspec skill, on demand).
 <!-- phrog-development:end -->
 
 # Phrog Web — Agent Guidelines

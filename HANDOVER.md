@@ -165,8 +165,9 @@ All engines are vendored under `engines/` with zero VPS-specific symlinks:
 ---
 
 ## 7. Next Work (Phase 2)
-1. **Agent Browser Module (`src/browser/`)**: Implement local cookie and `storageState.json` profile manager so external agents (Hermes / Playwright) can launch pre-authenticated browser sessions without Google accounts.
-2. **Systemd Service**: When desired, create `~/.config/systemd/user/phrog-web.service` to keep the gateway running persistently.
+1. **Agent Browser Module (`src/browser/`)**: not started; the directory is a placeholder. Implement local cookie and `storageState.json` profile manager so external agents (Hermes / Playwright) can launch pre-authenticated browser sessions without Google accounts.
+
+The systemd service item that used to live here is done: `deploy/units/phrog-web.service` is installed at `~/.config/systemd/user/` and runs the gateway from this checkout.
 
 ## Books: search and download (Z-Library, Anna's Archive)
 - Engine: `engines/zlibrary-mcp` (vendored rookslog/zlibrary-mcp, stdio MCP; tools `search`, `get_book`, `download`, `get_limits`, `get_history`). Built in place: `npm install && npm run build && UV_PROJECT_ENVIRONMENT=$PWD/.venv uv sync --no-dev` inside it (`node_modules`, `.venv`, `dist` are gitignored, so rebuild after a fresh clone).
