@@ -47,8 +47,6 @@ async function getJson(url: string, init: RequestInit = {}, timeoutMs = TIMEOUT_
   return res.json();
 }
 
-const iso = (sec?: number) => (sec ? new Date(sec * 1000).toISOString() : undefined);
-
 const decodeHtml = (s: string) =>
   s.replace(/<[^>]+>/g, '').replace(/&quot;/g, '"').replace(/&#x27;|&#39;/g, "'").replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&bull;/g, '*').replace(/&amp;/g, '&').trim();
 

@@ -1,4 +1,4 @@
-import type { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyInstance } from 'fastify';
 import { getFeed, personalDb, FeedInputError } from './feed.js';
 import { readArtifactImage } from './filter.js';
 

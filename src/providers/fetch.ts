@@ -328,7 +328,7 @@ async function fetchTinyFishWithKey(apiKey: string, url: string, options: FetchO
  * Markdown, and sits between the browser and the paid fallback: it rescues pages that a bot-wall
  * blocks and a container-rendered crawl still cannot read, without spending tinyfish quota.
  */
-async function fetchJina(url: string, options: FetchOptions = {}): Promise<FetchResult> {
+async function fetchJina(url: string): Promise<FetchResult> {
   const cfg = loadConfig().fetch.providers?.jina || {};
   const timeoutMs = cfg.timeoutMs || 30000;
   const endpoint = `${cfg.url || 'https://r.jina.ai'}/${url}`;
@@ -361,7 +361,7 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
       } else if (provider === 'tinyfish') {
         result = await fetchTinyFish(url, options);
       } else if (provider === 'jina') {
-        result = await fetchJina(url, options);
+        result = await fetchJina(url);
       } else {
         throw new Error(`Unknown fetch provider: ${provider}`);
       }

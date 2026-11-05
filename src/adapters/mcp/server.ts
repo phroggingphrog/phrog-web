@@ -19,7 +19,6 @@ import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduc
 import { searchSocial } from '../../providers/social.js';
 import { getTranscript } from '../../providers/transcript.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from '../../providers/crawl.js';
-import { browse } from '../../providers/browse.js';
 import { extract } from '../../providers/extract.js';
 import { runAgent } from '../../providers/agent.js';
 import { researchVault } from '../../providers/vault.js';
@@ -112,7 +111,7 @@ export function buildFeedToolResult(feed: { items?: any[]; [k: string]: unknown 
 
 export interface McpContext { personalAuthorized?: boolean }
 
-export function createMcpServer(ctx: McpContext = {}): McpServer {
+export function createMcpServer(_ctx: McpContext = {}): McpServer {
 loadConfig();
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 // Log every tool call: wrap the handler (always the last argument) of each server.tool registration.

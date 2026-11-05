@@ -1,7 +1,6 @@
 // PDF / Office to text using host tools: pdftotext for PDF, Python MarkItDown (existing venv) for Office.
 import { spawn } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const OFFICE: Record<string, string> = {

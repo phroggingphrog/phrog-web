@@ -12,7 +12,7 @@ import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { homedir } from 'node:os';
-import { convertDocument, documentKind } from './document.js';
+import { convertDocument } from './document.js';
 import { executeFetch } from './fetch.js';
 import { writeRun } from '../runlog.js';
 
@@ -89,7 +89,7 @@ function writeMonitors(all: Record<string, Monitor>): void {
   writeFileSync(file, JSON.stringify(all, null, 2), { mode: 0o600 });
 }
 
-function fingerprint(url: string, selector: string | undefined, body: string): string {
+function fingerprint(selector: string | undefined, body: string): string {
   const text = selector ? body.slice(0, 200000) : body;
   return createHash('sha256').update(text).digest('hex').slice(0, 32);
 }
@@ -98,7 +98,7 @@ function fingerprint(url: string, selector: string | undefined, body: string): s
 export async function createMonitor(input: { url?: string; selector?: string }): Promise<Monitor> {
   if (!input.url) throw new Error('url is required');
   const page = await executeFetch(input.url);
-  const hash = fingerprint(input.url, input.selector, page.markdown);
+  const hash = fingerprint(input.selector, page.markdown);
   const all = readMonitors();
   const id = createHash('sha256').update(`${input.url}|${input.selector ?? ''}`).digest('hex').slice(0, 16);
   const monitor: Monitor = {
@@ -115,7 +115,7 @@ export async function checkMonitor(id: string): Promise<{ monitor: Monitor; chan
   const monitor = all[id];
   if (!monitor) throw new Error(`unknown monitor: ${id}`);
   const page = await executeFetch(monitor.url);
-  const hash = fingerprint(monitor.url, monitor.selector, page.markdown);
+  const hash = fingerprint(monitor.selector, page.markdown);
   const changed = hash !== monitor.hash;
   const previousHash = monitor.hash;
   monitor.lastChecked = new Date().toISOString();

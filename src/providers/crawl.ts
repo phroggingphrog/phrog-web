@@ -2,7 +2,6 @@
 import { createHash, randomUUID } from 'node:crypto';
 import { lookup } from 'node:dns/promises';
 import { isIP } from 'node:net';
-import { loadConfig } from '../config.js';
 import { executeFetch, renderedLinks } from './fetch.js';
 
 const MAX_URLS = Number(process.env.WEB_MCP_MAX_URLS || 10);

@@ -26,7 +26,6 @@ import { getTranscript } from './providers/transcript.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { createMcpServer } from './adapters/mcp/server.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from './providers/crawl.js';
-import { browse } from './providers/browse.js';
 import { extract } from './providers/extract.js';
 import { runAgent } from './providers/agent.js';
 import { researchVault } from './providers/vault.js';
@@ -569,7 +568,7 @@ fastify.get('/api/cookbook', async () => ({
     { capability: 'monitor_check', path: '/api/monitor/:id/check', method: 'POST', params: ['id'], backed_by: ['content hash'], cost: 'free' },
     { capability: 'browser', path: '/api/browser', method: 'POST', params: ['url', 'profile=lite|stealth'], backed_by: ['tinyfish browser (Builder)'], cost: '$0.002/min' },
     { capability: 'browser_close', path: '/api/browser/:sessionId', method: 'DELETE', params: ['sessionId'], backed_by: ['tinyfish browser'], cost: 'closes the meter' },
-    { capability: 'research', path: '/api/research', method: 'POST', params: ['topic', 'depth'], backed_by: ['feynman/vane'], cost: 'local + llm' },
+    { capability: 'research', path: '/api/research', method: 'POST', params: ['question|topic', 'mode=quick|deep', 'domain'], backed_by: ['vane (quick, :3000)', 'feynman (deep, local engine)'], cost: 'local + llm' },
     { capability: 'keys', path: '/api/keys', method: 'GET|POST|DELETE', params: ['key', 'value'], backed_by: ['hub store'], cost: 'free' },
   ],
 }));
