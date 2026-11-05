@@ -1,3 +1,5 @@
+import { createReadStream, existsSync } from 'node:fs';
+import { resolve } from 'node:path';
 import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import { loadConfig } from './config.js';
@@ -12,6 +14,7 @@ import { setupDone } from './setup.js';
 import { keyStatus, removeKey, setKey } from './provider-keys.js';
 import { checkMonitor, closeBrowserSession, createBrowserSession, createMonitor, listMonitors, parseDocument } from './providers/cookbook.js';
 import { deleteJar, jarForUrl, listJars, writeJar } from './providers/profiles.js';
+import { scrape, shotsDir, SCRAPE_FORMATS } from './providers/scrape.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
@@ -543,6 +546,7 @@ fastify.get('/api/cookbook', async () => ({
     { capability: 'search', path: '/api/search', method: 'GET', params: ['q', 'limit', 'mode=quick|deep', 'categories'], backed_by: ['tinyfish', 'exa', 'searxng (fallback)', 'firecrawl (deep)'], cost: 'tinyfish free tier first' },
     { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
     { capability: 'interact', path: '/api/browse', method: 'POST', params: ['url', 'goal'], backed_by: ['jev runner'], cost: 'local' },
+    { capability: 'scrape_formats', path: '/api/scrape', method: 'POST', params: ['url', 'formats[]: ' + SCRAPE_FORMATS.join('|'), 'jsonSchema', 'fullPage', 'screenshotInline'], backed_by: ['plain + crawl4ai + CDP render'], cost: 'free' },
     { capability: 'profiles', path: '/api/profiles', method: 'GET|POST|DELETE', params: ['site'], backed_by: ['per-site cookie jars', 'Chromium persistent profile'], cost: 'free' },
     { capability: 'fetch_with_login', path: '/api/fetch-profile', method: 'POST', params: ['url', 'profile', 'waitMs'], backed_by: ['CDP + jar'], cost: 'free' },
     { capability: 'parse', path: '/api/parse', method: 'POST', params: ['url | base64+filename', 'maxChars'], backed_by: ['pdftotext', 'markitdown'], cost: 'free' },
@@ -610,6 +614,24 @@ fastify.post('/api/fetch-profile', async (req, reply) => {
   } catch (err) {
     return reply.code(502).send({ error: err instanceof Error ? err.message : String(err) });
   }
+});
+
+// --- Scrape: every format in one page visit (Firecrawl parity) ------------------------------
+fastify.post('/api/scrape', async (req, reply) => {
+  try {
+    return await scrape(req.body as Parameters<typeof scrape>[0]);
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Screenshots are files; serve them so a client gets a URL, not a megabyte of base64.
+fastify.get('/shots/:file', async (req, reply) => {
+  const name = (req.params as { file: string }).file;
+  if (!/^[a-f0-9]{8,40}\.png$/.test(name)) return reply.code(400).send({ error: 'bad screenshot name' });
+  const file = resolve(shotsDir(), name);
+  if (!existsSync(file)) return reply.code(404).send({ error: 'no such screenshot' });
+  return reply.type('image/png').send(createReadStream(file));
 });
 
 fastify.post('/api/parse', async (req, reply) => {

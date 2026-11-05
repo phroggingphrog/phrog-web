@@ -68,6 +68,7 @@ export interface PageResult {
   url: string;
   title: string;
   text: string;
+  html: string;
   cookies: string[];
 }
 
@@ -101,11 +102,16 @@ export async function fetchPage(
       expression: 'document.body ? document.body.innerText : ""',
       returnByValue: true,
     }, sessionId)).result?.value ?? '';
+    const html = (await rpc.send('Runtime.evaluate', {
+      expression: 'document.documentElement ? document.documentElement.outerHTML : ""',
+      returnByValue: true,
+    }, sessionId)).result?.value ?? '';
     const seen = (await rpc.send('Network.getCookies', { urls: [url] }, sessionId)).cookies ?? [];
     return {
       url,
       title: String(title),
       text: String(text),
+      html: String(html),
       cookies: seen.map((c: any) => `${c.name}=${c.value}`),
     };
   } finally {
@@ -146,5 +152,51 @@ export async function cdpAlive(): Promise<{ alive: boolean; browser?: string }> 
     return { alive: true, browser: v.Browser };
   } catch {
     return { alive: false };
+  }
+}
+
+/**
+ * Rendered screenshot of a page, as a PNG buffer. Uses the browser that already exists, so there is
+ * no headless-Chrome dependency in this service. `fullPage` uses CDP layout metrics to size the
+ * capture rather than relying on the viewport.
+ */
+export async function screenshotPage(
+  url: string,
+  cookies: CdpCookie[] = [],
+  opts: { waitMs?: number; fullPage?: boolean } = {},
+): Promise<{ png: Buffer; width: number; height: number }> {
+  const rpc = await connect();
+  let targetId = '';
+  try {
+    const created = await rpc.send('Target.createTarget', { url: 'about:blank' });
+    targetId = created.targetId;
+    const { sessionId } = await rpc.send('Target.attachToTarget', { targetId, flatten: true });
+    await rpc.send('Network.enable', {}, sessionId);
+    for (const c of cookies) {
+      try { await rpc.send('Network.setCookie', c as unknown as Record<string, unknown>, sessionId); } catch { /* skip */ }
+    }
+    await rpc.send('Page.enable', {}, sessionId);
+    await rpc.send('Page.navigate', { url }, sessionId);
+    await new Promise((r) => setTimeout(r, opts.waitMs ?? 2500));
+    let clip: Record<string, unknown> | undefined;
+    let width = 0;
+    let height = 0;
+    const metrics = await rpc.send('Page.getLayoutMetrics', {}, sessionId);
+    if (opts.fullPage) {
+      const size = metrics.cssContentSize ?? metrics.contentSize ?? { width: 1280, height: 800 };
+      width = Math.ceil(size.width);
+      height = Math.ceil(size.height);
+      clip = { x: 0, y: 0, width, height, scale: 1 };
+    } else {
+      // Report the real viewport so the caller knows what the image actually covers.
+      const view = metrics.cssLayoutViewport ?? metrics.layoutViewport ?? {};
+      width = Math.ceil(view.clientWidth ?? 0);
+      height = Math.ceil(view.clientHeight ?? 0);
+    }
+    const shot = await rpc.send('Page.captureScreenshot', { format: 'png', ...(clip ? { clip } : {}) }, sessionId);
+    return { png: Buffer.from(shot.data, 'base64'), width, height };
+  } finally {
+    if (targetId) { try { await rpc.send('Target.closeTarget', { targetId }); } catch { /* gone */ } }
+    rpc.close();
   }
 }

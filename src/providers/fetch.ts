@@ -57,7 +57,7 @@ export interface FetchOptions {
   stealth?: boolean;
 }
 
-function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } {
+export function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } {
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
   const title = titleMatch ? titleMatch[1].trim() : '';
 
