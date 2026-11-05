@@ -11,6 +11,7 @@ import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
 import { keyStatus, removeKey, setKey } from './provider-keys.js';
 import { checkMonitor, closeBrowserSession, createBrowserSession, createMonitor, listMonitors, parseDocument } from './providers/cookbook.js';
+import { deleteJar, jarForUrl, listJars, writeJar } from './providers/profiles.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
 import { searchPlaces } from './providers/places.js';
@@ -542,6 +543,8 @@ fastify.get('/api/cookbook', async () => ({
     { capability: 'search', path: '/api/search', method: 'GET', params: ['q', 'limit', 'mode=quick|deep', 'categories'], backed_by: ['tinyfish', 'exa', 'searxng (fallback)', 'firecrawl (deep)'], cost: 'tinyfish free tier first' },
     { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
     { capability: 'interact', path: '/api/browse', method: 'POST', params: ['url', 'goal'], backed_by: ['jev runner'], cost: 'local' },
+    { capability: 'profiles', path: '/api/profiles', method: 'GET|POST|DELETE', params: ['site'], backed_by: ['per-site cookie jars', 'Chromium persistent profile'], cost: 'free' },
+    { capability: 'fetch_with_login', path: '/api/fetch-profile', method: 'POST', params: ['url', 'profile', 'waitMs'], backed_by: ['CDP + jar'], cost: 'free' },
     { capability: 'parse', path: '/api/parse', method: 'POST', params: ['url | base64+filename', 'maxChars'], backed_by: ['pdftotext', 'markitdown'], cost: 'free' },
     { capability: 'agent', path: '/api/agent', method: 'POST', params: ['goal', 'url', 'async'], backed_by: ['tinyfish agent (Builder)'], cost: '$0.016/step' },
     { capability: 'crawl', path: '/api/crawl/start', method: 'POST', params: ['url', 'maxDepth', 'limit'], backed_by: ['crawl4ai'], cost: 'free' },
@@ -556,6 +559,58 @@ fastify.get('/api/cookbook', async () => ({
     { capability: 'keys', path: '/api/keys', method: 'GET|POST|DELETE', params: ['key', 'value'], backed_by: ['hub store'], cost: 'free' },
   ],
 }));
+
+// --- Login state: per-site cookie jars exported from the persistent Chromium profile ---------
+// crawl4ai's API refuses storage_state/user_data_dir/use_persistent_context per request, so a
+// logged-in fetch goes through CDP against the browser that actually holds the login.
+fastify.get('/api/profiles', async () => {
+  const { cdpAlive } = await import('./providers/cdp.js');
+  return { jars: listJars(), browser: await cdpAlive() };
+});
+
+fastify.post('/api/profiles/:site/save', async (req, reply) => {
+  const site = (req.params as { site: string }).site;
+  try {
+    const { exportCookies } = await import('./providers/cdp.js');
+    const cookies = await exportCookies(site);
+    const jar = writeJar(site, cookies);
+    return { saved: true, site: jar.site, cookies: jar.cookies.length, names: jar.cookies.map((c) => c.name).slice(0, 20) };
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+fastify.delete('/api/profiles/:site', async (req) => ({ removed: deleteJar((req.params as { site: string }).site) }));
+
+// A fetch that carries the jar for that site. Separate from /api/fetch so the normal chain stays
+// untouched when no login is involved.
+fastify.post('/api/fetch-profile', async (req, reply) => {
+  const body = (req.body ?? {}) as { url?: string; profile?: string; waitMs?: number };
+  if (!body.url) return reply.code(400).send({ error: 'url is required' });
+  const jar = jarForUrl(body.url, body.profile ?? true);
+  if (!jar) {
+    return reply.code(404).send({
+      error: `no login jar for ${body.url}. Save one with POST /api/profiles/<site>/save after logging in in the browser.`,
+      known: listJars().map((j) => j.site),
+    });
+  }
+  try {
+    const { fetchPage } = await import('./providers/cdp.js');
+    const page = await fetchPage(body.url, jar.cookies, { waitMs: body.waitMs });
+    return {
+      url: page.url,
+      title: page.title,
+      markdown: page.text,
+      length: page.text.length,
+      site: jar.site,
+      jar_saved_at: jar.saved_at,
+      cookies_seen: page.cookies.length,
+      provider_used: 'cdp-profile',
+    };
+  } catch (err) {
+    return reply.code(502).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
 
 fastify.post('/api/parse', async (req, reply) => {
   try {
