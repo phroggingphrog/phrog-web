@@ -1,0 +1,163 @@
+{
+  "queries": [
+    {
+      "q": "podman quadlet",
+      "expect": [
+        "podman.io",
+        "docs.podman.io",
+        "redhat.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "systemd timer vs cron",
+      "expect": [
+        "freedesktop.org",
+        "archlinux.org",
+        "digitalocean.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "ssh key permissions too open",
+      "expect": [
+        "openssh.com",
+        "archlinux.org",
+        "digitalocean.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "postgres vacuum full lock",
+      "expect": [
+        "postgresql.org"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "python asyncio gather exception handling",
+      "expect": [
+        "docs.python.org",
+        "realpython.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "rust borrow checker explained",
+      "expect": [
+        "doc.rust-lang.org",
+        "rust-lang.org",
+        "rust-lang.github.io"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "kubernetes ingress nginx rewrite target",
+      "expect": [
+        "kubernetes.io",
+        "github.com",
+        "docs.nginx.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "docker compose healthcheck depends_on",
+      "expect": [
+        "docs.docker.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "nginx proxy_pass trailing slash",
+      "expect": [
+        "nginx.org",
+        "docs.nginx.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "zfs scrub vs resilver",
+      "expect": [
+        "openzfs.org",
+        "docs.oracle.com",
+        "openzfs.github.io"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "tailscale subnet router setup",
+      "expect": [
+        "tailscale.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "cloudflared tunnel config.yml ingress",
+      "expect": [
+        "developers.cloudflare.com",
+        "cloudflare.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "prometheus node_exporter install",
+      "expect": [
+        "prometheus.io",
+        "github.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "git rebase interactive squash commits",
+      "expect": [
+        "git-scm.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "typescript satisfies operator",
+      "expect": [
+        "typescriptlang.org"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "sqlite wal mode concurrency",
+      "expect": [
+        "sqlite.org"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "ansible handler notify changed",
+      "expect": [
+        "docs.ansible.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "wireguard peer allowedips config",
+      "expect": [
+        "wireguard.com",
+        "procustodibus.io"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "frigate coral tpu detector",
+      "expect": [
+        "docs.frigate.video",
+        "github.com"
+      ],
+      "kind": "docs"
+    },
+    {
+      "q": "home assistant mqtt broker setup",
+      "expect": [
+        "home-assistant.io",
+        "mosquitto.org"
+      ],
+      "kind": "docs"
+    }
+  ]
+}

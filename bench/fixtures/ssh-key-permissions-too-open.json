@@ -1,0 +1,526 @@
+{
+ "query": "ssh key permissions too open",
+ "expect": [
+  "openssh.com",
+  "archlinux.org",
+  "digitalocean.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.openssh.org/",
+   "title": "OpenSSH",
+   "content": "OpenSSH is the premier connectivity tool for remote login with the SSH protocol. It encrypts all traffic to eliminate eavesdropping, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://help.openai.com/en/articles/8867743-assign-api-key-permissions",
+   "title": "Assign API Key Permissions | OpenAI Help Center",
+   "content": "Assign API Key Permissions Set and manage API key permissions, including full access, restricted access, and read-only access. Updated: 14 days ago You c…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ssh.com/academy/ssh",
+   "title": "What is SSH (Secure Shell)? | SSH Academy",
+   "content": "SSH is a software package that enables secure system administration and file transfers over insecure networks. It is used in nearly …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/kovshenin/sail/issues/41",
+   "title": "SSH key permissions problem on NTFS/drvfs mounts under WSL · Iss…",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Secure_Shell",
+   "title": "Secure Shell - Wikipedia",
+   "content": "The Secure Shell (SSH) protocol is a cryptographic network protocol for operating network services securely over an unsecured …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://trac.osgeo.org/osgeo/ticket/346",
+   "title": "#346 (MapGuide upload permissions too open) – OSGeo",
+   "content": "Change History (3) Currently there should be several folks with accounts on upload.osgeo.org who can use sudo to create new groups as required. Note that…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://sshgroup.com.au/",
+   "title": "SSH Group | Plant Hire & Mining Services",
+   "content": "SSH Group delivers plant hire, equipment maintenance, and workforce solutions. Explore our integrated Hire, Mine, and Own mining …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://hackernoon.com/using-cerbos-to-navigate-user-permissions",
+   "title": "Using Cerbos to Navigate User Permissions | HackerNoon",
+   "content": "Using Cerbos to Navigate User Permissions Too Long; Didn't Read Cerbos is an open-source decoupled access control for your software making user permissio…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://bbs.archlinux.org/viewtopic.php?id=302551",
+   "title": "[SOLVED] Permissions for ssh keys are too open - Arch Linux Forums",
+   "content": "13 Jan 2025 ... Re: [SOLVED] Permissions for ssh keys are too open ... are you authenticating with a public key? that doesn't work, you should use your private ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/9270734/ssh-permissions-are-too-open",
+   "title": "ssh \"permissions are too open\" [closed] - Stack Overflow",
+   "content": "14 Feb 2012 ... Permissions 0777 for '/Users/username/.ssh/id_rsa' are too open. It is recommended that your private key files are NOT accessible by others.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://superuser.com/questions/1296024/windows-ssh-permissions-for-private-key-are-too-open",
+   "title": "Windows SSH: Permissions for 'private-key' are too open - Super User",
+   "content": "18 Feb 2018 ... 18 Answers 18 ... You locate the file in Windows Explorer, right-click on it then select \"Properties\". Navigate to the \"Security\" tab and click \" ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@ProSunnySharma/fixing-permissions-are-too-open-ssh-key-error-on-windows-11-98cb3e4a4287",
+   "title": "Fixing “Permissions Are Too Open” SSH Key Error on Windows 11",
+   "content": "17 Nov 2025 ... Fixing “Permissions Are Too Open” SSH Key Error on Windows 11 · Step 1: Open PowerShell as Administrator · Step 2: Navigate to Your SSH Folder.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://sentry.io/answers/resolve-ssh-permissions-too-open-error/",
+   "title": "Fix SSH Private Key Permissions Too Open Error - Sentry",
+   "content": "3 Sept 2026 ... The Problem · Permissions 0777 for '/Users/username/.ssh/id_rsa' are too open. · It is recommended that your private key files are NOT ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=OTwEfZP1nb8",
+   "title": "[Solved] SSH Private Key Permissions Are Too Open Error - YouTube",
+   "content": "1 Mar 2023 ... Fix for SSH Permission Denied (Public Key) ... Go to channel Ask Leo! Say Goodbye to Passwords: Passkeys Explained Simply. Ask Leo!•1.8M views.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://customer.precisely.com/s/article/SSH-unprotected-private-key-file-authorities-for-key-files-Permissions-are-too-open9555153D",
+   "title": "authorities for key files Permissions are too open - Customer",
+   "content": "Authorities on the SSH key files are important. Receiving a message stating that the private key file is too open (unsecure), the authorities need to be ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.baeldung.com/linux/ssh-key-permissions",
+   "title": "SSH Error “permissions are too open” for Private Key File - Baeldung",
+   "content": "25 Mar 2025 ... 3. Private Key Permissions ... In this case, we encounter an error, which states our private key has the wrong permissions. Specifically, the SSH ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.educative.io/answers/ssh-error-permissions-are-too-open",
+   "title": "SSH error: permissions are too open - Educative.io",
+   "content": "This error is meant to inform users that the permissions for their private key need to be changed and made more secure. As the name implies, a private key must ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://aitechpartner.blog/2023/08/17/windows-ssh-permissions-for-private-key-are-too-open/",
+   "title": "Windows SSH: Permissions for 'private-key' are too open",
+   "content": "17 Aug 2023 ... Windows SSH: Permissions for 'private-key' are too open · Go to . · Select the “Security” tab · Click on the “Advanced” button [Properties -> ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cloudflare.com/learning/access-management/what-is-ssh/",
+   "title": "What is SSH? | Secure Shell (SSH) protocol - Cloudflare",
+   "content": "The Secure Shell (SSH) protocol sets up encrypted connections for remote logins and file transfers between computers. SSH also …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://superuser.com/a/1329702",
+   "title": "Windows SSH: Permissions for 'private-key' are too open - Super …",
+   "content": "sudo should not be utilized to open an SSH session as it's a security risk. The only time (at least that I'm aware of) root's account should be utilized …",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.wikihow.com/Use-SSH",
+   "title": "How to Use SSH (with Pictures) - wikiHow",
+   "content": "May 17, 2025 · This wikiHow article will teach you how to install an SSH client on Windows (as Linux and macOS already have …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://bugs.archlinux.org/task/46825.html",
+   "title": "FS#46825 : [steam] Valve gamepad permissions too open",
+   "content": "I think this is a good idea, and it could also fix the controller emulation/uinput problem. See FS#46833. This would be the resulting rule that fixes bot…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/linux-unix/ssh-command-in-linux-with-examples/",
+   "title": "SSH Command in Linux - GeeksforGeeks",
+   "content": "Jul 21, 2026 · SSH (Secure Shell) is a secure communication protocol that allows a user to access and control a remote computer …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://bugzilla.gnome.org/show_bug.cgi?id=581604",
+   "title": "Bug 581604 – Permissions on mail/local folders are too open",
+   "content": "Please describe the problem: Hi, it seems that the default permissions on the local mail folders are set to 755, which means that, by default, other user…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.man7.org/linux/man-pages/man1/ssh.1.html",
+   "title": "ssh (1) - Linux manual page - man7.org",
+   "content": "ssh (SSH client) is a program for logging into a remote machine and for executing commands on a remote machine. It is …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://bugs.launchpad.net/ubuntu-rtm/+bug/48734",
+   "title": "Bug #48734 “Home permissions too open” : Bugs : Ubuntu RTM",
+   "content": "Bug Description On a fresh dapper install i noticed that the file permissons for the home directory for the user created by the installer is set to 755, …",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.digitalocean.com/community/tutorials/how-to-use-ssh-to-connect-to-a-remote-server",
+   "title": "How to Use SSH to Connect to a Remote Server (Step-by-Step Guide)",
+   "content": "May 31, 2026 · SSH (Secure Shell) is the standard way to log into remote Linux servers over an encrypted connection. From your …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://circleci.com/changelog/ssh-key-support/",
+   "title": "SSH Key Support - CircleCI",
+   "content": "SSH Key Support What’s New You can now add any combination of SSH key cipher / encoding. Specifically, we now support the ed25519 cipher, openssh encodin…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/linuxquestions/comments/17c3dh8/issue_with_ssh_private_key_file_being_too_open/",
+   "title": "Issue with ssh private key file being too open, chmod 600 or ... - Reddit",
+   "content": "20 Oct 2023 ... Permissions 0777 for '/mnt/c/Users/onwin/source/repos/.ssh/id_ed25519' are too open. It is required that your private key files are NOT ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cloudflare.com/learning/security/what-is-ssh/",
+   "title": "What is SSH? | Secure Shell (SSH) protocol - Cloudflare",
+   "content": "What is the Secure Shell (SSH) protocol? The Secure Shell (SSH) protocol is a method for securely sending commands to a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.rs/ssh-key",
+   "title": "ssh_key - Rust",
+   "content": "Crate ssh_key Pure Rust implementation of SSH key file format decoders/encoders as described in RFC4251 and RFC4253 as well as OpenSSH’s PROTOCOL.key for…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://bugs.launchpad.net/bugs/48734",
+   "title": "Bug #48734 “Home permissions too open” : Bugs : adduser package …",
+   "content": "Bug Description On a fresh dapper install i noticed that the file permissons for the home directory for the user created by the installer is set to 755, …",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.rs/crate/ssh-key/0.5.1/source/",
+   "title": "ssh-key 0.5.1 - Docs.rs",
+   "content": "ssh-key 0.5.1 Pure Rust implementation of SSH key file format decoders/encoders as described in RFC4251/RFC4253 and OpenSSH key formats, as well as \"sshs…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.rs/crate/ssh-key/0.6.6/source/",
+   "title": "ssh-key 0.6.6 - Docs.rs",
+   "content": "ssh-key 0.6.6 Pure Rust implementation of SSH key file format decoders/encoders as described in RFC4251/RFC4253 and OpenSSH key formats, as well as \"sshs…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/learnprogramming/comments/yrllz4/help_with_ssh_keys_its_too_open/",
+   "title": "Help with SSH keys? It's \"too open\"? : r/learnprogramming - Reddit",
+   "content": "10 Nov 2022 ... I'm trying to SSH connect to an EC2 instance inside of VSCode, but I keep getting this error: https://i.imgur.com/StIQ6Uh.jpg It says my pem ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://apple.stackexchange.com/questions/342371/adding-ssh-private-key-gives-error-that-0644-permissions-are-too-open",
+   "title": "Adding SSH private key gives error that 0644 permissions are too ...",
+   "content": "12 Nov 2018 ... The error message is displayed because the file permission are set such that it is readable by other users apart from the logged-in user.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/craftcms/nitro/issues/154",
+   "title": "Private key permissions too open · Issue #154 · craftcms/nitro - GitHub",
+   "content": "27 May 2020 ... Not sure if this can be an easy fix by setting the permissions in the script that adds them, but chmod 600 ~/.ssh/id_rsa did the trick for me.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.alessioligabue.it/en/blog/permissions-directory-ssh",
+   "title": ".ssh Directory Permissions: Configurations, Errors, and Solutions",
+   "content": "16 Feb 2025 ... Error 3: Permissions 0644 for 'id_rsa' are too open ... The Cause: The SSH client actively detects that your private key is globally readable. It ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://serverfault.com/questions/1160384/why-can-i-use-an-ssh-private-key-with-group-permissions-on-a-remote-server-but-n",
+   "title": "Why can I use an SSH private key with group permissions on a ...",
+   "content": "4 June 2024 ... ssh/id_rsa Contains the private key for authentication. These files contain sensitive data and should be readable by the user but not accessible ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@agarwalprashant355/fix-ssh-key-permissions-error-permissions-0644-are-too-open-96831ffc6c80",
+   "title": "Fix SSH Key Permissions Error: “Permissions 0644… are too open",
+   "content": "8 May 2024 ... Fix SSH Key Permissions Error: “Permissions 0644… are too open · SSH Keys: They're used for secure authentication and need to be kept private.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://repost.aws/questions/QU6wGifZTpQpW4eP4JQtQfGg/ssh-private-key-permissions-local-machine-windows",
+   "title": "SSH private key permissions (local machine, windows) | AWS re:Post",
+   "content": "3 Apr 2024 ... Permissions for '.pem' are too open. It is required that your private key files are NOT accessible by others. This private key will be ignored.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.elliotjreed.com/linux/fix-ssh-permissions-after-moving-directory",
+   "title": "Fix SSH Directory Permissions | EJR - Elliot Reed",
+   "content": "10 Feb 2026 ... SSH is strict about file permissions for security reasons. If your SSH keys or config files have permissions that are too open, SSH will refuse ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://unix.stackexchange.com/questions/257590/ssh-key-permissions-chmod-settings",
+   "title": "SSH Key Permissions chmod settings? - Unix & Linux Stack Exchange",
+   "content": "25 Jan 2016 ... chmod 600 ~/.ssh/id_rsa; chmod 600 ~/.ssh/id_rsa.pub (i.e. chmod u=rw,go= ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ) are correct.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}

@@ -1,0 +1,428 @@
+{
+ "query": "docker compose healthcheck depends_on",
+ "expect": [
+  "docs.docker.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.docker.com/",
+   "title": "Docker | Secure Sandboxes for AI Agents",
+   "content": "Run AI agents and containers safely, anywhere. Docker gives builders trusted sandboxes, governance, and a secure supply chain …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://quantonganh.com/2021/09/09/docker-compose-healthcheck.md",
+   "title": "Docker Compose healthcheck",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.docker.com/products/docker-desktop/",
+   "title": "Docker Desktop: The #1 Containerization Tool for Developers | Docker",
+   "content": "Docker Desktop is collaborative containerization software for developers. Get started and download Docker Desktop today on Mac, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://nickjanetakis.com/blog/optional-depends-on-with-docker-compose-v2-20-2",
+   "title": "Optional depends_on with Docker Compose v2.20.2+ — Nick Janetakis",
+   "content": "A breaking change requires all depends_on services to be set and available July 2023: Docker Compose v2.20.2 is released A new required property is added…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.docker.com/desktop/setup/install/windows-install/",
+   "title": "Install Docker Desktop on Windows",
+   "content": "Docker only supports Docker Desktop on Windows for those versions of Windows that are still within Microsoft’s servicing timeline. ...",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/a/52699978",
+   "title": "depends_on doesn't wait for another service in docker-compose 1.…",
+   "content": "My docker-compose.yml file contains 2 services. I have specified postgrasdb service to start before python-app service using depends_on but the docker-co…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.docker.com/",
+   "title": "Docker Docs",
+   "content": "Sep 7, 2026 · Docker Documentation is the official Docker library of resources, manuals, and guides to help you containerize …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/q/68202592",
+   "title": "ElasticSearch Healthcheck on docker-compose failing - Stack Over…",
+   "content": "Elasticsearch healthcheck on docker-compose stops any dependent services because the container is always unhealthy. I see this when I run docker ps -a --…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Docker_(software)",
+   "title": "Docker (software) - Wikipedia",
+   "content": "Using docker stack instead of docker compose offers several advantages, such as the ability to manage a Swarm cluster across …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.docker.com/compose/how-tos/startup-order/",
+   "title": "Control startup and shutdown order in Compose - Docker Docs",
+   "content": "Learn how to manage service startup and shutdown order in Docker Compose using depends_on and healthchecks.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.docker.com/reference/compose-file/services/",
+   "title": "Define services in Docker Compose - Docker Docs",
+   "content": "With the depends_on attribute, you can control the order of service startup and shutdown. It is useful if services are closely coupled, and the startup sequence ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://last9.io/blog/docker-compose-health-checks/",
+   "title": "Docker Compose Healthcheck: Setup, Examples & Best Practices",
+   "content": "27 Mar 2025 ... Use depends_on with condition: service_healthy to hold dependent services until the check passes. Run docker compose ps to see live health ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://oneuptime.com/blog/post/2026-01-16-docker-compose-depends-on-healthcheck/view",
+   "title": "How to Use Docker Compose depends_on with Health Checks",
+   "content": "16 Jan 2026 ... depends_on with Conditions ... The current Docker Compose Specification supports conditions that wait for health checks. ... Now the app waits until ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.warp.dev/terminus/docker-compose-depends-on",
+   "title": "Understand The depends_on Field In Docker Compose - Warp",
+   "content": "31 Jan 2024 ... In Docker Compose, depends\\_on field is used to express the dependencies between the services of an application and specify the order in which ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@cbaah123/docker-compose-health-checks-made-easy-a-practical-guide-3a340571b88e",
+   "title": "Docker Compose Health Checks Made Easy: A Practical Guide",
+   "content": "29 Mar 2025 ... While Docker Compose's depends_on feature handles basic service dependencies, it doesn't verify if a service is actually ready to accept ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/69228847/docker-compose-healthcheck-and-depends-on-service-healthy-is-super-slow",
+   "title": "docker-compose healthcheck and depends_on service_healthy is ...",
+   "content": "17 Sept 2021 ... docker-compose healthcheck and depends_on service_healthy is super slow · start service first (might take a few seconds) · a second after the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/docker/compose/issues/11582",
+   "title": "Healthchecks dependent on health status of depends_on #11582",
+   "content": "6 Mar 2024 ... Description Hi, I was thinking it would be nice for a container that utilizes the depends_on and healthcheck attributes to report healthy ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.avonture.be/blog/docker-health-condition/",
+   "title": "Understanding the depends_on condition in Docker compose files",
+   "content": "30 July 2026 ... Prevent startup errors in your multi-service applications. Learn to use the healthcheck property and depends_on condition service_healthy in ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://stackoverflow.com/q/54988792",
+   "title": "mysql - Docker compose healthcheck use environment variables - S…",
+   "content": "4 Answers 4 You need to use double-dollar sign ($$) in order to tell docker-compose not to parse these environment variables. Also change the way of defi…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/introduction-to-docker/",
+   "title": "What is Docker? - GeeksforGeeks",
+   "content": "Apr 23, 2026 · The Docker client talks with the docker daemon which helps in building, running, and distributing the docker …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://hub.docker.com/",
+   "title": "Docker Hub Container Image Library | App Containerization",
+   "content": "Customize Docker Sandboxes with Reusable Kits Learn to build reusable Docker sandbox kits that install tools, share configurations, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackharbor.com/en/knowledge-base/docker-compose-depends-on-healthcheck/",
+   "title": "Docker Compose depends_on with healthcheck: wait until a service ...",
+   "content": "13 July 2026 ... The fix is two parts: add a healthcheck to the dependency so Compose can tell when it is actually ready, then change the dependent's depends_on ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/docker-tutorial/",
+   "title": "Docker Tutorial - GeeksforGeeks",
+   "content": "Feb 19, 2026 · Docker Engine, also known as Docker Daemon, is the core component of the Docker platform responsible for running …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tutorialspoint.com/docker/index.htm",
+   "title": "Docker Tutorial",
+   "content": "Docker is an open-source platform that has completely changed the way we develop, deploy, and use apps. The application …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/docker",
+   "title": "Docker - GitHub",
+   "content": "Docker helps developers build, share, run, and verify applications anywhere — without tedious environment configuration or …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/dotnet/comments/1otihfr/docker_compose_depends_on_on_one_net_service/",
+   "title": "docker compose depends_on on one .Net service ruins healthcheck ...",
+   "content": "10 Nov 2025 ... curl is probably failing your health check due to a self signed development certificate. Even if you're using something like mkcert to make that ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lours.me/posts/compose-tip-003-depends-on-healthcheck/",
+   "title": "Docker Compose Tip #3: Service dependencies with health checks",
+   "content": "7 Jan 2026 ... services: app: depends_on: - db # Container starts, but database isn't ready yet ... Debugging#. # Check health status docker compose ps # See ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://laplusda.com/en/posts/docker-compose-depends-on-healthcheck/",
+   "title": "Docker Compose depends_on Not Waiting: Add a Healthcheck",
+   "content": "13 Aug 2026 ... Docker Compose depends_on Not Waiting: Add a Healthcheck ... If a Docker Compose app starts before its database is ready, the fix is usually not a ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dockerhol.com/blog/docker-compose-advanced-scaling-depends-on-env-files",
+   "title": "Docker Compose Advanced: Scaling, depends_on & .env Files",
+   "content": "10 July 2026 ... Create a base docker-compose. · Add a healthcheck to the db using pg_isready , and make web wait for the database to be service_healthy before ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://geshan.com.np/blog/2024/02/docker-compose-depends-on/",
+   "title": "How to use docker compose depends_on: A Beginner's Guide",
+   "content": "27 Feb 2024 ... Docker Compose depends_on only specifies the order in which the services should start when no conditions are used. While depends_on ensures that ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dash0.com/faq/difference-between-links-and-depends-on-in-docker-compose",
+   "title": "What's The Difference Between links and depends_on in Docker ...",
+   "content": "10 June 2026 ... You're reading an older compose.yaml , or following a tutorial that hasn't aged well, and you hit a service with both links and depends_on",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.linkedin.com/pulse/mastering-health-checks-docker-compose-from-mongodb-julys-martins-v5xdf",
+   "title": "Mastering Health Checks in Docker Compose — From MongoDB to ...",
+   "content": "15 Aug 2025 ... Order vs. readiness: depends_on handles order; healthcheck handles readiness. Custom commands: You can tailor health checks to run simple pings ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.juery.fr/posts/astuces-docker-compose/",
+   "title": "Docker Compose Tips: Services, Healthchecks, and Reliable Startups",
+   "content": "2 Aug 2026 ... The classic trap: depends_on alone only guarantees the startup order of containers, not their readiness. For example, PostgreSQL takes a couple ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://denhox.com/posts/forget-wait-for-it-use-docker-compose-healthcheck-and-depends-on-instead/",
+   "title": "Forget wait-for-it, use docker-compose healthcheck and ...",
+   "content": "20 Jan 2024 ... You don't need wait-for-it scripts anymore. To orchestrate your docker-compose dependencies, use healthcheck and depends_on.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://crossprogramming.com/2018/05/13/controlling-service-startup-order-in-docker-compose.html",
+   "title": "Controlling service startup order in Docker Compose",
+   "content": "12 May 2018 ... Starting with version 1.12, Docker has added the HEALTHCHECK Dockerfile instruction used for verifying whether a container is still working; ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ]
+}

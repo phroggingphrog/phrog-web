@@ -1,0 +1,368 @@
+{
+ "query": "ansible handler notify changed",
+ "expect": [
+  "docs.ansible.com"
+ ],
+ "rows": [
+  {
+   "url": "https://docs.ansible.com/projects/ansible/latest/playbook_guide/playbooks_handlers.html",
+   "title": "Handlers: running operations on change - Ansible documentation",
+   "content": "Notifying the same handler multiple times will result in executing the handler only once regardless of how many tasks notify it. For example, if multiple tasks ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/62182998/how-do-you-notify-a-handler-in-ansible-based-solely-on-a-conditional",
+   "title": "How do you notify a handler in Ansible based solely on a conditional?",
+   "content": "3 June 2020 ... You can achieve a change result on any task with the help of the changed_when option in Ansible. Then, doing a simple debug could be an option.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ansiblebyexample.com/articles/ansible-handlers-notify-trigger-on-change",
+   "title": "Ansible Handlers — notify on Change | AnsibleByExample",
+   "content": "12 Apr 2026 ... How Handlers Work · A task runs and reports changed: true · If that task has notify: , the named handler is queued · Handlers run once at the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://serverfault.com/questions/813206/trigger-ansible-handler-when-a-variable-is-changed",
+   "title": "Trigger ansible handler when a variable is changed - Server Fault",
+   "content": "4 Nov 2016 ... I would like to trigger a handler when a variable is changed. For example I have in mysql config file the innodb-log-file-size config item. I ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://oneuptime.com/blog/post/2026-02-21-how-to-use-ansible-notify-and-handlers-for-service-restarts/view",
+   "title": "How to Use Ansible notify and Handlers for Service Restarts",
+   "content": "21 Feb 2026 ... But you do not want to restart the service every time the playbook runs, only when the config actually changed. Ansible's handler system solves ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.ansible.com/t/ansible-handler-with-when-condition/2366",
+   "title": "Ansible handler with when condition - Get Help",
+   "content": "14 Nov 2023 ... ... Notifying handlers' changed_when: this_thing_is_true … ... I can activate the handler by changing the use_handler variable in the playbook.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://cyberpanel.net/blog/ansible-handlers-2",
+   "title": "Ansible Handlers: Flush and Force Explained in 5 Minutes",
+   "content": "13 May 2026 ... Ansible handlers can be thought of as special tasks that get triggered only when notified by another task and only if that task signals a change ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://spacelift.io/blog/ansible-handlers",
+   "title": "Handlers in Ansible Playbooks: How to Use Them - Spacelift",
+   "content": "7 Oct 2025 ... They don't run unless 'notified' by other tasks in the sequence, for example, restarting a service after a configuration file has been modified.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@life-is-short-so-enjoy-it/ansible-refactoring-ansible-tasks-with-handlers-why-its-better-and-when-to-use-them-6dce0cfdf0e7",
+   "title": "Ansible: Refactoring Ansible Tasks with Handlers: Why It's Better ...",
+   "content": "8 Apr 2025 ... Managing services in Ansible often involves restarting them when configuration files change. It's common to use conditional logic like when: ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.ansible.com/projects/ansible/latest/index.html",
+   "title": "Ansible Documentation",
+   "content": "1 day ago · This documentation covers the version of Ansible noted in the upper left corner of this page. We maintain multiple …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Ansible_(software)",
+   "title": "Ansible (software) - Wikipedia",
+   "content": "Originally written by Michael DeHaan in 2012, and acquired by Red Hat in 2015, Ansible is designed to configure both Unix-like …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.ansible.com/projects/ansible/latest/getting_started/introduction.html",
+   "title": "Introduction to Ansible — Ansible Community Documentation",
+   "content": "1 day ago · This is the latest (stable) Ansible community documentation. For Red Hat Ansible Automation Platform subscriptions, see …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/ansible/ansible",
+   "title": "GitHub - ansible/ansible: Ansible is a radically simple IT automation ...",
+   "content": "Ansible is a radically simple IT automation system. It handles configuration management, application deployment, cloud provisioning, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://deepsource.com/directory/ansible/issues/ANS-E5003",
+   "title": "Tasks that run when changed should likely be handlers - ANS-E5003",
+   "content": "For example, you may want to restart a service if a task updates the configuration of that service, but not if the configuration is unchanged. Ansible uses ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/ansible-collaborative/how-ansible-works",
+   "title": "How Ansible works",
+   "content": "Ansible is an open source, command-line IT automation software application written in Python. It can configure systems, deploy …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/introduction-to-ansible-and-its-architecture-components/",
+   "title": "Introduction to Ansible - GeeksforGeeks",
+   "content": "Dec 17, 2025 · Ansible is an open-source IT automation engine that automates provisioning, configuration management, application …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/technologies/management/ansible",
+   "title": "Red Hat Ansible Automation Platform",
+   "content": "Learn everything you need to start using Ansible Automation Platform, with training courses, learning paths, and free, interactive labs.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tutorialspoint.com/ansible/index.htm",
+   "title": "Ansible Tutorial",
+   "content": "Ansible is simple open source IT engine which automates application deployment, intra service orchestration, cloud provisioning and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/ansible",
+   "title": "Ansible - GitHub",
+   "content": "Ansible is a radically simple IT automation platform that makes your applications and systems easier to deploy and maintain. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://spacelift.io/blog/ansible-tutorial",
+   "title": "Ansible Tutorial for Beginners: Playbook & Examples - Spacelift",
+   "content": "Apr 13, 2026 · Ansible is one of the most popular tools for managing cloud and on-premises infrastructure. If you are looking for a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/ansible/comments/15toemw/why_does_ansiblelint_suggest_turning_my_task_into/",
+   "title": "Why does ansible-lint suggest turning my task into a handler? - Reddit",
+   "content": "17 Aug 2023 ... The last task causes the ansible-lint error \"Tasks that run when changed should likely be handlers. ... It notifies the handler to restart Apache.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/ansible/ansible/issues/80880",
+   "title": "Problem with handlers notifying another handlers #80880 - GitHub",
+   "content": "24 May 2023 ... Summary The ansible-core 2.15 ignores handlers notified by another handlers when are more than one case. With the ansible-core 2.14, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://backlogzero.ai/guides/ansible-core/use-notify-in-a-loop",
+   "title": "Use notify in a loop to target dynamic handlers",
+   "content": "16 Sept 2026 ... A looped task can notify handlers with a templated name. If any loop iteration reports changed, Ansible treats the task as changed and runs all ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=Bl1Iab8B1L8",
+   "title": "Ansible Notify And Handler - YouTube",
+   "content": "20 Jan 2021 ... ... Handlers are also tasks that only run when notified. Handlers are used in cases when you want a task to run only when a change is made on a ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.ansible.com/projects/lint/rules/no-handler/",
+   "title": "no-handler - Ansible Lint Documentation",
+   "content": "If a task has a when: result.changed condition, it effectively acts as a handler. The recommended approach is to use notify and move tasks to handlers . If ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.ansible.com/t/ansible-playbook-doesnt-run-handlers-if-play-has-different-tag/44481",
+   "title": "ansible-playbook doesn't run handlers if play has different tag",
+   "content": "13 Sept 2025 ... handlers for changed tasks aren't shown or executed (not expected) ... If you run the playbook with the role tag, notified handler is not executed ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.digitalocean.com/community/tutorials/how-to-define-and-use-handlers-in-ansible-playbooks",
+   "title": "How To Define and Use Handlers in Ansible Playbooks | DigitalOcean",
+   "content": "8 Apr 2026 ... Ansible handlers are named tasks that run only after being notified, and only when at least one notifying task reports a change. They run once ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.ansible.com/t/notify-a-task/11771",
+   "title": "Notify a task - Ansible Forum",
+   "content": "8 Aug 2012 ... The issue addresses the case where ansible decides to stop executing the remaining handlers. What is happening in my case is that ansible gets ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.ansible.com/t/how-to-mix-a-reboot-handler-with-a-service-restart-handler-in-the-same-ansible-playbook/32729",
+   "title": "How to mix a reboot handler with a service restart ... - Ansible Forum",
+   "content": "19 Apr 2020 ... ... handler to reboot the system while others notify different handlers to restart different services (due to configuration changes to those ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@kylejones199108/ansible-working-with-handlers-1990151eaf13",
+   "title": "Ansible: Working with Handlers - Medium",
+   "content": "27 Oct 2022 ... ... handler to restart that service, but only if a change is made. ... notify' statement to call a handler. The notify statement, in our ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}

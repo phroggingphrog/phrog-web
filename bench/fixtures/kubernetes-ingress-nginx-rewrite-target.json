@@ -1,0 +1,442 @@
+{
+ "query": "kubernetes ingress nginx rewrite target",
+ "expect": [
+  "kubernetes.io",
+  "github.com",
+  "docs.nginx.com"
+ ],
+ "rows": [
+  {
+   "url": "https://kubernetes.io/",
+   "title": "Kubernetes",
+   "content": "Kubernetes, also known as K8s, is an open source system for automating deployment, scaling, and management of containerized …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kubernetes.io/blog/2025/11/11/ingress-nginx-retirement/",
+   "title": "Ingress NGINX Retirement: What You Need to Know | Kubernetes",
+   "content": "Ingress NGINX Retirement: What You Need to Know To prioritize the safety and security of the ecosystem, Kubernetes SIG Network and the Security Response …",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kubernetes.github.io/ingress-nginx/examples/rewrite/",
+   "title": "Rewrite - Ingress-Nginx Controller - Kubernetes",
+   "content": "0, ingress definitions using the annotation nginx.ingress.kubernetes.io/rewrite-target are not backwards compatible with previous versions. In Version 0.22.0 ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kubernetes",
+   "title": "Kubernetes - Wikipedia",
+   "content": "Kubernetes (/ ˌk (j) uːbərˈnɛtɪs, - ˈneɪtɪs, - ˈneɪtiːz, - ˈnɛtiːz /), also known as K8s, is an open-source container orchestration system …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/sky-uk/feed",
+   "title": "GitHub - sky-uk/feed: Nginx based Kubernetes ingress controller …",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kubernetes.io/docs/home/",
+   "title": "Kubernetes Documentation",
+   "content": "Kubernetes is an open source container orchestration engine for automating deployment, scaling, and management of containerized …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://stackoverflow.com/a/64378566",
+   "title": "networking - Kubernetes Ingress nginx on Minikube fails - Stack …",
+   "content": "minikube v1.13.0 on Ubuntu 18.04 with Kubernetes v1.19.0 on Docker 19.03.8. Using helm/helmfile (\"v3.3.4\"). The Ubuntu VM is on VM-Workstation running on…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/introduction-to-kubernetes-k8s/",
+   "title": "Introduction to Kubernetes (K8s) - GeeksforGeeks",
+   "content": "Oct 3, 2026 · Updating applications without downtime requires automated deployment and coordination. Kubernetes automates …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://seclists.org/oss-sec/2023/q4/184",
+   "title": "oss-sec: [kubernetes] CVE-2023-5043: Ingress nginx annotation in…",
+   "content": "Issue Details A security issue was identified in ingress-nginx <https://github.com/kubernetes/ingress-nginx> where the nginx.ingress.kubernetes.io/config…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://discuss.kubernetes.io/t/ingress-nginx-rewrite-target/30448",
+   "title": "Ingress - nginx - rewrite target - Discuss Kubernetes",
+   "content": "8 Nov 2024 ... It seems that controller is built using older k8s libraries (v 1.18) and still tries to look for the v1beta1.Ingress . Try checking whether your ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kubernetes.io/blog/2026/02/27/ingress-nginx-before-you-migrate/",
+   "title": "Before You Migrate: Five Surprising Ingress-NGINX Behaviors You ...",
+   "content": "27 Feb 2026 ... The nginx.ingress.kubernetes.io/rewrite-target: \"/uuid\" annotation causes requests that match paths in the rewrite-target-ingress Ingress to ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/kubernetes/kubernetes/issues/137560",
+   "title": "CVE-2026-3288: ingress-nginx rewrite-target nginx configuration ...",
+   "content": "9 Mar 2026 ... A security issue was discovered in ingress-nginx where the nginx.ingress.kubernetes.io/rewrite-target Ingress annotation can be used to inject ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/47837087/nginx-ingress-rewrite-target",
+   "title": "kubernetes - nginx ingress & rewrite-target - Stack Overflow",
+   "content": "15 Dec 2017 ... As you'll notice, the ingress rewrite annotation appears to be very particular about trailing slashes. If a trailing slash is not present, the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kubernetes.nginx.org/ingress-nginx-migration.html",
+   "title": "NGINX Ingress Migration Tool",
+   "content": "The F5 NGINX Ingress Controller uses Custom Resource Definitions (CRDs) to extend Kubernetes with NGINX-specific configuration. CRDs provide type-safe, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.nashtechglobal.com/explore-nginx-ingress-kubernetes-io-rewrite-target-annotation/",
+   "title": "Explore nginx.ingress.kubernetes.io/rewrite-target annotation",
+   "content": "11 Mar 2024 ... Solution. This problem can be solved by using the annotation nginx.ingress.kubernetes.io/rewrite-target: “/” in our ingress object. ... we will ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/ww-engineering/kubernetes-nginx-ingress-traffic-redirect-using-annotations-demystified-b7de846fb43d",
+   "title": "Kubernetes Nginx ingress: traffic redirect using annotations ...",
+   "content": "13 May 2020 ... Redirect HTTP traffic or rewrite URLs using Kubernetes ingress annotations and Nginx ingress ... nginx.ingress.kubernetes.io/rewrite-target ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community.f5.com/t/how-to-rewrite-a-path-to-a-backend-service-dropping-the-prefix-and-passing-the-remaining-path/69865",
+   "title": "How to rewrite a path to a backend service dropping the prefix and ...",
+   "content": "2 June 2022 ... ok, maybe you're using the kubernetes version of the nginx ingress instead of the nginx version of the nginx ingress. Give a read-through on ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://discuss.kubernetes.io/t/security-advisory-cve-2026-3288-ingress-nginx-rewrite-target-nginx-configuration-injection/34289",
+   "title": "[Security Advisory] CVE-2026-3288: ingress-nginx rewrite-target ...",
+   "content": "9 Mar 2026 ... Hello Kubernetes Community, A security issue was discovered in ingress-nginx where the nginx.ingress.kubernetes.io/rewrite-target Ingress ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/kubernetes/kubernetes",
+   "title": "GitHub - kubernetes/kubernetes: Production-Grade Container …",
+   "content": "Kubernetes, also known as K8s, is an open source system for managing containerized applications across multiple hosts. It provides …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://serverfault.com/a/806231",
+   "title": "nginx - Kubernetes Ingress HA - Server Fault",
+   "content": "1 Answer 1 ELB doesn't support http2 per se, but it does support TCP. Your best bet is to front your k8s cluster nodes with the ELB. If you want fancier …",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/kubernetes/comments/oc6mc6/nginx_ingress_rewritetarget/",
+   "title": "Nginx ingress \"rewrite-target\" : r/kubernetes - Reddit",
+   "content": "2 July 2021 ... All rewrite-target does is let you change the URL that hits your container from the one that hit your ingress. It's useful if you have multiple ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/topics/containers/what-is-kubernetes",
+   "title": "What is Kubernetes? - Red Hat",
+   "content": "Jun 26, 2026 · Kubernetes is an open source container orchestration platform that automates the deployment, management, and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/a/59308424",
+   "title": "nginx - Kubernetes ingress update with deployment - Stack Overfl…",
+   "content": "We are currently setting up a kubernetes cluster for deploying our production workloads (mainly http rest services). In this cluster we have setup nginx i…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/kubernetes-tutorial/",
+   "title": "Kubernetes Tutorial - GeeksforGeeks",
+   "content": "Jun 25, 2026 · Developed at Google in 2014, Kubernetes draws on Google’s production experience and is now maintained by the …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.byteplus.com/en/docs/vke/Configuring-URL-rewrite-rules-for-an-Nginx-Ingress",
+   "title": "Configuring URL rewrite rules in Nginx Ingresses - BytePlus",
+   "content": "23 July 2026 ... nginx.ingress.kubernetes.io/rewrite-target · String · Yes · The target URI for URL rewriting. It uses regular expressions to define capture groups.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://k8s.info/docs/foundations/what-is-kubernetes",
+   "title": "What is Kubernetes? | The Kubernetes Visual Handbook",
+   "content": "Kubernetes (often abbreviated as K8s — the 8 stands for the eight letters between the \"K\" and the \"s\") is an open-source system for …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.nginx.com/nginx-ingress-controller/configuration/ingress-resources/advanced-configuration-with-annotations/",
+   "title": "Advanced configuration with Annotations | NGINX Documentation",
+   "content": "The Ingress resource can use basic NGINX features such as host or path-based routing and TLS termination. Advanced features like rewriting the request URI or ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tutorialspoint.com/kubernetes/index.htm",
+   "title": "Kubernetes Tutorial - Online Tutorials Library",
+   "content": "Kubernetes is a container management technology developed in Google lab to manage containerized applications in different kind of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/kodekloudhub/certified-kubernetes-administrator-course/blob/master/docs/09-Networking/23-Ingress-Annotations-and-rewrite-target.md",
+   "title": "23-Ingress-Annotations-and-rewrite-target.md - GitHub",
+   "content": "Different Ingress controllers have different options to customize the way it works. Nginx Ingress Controller has many options but we will take a look into the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://azure.microsoft.com/en-us/resources/cloud-computing-dictionary/what-is-kubernetes/?msockid=257f674750e16d060a827f4f51936cb0",
+   "title": "What Is Kubernetes? | Microsoft Azure",
+   "content": "Kubernetes is open-source software that automates the deployment, management, and scaling of containerized applications. It …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ibm.com/docs/en/cloud-paks/foundational-services/4.14.0?topic=reporter-configuring-kubernetes-ingress",
+   "title": "Configuring Kubernetes Ingress - IBM",
+   "content": "... Ingress under this section. nginx.ingress.kubernetes.io/rewrite-target: \"/$2\" path: /license-service-reporter-api(/|$)(.*) tls: - hosts: - www.example.com ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.haproxy.com/ingress-nginx-migration-assistant",
+   "title": "Ingress NGINX to HAProxy Kubernetes Ingress Migration",
+   "content": "Migration assistance from Ingress NGINX to HAProxy Kubernetes Ingress Controller ... Your toolkit for converting configuration and annotations from the retiring ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kgateway.dev/docs/envoy/latest/migrate/providers/ingressnginx/",
+   "title": "Ingress NGINX - kgateway",
+   "content": "nginx.ingress.kubernetes.io/force-ssl-redirect : When set to \"true ... rewrite-target generates TrafficPolicy URL rewrites using spec.urlRewrite ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://kodekloud.com/community/t/how-ingress-works-with-respect-to-annotation-nginx-ingress-kubernetes-io-rewrite-target/460036",
+   "title": "How Ingress works, with respect to annotation nginx ... - KodeKloud",
+   "content": "The rewrite target performs a URL rewrite on the incoming URL before passing it to the backend service. URL rewriting is a very common operation in web servers ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://doc.traefik.io/traefik/reference/routing-configuration/kubernetes/ingress-nginx/",
+   "title": "Traefik Kubernetes Ingress NGINX Routing Configuration",
+   "content": "Forward auth behaves differently than NGINX. When combined on the same Ingress with rewrite-target (or a rewrite directive in configuration-snippet / auth- ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/kubernetes/ingress-nginx/issues/10920",
+   "title": "rewrite-target not generating rewrite NGINX configuration #10920",
+   "content": "26 Jan 2024 ... What happened: According to documentation, following example: apiVersion: networking.k8s.io/v1 kind: Ingress metadata: annotations: ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}
