@@ -1,0 +1,9 @@
+name: web-phrog-web
+version: 1.0.0
+description: "phrog-web — self-hosted search + extract backend. Routes Hermes's native web_search and web_extract tools to the local phrog-web API (no MCP server, no vendor key)."
+author: phroggingphrog
+kind: backend
+provides_web_providers:
+  - phrog-web
+requires_env:
+  - PHROG_WEB_URL
