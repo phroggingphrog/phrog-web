@@ -4,7 +4,7 @@ import { shapeQuery } from './query-shape.js';
 import { refineEnabled, refineQuery } from './query-llm.js';
 import { rerank, rerankEnabled, rerankMaxCandidates } from './rerank.js';
 import { searchAnySearch, searchExaMcp, searchFirecrawl, searchWikimedia } from './free-engines.js';
-import { runWithTinyfishKeys } from './tinyfish-keys.js';
+import { runWithTinyfishKeys, type TinyfishPlan } from './tinyfish-keys.js';
 
 export interface SearchResult {
   title: string;
@@ -38,7 +38,12 @@ export interface SearchOptions {
   safesearch?: string;
 }
 
+/** Plan that paid for the TinyFish call in this response: 'free' (Hobby) or 'paid' (Builder). */
+let lastTinyfishPlan: TinyfishPlan | undefined;
+
 export interface SearchResponse {
+  /** Which TinyFish plan answered ('free' Hobby vs 'paid' Builder) — never the key itself. */
+  tinyfishPlan?: TinyfishPlan;
   /** True when the primary index came back thin and the fallback tier was consulted. */
   fellBackToFallback?: boolean;
   /** Present when engines were unresponsive or the candidate set is thin. */
@@ -125,7 +130,12 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<{ r
 async function searchTinyFish(query: string, options: SearchOptions): Promise<SearchResult[]> {
   // Two accounts = two 12,000/day allowances. Try the key that last worked, and move on when a
   // key reports exhausted (401/402/403/429) instead of failing the whole search.
-  return runWithTinyfishKeys((apiKey) => searchTinyFishWithKey(apiKey, query, options));
+  return runWithTinyfishKeys((apiKey, plan) => {
+    // Cost visibility: a response should say whether this query spent free Hobby allowance or
+    // Builder credit, without exposing the key itself.
+    lastTinyfishPlan = plan;
+    return searchTinyFishWithKey(apiKey, query, options);
+  });
 }
 
 async function searchTinyFishWithKey(apiKey: string, query: string, options: SearchOptions): Promise<SearchResult[]> {
@@ -447,7 +457,7 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   // A degraded search must SAY it is degraded: a thin result set caused by a rate-limited
   // engine is not the same as "the web has nothing".
   const degraded = unresponsive.length ? { unresponsive_engines: unresponsive, thin: rankedAll.length < 15 } : undefined;
-  const response: SearchResponse = { query, results, fellBackToFallback: fellBack, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope, ...(degraded ? { degraded } : {}), ...(rerankInfo ? { rerank: rerankInfo } : {}) };
+  const response: SearchResponse = { query, results, fellBackToFallback: fellBack, ...(lastTinyfishPlan ? { tinyfishPlan: lastTinyfishPlan } : {}), provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope, ...(degraded ? { degraded } : {}), ...(rerankInfo ? { rerank: rerankInfo } : {}) };
   if (searchCache.size >= CACHE_MAX_ENTRIES) searchCache.delete(searchCache.keys().next().value!);
   searchCache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, value: response });
   return response;
