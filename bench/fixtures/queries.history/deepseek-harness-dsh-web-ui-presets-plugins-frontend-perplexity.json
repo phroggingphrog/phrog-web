@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "deepseek harness dsh web ui presets plugins frontend perplexity",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://agedcaresteps.com.au/",
+   "title": "Aged Care Steps",
+   "content": "Oct 17, 2026 · With simple data input and template SoA wording, the Aged Care Steps (ACS) Advice Generator™ allows you to …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://calculator.agedcaresteps.com.au/",
+   "title": "Aged Care Steps",
+   "content": "Forgot your password?",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://myagedcare-serviceproviderportal.health.gov.au/",
+   "title": "Login | Health",
+   "content": "Digital ID is a safe, secure and convenient way to prove and reuse your identity online. Commonwealth of Australia | Department of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://agedcaresteps.com.au/acs-services",
+   "title": "ACS services — Aged Care Steps",
+   "content": "Become an Aged Care Steps member to save time and money, with everything you need to deliver quality aged care advice. The …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.myagedcare.gov.au/access-your-online-account",
+   "title": "Access your information online - My Aged Care",
+   "content": "Access your Online Account, which contains important information about your aged care assessments, services, and interactions …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.myagedcare.gov.au/",
+   "title": "Helping you navigate aged care, every step of the way",
+   "content": "Use My Guide to create a personalised step-by-step plan to access aged care. It can make the process to accessing aged care …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.health.gov.au/resources/apps-and-tools/my-aged-care-service-and-support-portal",
+   "title": "My Aged Care Service and Support Portal",
+   "content": "Sep 30, 2026 · Before you can access the Portal for the first time, you must complete the steps outlined in the Logging in to the Aged …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://learning.myagedcare.gov.au/",
+   "title": "My Aged Care - Sign In",
+   "content": "Forgot password? Not a member? Sign Up.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://agedcare.acnp.org.au/login",
+   "title": "Login - agedcare.acnp.org.au",
+   "content": "Forgot password? Don’t have an account? Register now.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://myagedcare.healthdirect.gov.au/",
+   "title": "Login - My Aged Care",
+   "content": "Forgotten your password?",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

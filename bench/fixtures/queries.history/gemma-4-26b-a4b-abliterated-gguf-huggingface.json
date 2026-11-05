@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "gemma 4 26b-a4b abliterated gguf huggingface",
+ "expect": [
+  "huggingface.co"
+ ],
+ "rows": [
+  {
+   "url": "https://deepmind.google/models/gemma/gemma-4/",
+   "title": "Gemma 4 — Google DeepMind",
+   "content": "Apr 2, 2026 · Gemma 4 is a family of open models, purpose-built for advanced reasoning and agentic workflows.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://deepmind.google/models/gemma/",
+   "title": "Gemma — Google DeepMind",
+   "content": "Gemma is a collection of lightweight, open models built from the same technology that powers our Gemini models.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://gemma.ai/models/",
+   "title": "Gemma Model Family - Gemma Documentation",
+   "content": "Gemma is Google DeepMind's family of open models: the weights are published, so you download them and run them on your own …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Gemma_(language_model)",
+   "title": "Gemma (language model) - Wikipedia",
+   "content": "In February 2024, Google debuted Gemma, a collection of open weight LLMs that serve as a lightweight version of Gemini. The …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://gemma4.com/",
+   "title": "Gemma 4 — Google DeepMind",
+   "content": "Gemma 4 is the fourth generation of Google DeepMind's family of open models. Built from the same research, data pipelines, and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/google-deepmind/gemma",
+   "title": "GitHub - google-deepmind/gemma: Gemma open-weight LLM library, …",
+   "content": "Gemma is a family of open-weights Large Language Model (LLM) by Google DeepMind, based on Gemini research and technology. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.gemmasimplyitalian.com.au/",
+   "title": "Pizza and Gnocchi Bar in Carlton, Lygon Street - Gemma Simply Italian",
+   "content": "Who's Gemma? Gemma is the Nonna who gave us love. The Nonna who taught us how to make homemade Gnocchi. The Nonna …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.biggerbolderbaking.com/",
+   "title": "Bigger Bolder Baking | Trusted Baking Recipes by Chef Gemma",
+   "content": "Pro chef & baking expert, Gemma Stafford, will help you bake with confidence through her trusted Bigger Bolder Baking recipes & …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ai.google.dev/gemma/docs",
+   "title": "Gemma models overview - Google AI for Developers",
+   "content": "Oct 7, 2026 · Developed by Google DeepMind and other teams across Google, Gemma is named after the Latin gemma, meaning …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/google/gemma-7b",
+   "title": "google/gemma-7b · Hugging Face",
+   "content": "Summary description and brief definition of inputs and outputs. Gemma is a family of lightweight, state-of-the-art open models from …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

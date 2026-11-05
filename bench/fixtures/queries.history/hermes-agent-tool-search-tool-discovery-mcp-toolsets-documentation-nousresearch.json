@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "hermes agent tool search tool discovery mcp toolsets documentation nousresearch",
+ "expect": [
+  "raw.githubusercontent.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.hermes.com/au/en/",
+   "title": "The official Hermes online store | Hermès Australia",
+   "content": "Discover all the collections of Hermès, fashion accessories, scarves and ties, belts and ready-to-wear, perfumes, watches and jewelry.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hermes.com/au/en/content/263526-masterpagewomenss1auen/",
+   "title": "Hermes - The official Hermes online store | Hermès Australia",
+   "content": "Hermès objects continue to compose a beautiful story for women. For bags, belts and wallets, leather goods emphasise know-how in …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Hermes",
+   "title": "Hermes - Wikipedia",
+   "content": "Hermes (/ ˈhɜːrmiːz /; Ancient Greek: Ἑρμῆς) is an Olympian deity in ancient Greek religion and mythology considered the herald of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Herm%C3%A8s",
+   "title": "Hermès - Wikipedia",
+   "content": "Hermès International S.C.A. (/ ɛərˈmɛz / ⓘ air-MEHZ, French: [ɛʁmɛs] ⓘ), using the trade name Hermès Paris or simply Hermès, is …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.britannica.com/topic/Hermes-Greek-mythology",
+   "title": "Hermes | God of Thieves, Symbol, Father, The Odyssey, …",
+   "content": "One of the 12 Olympians, Hermes was the divine messenger, the protector of herds and travelers, and the god of commerce and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.myer.com.au/c/beauty/featured-beauty--brands/hermes-1",
+   "title": "HERMÈSHermes | Hermes Australia | Buy Hermes Products Online",
+   "content": "HERMÈS at Myer. Free Delivery 🚚 On Orders Above $99! 30 Days FREE Returns* Shop Our Range Of HERMÈS with Afterpay!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.greekmythology.com/Olympians/Hermes/hermes.html",
+   "title": "Hermes :: Messenger of the Gods: His Myths, Symbols & Family",
+   "content": "Oct 6, 2026 · Hermes is the Olympian messenger god, the son of Zeus and the nymph Maia, and the god of travel, trade, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hermes.com/au/en/category/leather-goods/bags-and-clutches/",
+   "title": "All Hermès Bag Collection | Hermès Australia",
+   "content": "Explore the entire Hermès bag collection. Find contemporary silhouettes available in distinct sizes and hues defined by artisanal …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hermes.com/au/en/category/leather-goods/bags-and-clutches/womens-bags-and-clutches/",
+   "title": "Women's Bag Collection: Shoulder, Crossbody and Tote Bags",
+   "content": "Explore the latest Hermès handbags for women. Find shoulder bags, clutches, and crossbody styles available in various sizes and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hermes.com/au/en/find-store/australia/",
+   "title": "Hermes Stores Australia | Hermès Australia",
+   "content": "Find your Hermès store in Australia: ready-to-wear, bags, jewelry, and many other Hermès products to discover in your nearest store!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

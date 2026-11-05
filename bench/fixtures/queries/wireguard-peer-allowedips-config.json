@@ -1,0 +1,418 @@
+{
+ "query": "wireguard peer allowedips config",
+ "expect": [
+  "wireguard.com",
+  "procustodibus.io"
+ ],
+ "rows": [
+  {
+   "url": "https://lists.zx2c4.com/pipermail/wireguard/2016-July/000278.html",
+   "title": "[WireGuard] 0.0.0.0/0 in AllowedIPs for multiple peer on the sam\u2026",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://onepiece.fandom.com/wiki/Going_Merry",
+   "title": "Going Merry | One Piece Wiki | Fandom",
+   "content": "Unfortunately, the Going Merry took an inordinate amount of damage during her \"lifetime\", being blown up, impaled, sliced up \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://defguard.net/blog/allowedips-explained/",
+   "title": "AllowedIPs in WireGuard\u00ae Explained: Quick Reference and How It ...",
+   "content": "22 Jan 2026 ... On the server (gateway) config \u2014 for each [Peer] (client): ... AllowedIPs = list of IPs/networks this client is allowed to use as source when\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lists.zx2c4.com/pipermail/wireguard/2016-July/000276.html",
+   "title": "[WireGuard] 0.0.0.0/0 in AllowedIPs for multiple peer on the sam\u2026",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://onepiece.fandom.com/wiki/Episode_312",
+   "title": "Episode 312 - One Piece Wiki",
+   "content": "As the crew make their way back to Water 7, they meet the Galley-La Company, Iceburg and all, who are sailing out to greet them. \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/WireGuard/comments/1f9fw3i/what_exactly_does_wireguard_do_with_the_ips_in/",
+   "title": "What exactly does Wireguard do with the IPs in AllowedIPs? - Reddit",
+   "content": "5 Sept 2024 ... The AllowedIPs list is used by wireguard to create it's \"crypto-key routing table\". It's like the ARP table for ethernet (kinda). You can learn\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.opnsense.org/index.php?topic=40324.0",
+   "title": "opnsense + wireguard peer generator QR code on android8",
+   "content": "Hi, had setup fresh opnsense and wireguard. if i manualy configure a peer for example on windows and copy the config with .zip file to my little old andr\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wiki.sportskeeda.com/one-piece/when-does-the-going-merry-die",
+   "title": "When does the Going Merry die? - Sportskeeda Wiki",
+   "content": "Going Merry, the first ship of the Straw Hat Pirates collapsed under its own weight and was destroyed in episode 312 of the anime \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lists.zx2c4.com/pipermail/wireguard/2016-July/000040.html",
+   "title": "[WireGuard] [PATCH 4/4] Clarify what Peer.AllowedIPs actually co\u2026",
+   "content": "It looks to me like AllowedIPs acts as a filter for traffic sent by the peer. To avoid some other confused interpretation (e.g. IP addresses that are all\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.wireguard.com/quickstart/",
+   "title": "Quick Start - WireGuard",
+   "content": "This feature may be specified by adding the PersistentKeepalive = field to a peer in the configuration file, or setting persistent-keepalive at the command line\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.mikrotik.com/t/wireguard-allowed-ips-unofficial-wireguard-documentation/156426",
+   "title": "Unofficial WireGuard Documentation - allowed IPs - MikroTik Forum",
+   "content": "9 Mar 2022 ... AllowedIPs This defines the IP ranges for which a peer will route traffic. On simple clients, this is usually a single address (the VPN\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://oneuptime.com/blog/post/2026-03-20-wireguard-allowedips-ipv4-split-tunneling/view",
+   "title": "How to Configure WireGuard AllowedIPs for IPv4 Split Tunneling",
+   "content": "20 Mar 2026 ... The AllowedIPs field in a WireGuard peer configuration is both an access control list and a routing directive. Understanding it is key to\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://eoffice.rs/en/blog/wireguard-configuration-fields-explained",
+   "title": "WireGuard Config: Interface and Peer Fields | Eoffice Blog",
+   "content": "20 May 2025 ... Every field in a WireGuard wg0.conf, explained: PrivateKey, Address, ListenPort, AllowedIPs, Endpoint and PersistentKeepalive,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.procustodibus.com/blog/2021/03/wireguard-allowedips-calculator/",
+   "title": "WireGuard AllowedIPs Calculator - Pro Custodibus",
+   "content": "21 Mar 2021 ... You use the AllowedIPs setting of WireGuard to configure which blocks of IP addresses should be routed through which remote WireGuard peers.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/opnsense/core/issues/7359",
+   "title": "Wireguard Peer Generator - Allowed IPs is correctly added ... - GitHub",
+   "content": "4 Apr 2024 ... The most common value for this is AllowedIPs = 0.0.0.0/0, ::/0 which routes all traffic through from the client through the VPN. However when\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://superuser.com/questions/1830713/how-to-configure-wireguard-allowedips-to-allow-local-connections-and-route-all-o",
+   "title": "How to configure WireGuard AllowedIPs to allow local connections ...",
+   "content": "18 Feb 2024 ... 45.1, and route all the rest of the internet traffic through WireGuard. Also, I have noticed something when you have this ::/0 in the AllowedIPs\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.openwrt.org/t/understanding-the-route-allowed-ips-option-in-wireguard/152044",
+   "title": "Understanding the 'Route Allowed IPs' option in Wireguard",
+   "content": "18 Feb 2023 ... If you've already assigned the wireguard interface a subnet and all your peers are individual devices with addresses inside that subnet then\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community.ui.com/questions/Feature-Request-Wireguard-AllowedIPs/6191cf3b-3e9d-4c6c-94fc-72ba0139c680",
+   "title": "Feature Request - Wireguard AllowedIPs - Ubiquiti Community",
+   "content": "10 Nov 2023 ... The missing piece is being able to add multiple allowed IPs onto the peer configuration. The remote client connects ok and is able to access\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.crunchyroll.com/watch/GX9UQX450/thank-you-merry-snow-falls-over-the-parting-sea",
+   "title": "E312 - Thank You, Merry! Snow Falls Over the Parting Sea!",
+   "content": "Snow Falls Over the Parting Sea!, on Crunchyroll. The Straw Hats bid a tearful farewell to the brave little ship that was their home for \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://m.youtube.com/watch?v=MAytEIgqlPA",
+   "title": "One Piece Merry's Funeral - YouTube",
+   "content": "Dec 18, 2009 \u00b7 you just can't hold you tears when you see this!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wiki.teltonika-networks.com/view/Wireguard_Peer_To_Peer_Configuration_example",
+   "title": "Wireguard Peer To Peer Configuration example",
+   "content": "WireGuard instance general configuration \u00b7 When you have pressed near the WireGuard interface, go to the General settings section \u00b7 Enable the interface \u00b7 Press\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://m.youtube.com/watch?v=wtYd5DxzbCQ",
+   "title": "Going Merry's Last Moment | Merry's Death | Goodbye Merry | One piece ...",
+   "content": "Mar 23, 2023 \u00b7 Going Merry's Last Moment | Merry's Death | Goodbye Merry | One piece episode - 312 AnimeThrowback 3.11K \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/OnePiece/comments/1ddqloo/one_piece_going_merry/",
+   "title": "One Piece Going Merry : r/OnePiece - Reddit",
+   "content": "I just finished episode 312 where the going merry is burned and eventually sunk into the sea. My only question is why didn\u2019t they \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/OnePiece/comments/ibrsob/who_was_in_the_wrong_regarding_the_going_merry_at/",
+   "title": "Who was in the wrong regarding the going merry at water 7.",
+   "content": "Aug 18, 2020 \u00b7 Luffy\u2019s two choices were to let the going merry sink, which would leave them without a ship or buy a new ship \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://darkskiesfilm.com/what-episode-does-luffy-burn-the-going-merry/",
+   "title": "The Final Voyage: Understanding When Luffy Said Goodbye to the Going ...",
+   "content": "Jun 18, 2025 \u00b7 The burning of the Going Merry is arguably one of the most heart-wrenching moments in One Piece. As the flames \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cbr.com/one-piece-moments-going-merry-damaged/",
+   "title": "One Piece: 7 Times the Going Merry Was Damaged & Destroyed (In \u2026",
+   "content": "Jun 3, 2025 \u00b7 Before the Going Merry's untimely demise in One Piece, this carousel went through the wringer for nearly 300 \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/openwrt/luci/issues/7420",
+   "title": "luci-app-wireguard save peer AllowedIPs configuration \u00b7 Issue #7420",
+   "content": "23 Nov 2024 ... Your description is that of the peer's entry on the OpenWrt server. The AllowedIPs on the page you are describing turns into the list\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/10/html/configuring_and_managing_networking/setting-up-a-wireguard-vpn",
+   "title": "Chapter 7. Setting up a WireGuard VPN | Red Hat Enterprise Linux",
+   "content": "peers parameter defines the peer section of the client in the NetworkManager connection profile. Use 0.0.0.0/0;::/0; in allowed-ips to allow any remote IPv4 and\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.opnsense.org/manual/how-tos/wireguard-client.html",
+   "title": "WireGuard Road Warrior Setup - OPNsense documentation",
+   "content": "Peers can be generated using the new peer generator feature under VPN \u2023 WireGuard \u2023 Peer generator. If using the peer generator and require Unbound DNS to serve\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.procustodibus.com/blog/2021/01/wireguard-endpoints-and-ip-addresses/",
+   "title": "WireGuard Endpoints and IP Addresses - Pro Custodibus",
+   "content": "2 Jan 2021 ... In our case, we have only one peer configured for the interface, and its AllowedIPs setting matches. Therefore, WireGuard will encrypt the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://help.firewalla.com/hc/en-us/community/posts/29612351553171-Wireguard-Allowed-IPs-problem",
+   "title": "Wireguard Allowed IPs problem - Firewalla",
+   "content": "22 May 2024 ... Wireguard server setup, with client profiles created and installed on Windows laptops. Office with Firewalla/Wireguard server is location A\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.varidata.com/blog-en/how-to-configure-a-different-ip-address-for-your-wireguard/",
+   "title": "How to Configure a Different IP Address for Your WireGuard - Varidata",
+   "content": "25 Feb 2026 ... You use the allowedips setting for each peer. This helps your network work with the correct endpoint. What does the /31 subnet mask do in a\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://alexander2k.github.io/netroute-site/guides/wireguard.html",
+   "title": "WireGuard Split Tunneling with AllowedIPs - GitHub Pages",
+   "content": "Route specific websites through WireGuard VPN via AllowedIPs. Generate the list from domains in NetRoute, paste into peer config, restart tunnel \u2014 split\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.netgate.com/topic/184254/setup-docs-incomplete-for-wireguard-confused-about-terms-having-a-challenging-time-setting-up-wireguard-read-here",
+   "title": "Setup Docs Incomplete for Wireguard - Confused about terms ...",
+   "content": "21 Nov 2023 ... In Wireguard on pfSense, you control the range of IPs that a Peer is allowed to reach on your network with Firewall Rules (not with Allowed IPs)\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

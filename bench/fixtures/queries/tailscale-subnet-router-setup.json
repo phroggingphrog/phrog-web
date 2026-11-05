@@ -1,0 +1,466 @@
+{
+ "query": "tailscale subnet router setup",
+ "expect": [
+  "tailscale.com"
+ ],
+ "rows": [
+  {
+   "url": "https://tailscale.com/kb/1019/subnets",
+   "title": "Subnet routers and traffic relay nodes \u00b7 Tailscale Docs",
+   "content": "Subnet routers Subnet routers let you extend your Tailscale network (known as a tailnet) to include devices that don't or can't run the Tailscale client. \u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1,
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/1056330/how-to-display-a-label-next-to-a-marker-for-google-maps",
+   "title": "How to display a label next to a Marker for Google Maps?",
+   "content": "Jun 9, 2022 \u00b7 If you just want to show label below the marker, then you can extend google maps Marker to add a setter method for \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/35400664/google-maps-multiple-markers-via-url-only",
+   "title": "Google Maps - Multiple Markers via URL only - Stack Overflow",
+   "content": "Feb 15, 2016 \u00b7 answered Nov 29, 2021 at 22:00 RJ Adriaansen 9,719 2 17 29 google-maps google-maps-markers",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.ctms.me/posts/2023-09-18-tailscale-shenanigans-subnet-routing/",
+   "title": "Tailscale subnet routing with Pihole is homelab perfection - Dom\u2026",
+   "content": "tl;dr: After I lost the ability to do port forwarding with my ISP, I setup my Pihole instance on my tailnet and then enabled Tailscale subnet routing. Thi\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mymaps/answer/7629390?hl=en",
+   "title": "Delete a map from My Maps - Google Help",
+   "content": "You can remove your maps from My Maps when you don\u2019t need them anymore. You can move the map to your trash in My Maps, \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/vidbase/tailscale-router",
+   "title": "GitHub - vidbase/tailscale-router: Tailscale Subnet Router on Re\u2026",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/Tailscale/comments/vqdgfy/here_is_the_howtoconfigure_tailscale_subnet/",
+   "title": "Here is the how-to-configure TailScale Subnet Router for Windows ...",
+   "content": "3 July 2022 ... Here is the how-to-configure TailScale Subnet Router for Windows Machine. The Windows installer places a tailscale.exe command in %PATH%. You\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/maps/answer/144349?hl=fi&co=GENIE.Platform%3DAndroid",
+   "title": "Android-puhelin ja \u2011tabletti - Maps Ohjeet - Google Help",
+   "content": "T\u00e4ss\u00e4 artikkelissa kerrotaan perusasioista monista eri Google Maps \u2011ominaisuuksista ja annetaan ohjeita niiden k\u00e4ytt\u00f6\u00f6n. Voit \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/GoogleMaps/comments/196e9fk/maps_button_gone_from_google_search/",
+   "title": "\"Maps\" button gone from Google Search : r/GoogleMaps - Reddit",
+   "content": "There used to be a \"Maps\" button next to \"Images\" after you do a Google search. Also, on the right side of the screen, where you get \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/features/subnet-routers/how-to/setup",
+   "title": "Configure a subnet router \u00b7 Tailscale Docs",
+   "content": "5 Jan 2026 ... Configure a subnet router \u00b7 Download and install the Tailscale client. \u00b7 Open a terminal session on the device and enable IP forwarding. \u00b7 In\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/features/subnet-routers",
+   "title": "Subnet routers \u00b7 Tailscale Docs",
+   "content": "29 Sept 2026 ... Network: 100.64.0.0/10 (the Tailscale IP address range, which includes reserved IP addresses); Next hop or gateway: The LAN IP address of your\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=dAZCrky2qns",
+   "title": "Tailscale Subnet Router in 5 Minutes: The Missing Piece ... - YouTube",
+   "content": "6 Aug 2026 ... Access your entire home network from anywhere with no port forwarding, no monthly fees, and no cloud middleman. In this video I explain what\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/blog/subnet-router-video",
+   "title": "Subnet routers: how do they work? - Tailscale",
+   "content": "20 June 2024 ... But there are some cases, like embedded devices or existing VPCs, where a direct installation on each node isn't feasible. That's when you can\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=UmVMaymH1-s",
+   "title": "Subnet Routers | Tailscale Explained - YouTube",
+   "content": "20 June 2024 ... He also shows you how to install Tailscale and configure subnet routers ... Tailscale Subnet Router Setup - Extending Your Local Network. Mike\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.xda-developers.com/tailscale-subnet-routing-home-lab-remote-access/",
+   "title": "I used Tailscale's subnet routing to make my entire home lab feel ...",
+   "content": "13 Aug 2026 ... 0.0/10 range on the tailnet. Anything that can't run the Tailscale client just doesn't exist, as far as the tailnet is concerned. A subnet\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/how-to/quickstart",
+   "title": "Tailscale quickstart",
+   "content": "5 Jan 2026 ... For details on how to quickly configure and use a subnet router, refer to Configure a subnet router. For more in-depth information about subnet\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=EklFACXxC9Q",
+   "title": "Tailscale Subnet Router Setup - Extending Your Local Network",
+   "content": "14 Jan 2022 ... Tailscale is easy and works great when you have client applications set up on your devices, however, there are times when you want to reach\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.gl-inet.com/router/en/4/interface_guide/tailscale/",
+   "title": "Tailscale - GL.iNet Router Docs 4",
+   "content": "Set up Tailscale network\u00b6 \u00b7 glinet bind link. It will show a Tailscale link in the pop-up window. \u00b7 glinet bind link. Once logged in, you will be asked to confirm\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dietpi.com/forum/t/tailscale-on-dietpi-fails-to-act-as-subnet-router/20740",
+   "title": "Tailscale on Dietpi Fails to Act as Subnet Router - Troubleshoot\u2026",
+   "content": "Additional Information (if applicable) Steps to reproduce After installing Tailscale on Dietpi, I wanted to make the RPi a \u201cSubnet Router\u201d so that I can \u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/GoogleMaps/comments/927hh4/google_maps_estimate_walk_time_vs_actual_walk_time/",
+   "title": "Google Maps estimate walk time vs Actual Walk Time",
+   "content": "Jul 26, 2018 \u00b7 Maps simply uses the average walk speed of a human, 5 km/h, to calculate walk times. Google cannot know that you \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://tailscale.com/kb/1298/subnet-bgp",
+   "title": "Subnet router BGP advertisement \u00b7 Tailscale Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/maps/answer/144349?hl=en&co=GENIE.Platform%3DAndroid",
+   "title": "Get started with Google Maps",
+   "content": "This article will help you set up, learn the basics, and explain various features of Google Maps. You can use the Google Maps app on \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=40990101",
+   "title": "I use a Raspberry Pi to run a Tailscale subnet router on the LAN\u2026",
+   "content": "I use a Raspberry Pi to run a Tailscale subnet router on the LAN. I installed some cheap IP cams but blocked all Internet access so they can only access m\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/maps/answer/13380972?hl=it&co=GENIE.Platform%3DDesktop",
+   "title": "Gestire gli indirizzi nell'Account Google - Computer - Guida di Maps",
+   "content": "Scopri di pi\u00f9 sui diversi tipi di indirizzi presenti nel tuo Account Google e su come gestirli. Indirizzi di casa e di lavoro Per \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://tailscale.com/kb/1214/site-to-site",
+   "title": "Site-to-site networking \u00b7 Tailscale Docs",
+   "content": "Site-to-site networking You can use Tailscale subnet routers to connect two or more subnets (such as different physical locations or cloud environments) \u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/maps/answer/144349?hl=en-GB&co=GENIE.Platform=Android",
+   "title": "Get started with Google Maps",
+   "content": "When you open the Google Maps app, you can find these tabs at the bottom of the Home screen: Explore : Choose where to go. You \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/kb/1406/quick-guide-subnets",
+   "title": "Configure a subnet router \u00b7 Tailscale Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/maps/answer/6194894?hl=en&co=GENIE.Platform%3DDesktop",
+   "title": "Report wrong directions in Google Maps",
+   "content": "Report wrong directions in Google Maps If you got the wrong directions in Google Maps, you can tell us which step was incorrect. \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://worthy.cc/blog/g48fnwc7/",
+   "title": "Tailscale Subnet Router & Exit Node\uff1aComplete Setup Guide | Blog",
+   "content": "2 days ago ... Step 3: Approve in the Admin Console \u00b7 Go to the Tailscale Admin Console. \u00b7 Find your Windows machine in the list. \u00b7 Click the three dots (...)\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.differentpla.net/blog/2022/11/25/tailscale-subnet-router/",
+   "title": "Tailscale Subnet Router - Roger's Blog",
+   "content": "25 Nov 2022 ... Subnet Router \u00b7 On the Diskstation, run sudo tailscale up --advertise-routes=192.168.28.0/24 (because my home network is on 192.168.28.x ). \u00b7 In\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/features/site-to-site",
+   "title": "Site-to-site networking \u00b7 Tailscale Docs",
+   "content": "29 Sept 2026 ... Step 1: Select a subnet router \u00b7 Step 2: Configure the subnet router \u00b7 Step 3: Approve the subnet router \u00b7 Step 4: Update tailnet access control\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=ZElK9dl0fJs",
+   "title": "Tailscale Subnet Router On Windows - Simplified Remote Access",
+   "content": "4 June 2023 ... Today's video shows how easy installing and configuring a Tailscale subnet router is using Windows. A subnet router is a perfect solution\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/tailscale/tailscale/issues/14971",
+   "title": "tailscale - Subnet Router NAT Configuration - GitHub",
+   "content": "10 Feb 2025 ... When setting up a Tailscale subnet router on a Linux system (in this case a Raspberry Pi running Ubuntu), there's a gap between getting routes\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community.home-assistant.io/t/tailscale-subnets-how-to-access-a-different-subnet/574372",
+   "title": "Tailscale + Subnets: How to access a different subnet? - Configuration",
+   "content": "23 May 2023 ... I was able to get the Tailscale addon installed and setup. However, it automatically defaulted to adding subnet 192.168.0.0/24 based on what I\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/route",
+   "title": "Route traffic \u00b7 Tailscale Docs",
+   "content": "29 Sept 2026 ... Subnet routers respect features like access control policies, which make it easy to migrate a large network to Tailscale without installing the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://budgethomelab.com/guides/tailscale-subnet-routing/",
+   "title": "Tailscale Subnet Router Setup in 5 Steps - Budget Homelab",
+   "content": "16 Apr 2026 ... Quick Answer: How to Set Up Tailscale Subnet Routing \u00b7 Enable IP forwarding on the server that will act as the subnet router: add net.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscale.com/docs/install/cloud/aws",
+   "title": "Connect to an AWS VPC using subnet routes \u00b7 Tailscale Docs",
+   "content": "4 Dec 2025 ... Deployment steps \u00b7 Step 1: Sign in to your AWS account \u00b7 Step 2: Create a VPC \u00b7 Step 3: Create an EC2 instance for the Tailscale subnet router.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://tailscaleguide.com/posts/tailscale-subnet-router-configuration/",
+   "title": "Tailscale Subnet Router: Advertise, Approve, Accept Routes",
+   "content": "5 Sept 2026 ... Setup takes four steps: enable IP forwarding, run sudo tailscale set --advertise-routes=10.0.20.0/24 , approve the route in the admin console,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

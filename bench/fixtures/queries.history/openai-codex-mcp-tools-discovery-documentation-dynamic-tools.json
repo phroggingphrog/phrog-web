@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "openai codex mcp tools discovery documentation dynamic tools",
+ "expect": [
+  "raw.githubusercontent.com"
+ ],
+ "rows": [
+  {
+   "url": "https://openai.com/",
+   "title": "OpenAI | Research & Deployment",
+   "content": "We believe our research will eventually lead to artificial general intelligence, a system that can solve human-level problems.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://chatgpt.com/",
+   "title": "ChatGPT",
+   "content": "You can still log in below.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openai.com/index/chatgpt/",
+   "title": "Introducing ChatGPT - OpenAI",
+   "content": "Nov 30, 2022 · Iterative deployment Today’s research release of ChatGPT is the latest step in OpenAI’s iterative deployment ⁠ of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://platform.openai.com/onboarding",
+   "title": "OpenAI Platform",
+   "content": "OpenAI Platform ... OpenAI Platform",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/OpenAI",
+   "title": "OpenAI - Wikipedia",
+   "content": "OpenAI is an American artificial intelligence (AI) public benefit corporation (PBC) headquartered in San Francisco, California. [9] . It …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://platform.openai.com/",
+   "title": "OpenAI Platform",
+   "content": "Sign up or login with an OpenAI account to build with the OpenAI API.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://chatgpt.com/overview/",
+   "title": "Overview | ChatGPT",
+   "content": "ChatGPT helps you learn, create, and get things done. Ask questions, explore ideas, write content, analyze information, and more …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openai.smapply.org/",
+   "title": "OpenAI",
+   "content": "OpenAI’s mission is to ensure that artificial general intelligence (AGI) benefits all of humanity. In service of that mission, we …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.openai.com/api/docs/models/all",
+   "title": "All models | OpenAI API",
+   "content": "Browse all available models on the OpenAI Platform.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.openai.com/",
+   "title": "OpenAI Developers",
+   "content": "OpenAI for developers Docs and resources to help you build with, for, and on OpenAI.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

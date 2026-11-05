@@ -1,0 +1,141 @@
+{
+ "corpus": "queries.history",
+ "query": "grok 4.7 benchmark scores swe bench gpqa official xai",
+ "expect": [
+  "vals.ai"
+ ],
+ "rows": [
+  {
+   "url": "https://grok.com/",
+   "title": "Grok",
+   "content": "Grok is an AI assistant built by SpaceXSI. Chat, create images, write code, and get real-time answers from the web and X.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://vals.ai/models/grok_grok-4.7",
+   "title": "Grok 4.7 Benchmarks, Cost and Capabilities | Vals AI",
+   "content": "Grok 4.7 by SpaceXAI: accuracy, cost, and latency across 29 Vals AI benchmarks. Scores 58.56% on the Vals Index.",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://grok.com/imagine",
+   "title": "Grok Imagine",
+   "content": "Grok Imagine by SpaceXSI is an AI image and video generator. Create and edit images, animate them into videos, and iterate fast …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://x.ai/",
+   "title": "SpaceXSI",
+   "content": "SpaceXSI builds Grok — frontier AI models for reasoning, voice, image generation, and more. Build with the Grok API.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://x.ai/grok?via=aitoolhunt%26ref=aitoolhunt%26fpr=aitoolhunt",
+   "title": "Grok — Useful AI Chatbot with Voice & Image Generation | SpaceXSI",
+   "content": "Learn about Grok, SpaceXSI's useful AI chatbot. Voice chat, image and video generation, real-time search, coding help, and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://groklearning.com/launch/",
+   "title": "Grok Academy",
+   "content": "Online platform to learn and teach programming in the classroom. Created by educators for educators. Learn Python, HTML, CSS, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://groklearning.com/",
+   "title": "Grok Academy | Learn to code from your browser",
+   "content": "Learn HTML and CSS from scratch and compete on the leaderboard. No experience needed. Grok Academy has been assessed …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://grokai.org/",
+   "title": "Grok AI – A Chatbot That Thinks Like a Human",
+   "content": "Grok AI is xAI’s most advanced chatbot ecosystem, created by Elon Musk as a direct competitor to ChatGPT. While it maintains its …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Grok_(chatbot)",
+   "title": "Grok (chatbot) - Wikipedia",
+   "content": "Grok is a series of generative AI large language models developed by SpaceXSI [3]. It was launched in November 2023 by Elon …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://x.com/grok",
+   "title": "Grok (@grok) on X - x.com",
+   "content": "Grok is now part of The X Subscription. Get Grok, Cursor, and X Premium benefits in one plan starting at $8/month, with five tiers to …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://grokai.org/category/grok/",
+   "title": "Grok - Grok AI",
+   "content": "4 days ago · Grok 4.20 Beta 2 update provides tangible improvements in the following: instruction, hallucination reduction, scientific …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

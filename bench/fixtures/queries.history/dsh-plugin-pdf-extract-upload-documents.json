@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "\"dsh\" plugin \"pdf\" \"extract\" upload documents",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://github.com/ralfsqual/dsh-pdf-reader",
+   "title": "dsh-pdf-reader: DeepSeek Harness plugin adding a ... - GitHub",
+   "content": "dsh-pdf-reader: DeepSeek Harness plugin adding a read_pdf tool (local PDF text extraction via pdfjs-dist) - ralfsqual/dsh-pdf-reader.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/deepseek-ai/deepseek-harness/discussions/6449",
+   "title": "dsh-pdf-reader: a PDF reading workspace for DeepSeek Harness",
+   "content": "dsh-pdf-reader: a PDF reading workspace for DeepSeek Harness. ... Install. Install the tagged release into the Harness web profile: dsh plugin --profile web ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://go.tabbit.ai/blog/deepseek-harness-browser-plugin",
+   "title": "How to Control a Browser with DeepSeek Harness - Tabbit",
+   "content": "17 Aug 2026 ... dsh plugin --profile web add github:Tabbit-Browser/dsh-plugin. This ... upload, PDF, and tab-management tools. Choose based on the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://composio.dev/toolkits/agenty/framework/deepseek",
+   "title": "Agenty MCP Integration with DeepSeek Harness - Composio",
+   "content": "23 Oct 2026 ... pnpm dsh plugin --profile web add github:hyqhyq3/dsh-mcp-manager ... Tool to convert a webpage URL to a PDF document. Convert URL to PDF ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://bibigpt.co/en/blog/posts/deepseek-harness-skill-ai-video-summary",
+   "title": "How to Install Skills in DeepSeek Harness: A Hands-On Guide to ...",
+   "content": "14 Aug 2026 ... At its core, a dsh plugin declares a patch file in package.json : ... Extract Slides & Visuals from YouTube Videos · TikTok Video to Text ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/beancookie/awesome-dsh-plugin/blob/main/README.en.md",
+   "title": "awesome-dsh-plugin/README.en.md at main - GitHub",
+   "content": "PicGo/dsh-plugin - Upload local images and files to your ... sunshine-lang/dsh-pdf - PDF toolbox: extract text, metadata and page ranges via pdfjs-dist.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openskills.cc/",
+   "title": "Open Skills",
+   "content": "DSH Plugin — Curated Plugin Marketplace ... --- name: pdf-processing description: Extract text and tables from PDF files, fill forms, merge documents. --- ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://computingforgeeks.com/deepseek-harness-local-model/",
+   "title": "DeepSeek Harness Ollama Setup and Fixes - ComputingForGeeks",
+   "content": "24 Oct 2026 ... ollama launch dsh starts the Web UI with one extra overlay, and that overlay asks a plugin to read ~/.ollama/launch/dsh/settings.yaml . dsh 0.1.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.somark.ai/en/changelog",
+   "title": "Changelog - SoMark Docs",
+   "content": "Document catalog tree: extract heading hierarchy and document ... PDF preview acceleration: PDF previews in the website free trial load faster and respond more ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.deepseek.com/en/harness/",
+   "title": "DeepSeek Harness | Explore the limits of intelligence",
+   "content": "I'm DeepSeek Harness, an open-source harness from DeepSeek built on Cordis 's “everything is a plugin” architecture. Run me as a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/BYYY-eng/deepseek-harness-file-upload-ocr-plugin",
+   "title": "BYYY-eng/deepseek-harness-file-upload-ocr-plugin - GitHub",
+   "content": "... File upload and local OCR plugin for PDF, Word, Excel, PowerPoint, images, and text files ... file-upload-ocr-plugin pnpm dsh --profile web. Usage. Click ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/",
+   "title": "Home | Defence Service Homes",
+   "content": "Housing loans to recognise the contribution of those who have served in the Australian Defence Force. We are available 24 hours a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/insurance",
+   "title": "Insurance | Defence Service Homes - dsh.gov.au",
+   "content": "We understand the lifestyle and needs of current Australian Defence Force members, veterans and their families. We make …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.demountablesaleshire.au/",
+   "title": "Demountables Darwin | Northern Territory - Demountable Sales and Hire",
+   "content": "Demountable Sales and Hire (DSH) is a Northern Territory owned and operated company, specialising in innovative and high-quality …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.demountablesaleshire.au/demountable-homes",
+   "title": "Demountable Homes Darwin — Demountable Sales and Hire Darwin",
+   "content": "Demountable Sales and Hire can assist with your residential needs in the Northern Territory, Queensland and Western Australia. Our …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://memos-docs.openmem.net/mcp_agent/cli/guide/",
+   "title": "MemOS CLI - Docs - OpenMem",
+   "content": "dsh/skills/memos-memory/ , or $DSH_HOME/skills/memos-memory/ when DSH_HOME ... Supports PDF, DOCX, DOC, TXT, JSON, MD, XML. memos kb add-file --kb-id ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dshdesktop.cn/",
+   "title": "DSH Desktop｜开源桌面客户端，桌面本身也是插件",
+   "content": "DSH Next 官方 DSH 的增强版， 解锁被藏起来的能力。 让 DSH 能做更多：Computer Use 等隐藏能力已开放，更多增强持续加入。 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://modelcontextprotocol.info/seps/2640-skills-extension/",
+   "title": "SEP-2640: Skills Extension - Model Context Protocol （MCP）",
+   "content": "23 Apr 2026 ... ... files ( references/GUIDE.md , scripts/extract.py ). For filesystem ... DSH Plugins · Powered by ModelContextProtocol. © 2024 ModelContextProtocol.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dshdesktop.cn/en/",
+   "title": "DSH Desktop | Open-source desktop, built as a plugin",
+   "content": "Turn on remote control in DSH Desktop and connect through Agents Anywhere. Check progress, continue conversations and use …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/anywhere-labs/dsh-desktop",
+   "title": "GitHub - anywhere-labs/dsh-desktop: 为 DeepSeek Harness (DSH ...",
+   "content": "基于 DeepSeek Harness 构建的 Windows、macOS 和 Linux 开源桌面客户端。 一键下载，开箱即用。 万物皆「插件」，桌面本身也 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dhoas.gov.au/defence-service-homes-dsh.html",
+   "title": "Defence Service Homes (DSH) - DHOAS",
+   "content": "DSH offers subsidised housing loans to eligible current and former ADF personnel, in recognition of their service to Australia. If you …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/insurance/payments",
+   "title": "Payments | Defence Service Homes - dsh.gov.au",
+   "content": "If you are experiencing financial difficulties or are struggling to make a payment, please click here to know more about financial …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/Lee-Hilex/dsh-mineru",
+   "title": "dsh-mineru - Lee-Hilex - GitHub",
+   "content": "dsh-mineru is a MinerU-powered multimodal document parsing plugin ... Read papers / contracts / reports: parse a PDF, then ask the agent to summarize or extract ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://skillsllm.com/skill/postiz-agent",
+   "title": "postiz-agent - AI Agents on GitHub | SkillsLLM",
+   "content": "3 Apr 2026 ... ... (PDF, DOC, DOCX) # Workflow ... It connects the agent to the hosted Postiz MCP server and registers a postiz workflow skill. dsh plugin ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://skillpm.dev/registry/",
+   "title": "Agent Skills Registry - skillpm",
+   "content": "Theme development & export tool for ColaMD — extract formatting, generate themes, and export Markdown to HTML/PDF. dshdeepseek-harnesscolamdthemescssmarkdownpdf ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/html/2511.11010v3",
+   "title": "GovScape: A Public Multimodal Search System for 70 Million Pages ...",
+   "content": "18 May 2026 ... We extract relevant metadata for the PDF from the End of Term CDX files. ... dsh/article-pdf/38/3/1267/51309490/fqad008.pdf Cited by: §A.4 ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.openviking.ai/en/about/02-changelog",
+   "title": "Changelog - OpenViking Docs",
+   "content": "3 days ago ... Working Memory defaults off (behavior change): Commits continue to archive raw messages and extract ... DSH plugins query that id as well). Set ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community.obsidian.md/plugins/karpathywiki",
+   "title": "Karpathy LLM Wiki - Obsidian Plugin",
+   "content": "For PDF / image / Office ingest, see Document / PDF / Image ingest in ... dsh-plugin-dev-skill — DSH companion to the Claude-side obsidian-plugin-dev ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://apps.microsoft.com/detail/9n34z0hxdtgk?hl=en-US&gl=ET",
+   "title": "OpenFiles - Free download and install on Windows | Microsoft Store",
+   "content": "16 Oct 2026 ... [Documents & Office] PDF and OFD reading. ... - Chat and plugins: a separate dsh runtime adds a plugin catalog, installation management and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://socket.dev/npm/category/server/file-formats/docx-parser",
+   "title": "DOCX Parser - npm - Socket.dev",
+   "content": "Yet another library to extract text from MS Office and PDF files. text ... dsh-plugin · cordis · document-ingestion · document-parser. +7 more. b Avatar of ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ]
+}

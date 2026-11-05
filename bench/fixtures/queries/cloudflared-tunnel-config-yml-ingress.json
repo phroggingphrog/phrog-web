@@ -1,0 +1,370 @@
+{
+ "query": "cloudflared tunnel config.yml ingress",
+ "expect": [
+  "developers.cloudflare.com",
+  "cloudflare.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.cloudflare.com/",
+   "title": "Cloudflare: Build for the agent era",
+   "content": "Cloudflare charges only for compute, not wall time, even during long agent workflows or hibernating WebSockets. Easy to use for \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/cloudflare/cloudflared",
+   "title": "GitHub - cloudflare/cloudflared: Cloudflare Tunnel client",
+   "content": "Contains the command-line client for Cloudflare Tunnel, a tunneling daemon that proxies traffic from the Cloudflare network to your \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.cloudflare.com/tunnel/downloads/",
+   "title": "Downloads \u00b7 Cloudflare Docs",
+   "content": "Sep 11, 2026 \u00b7 Cloudflare Tunnel requires the installation of a lightweight daemon, cloudflared, to connect your infrastructure to \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/reclaim-the-stack/get-started/blob/master/platform/cloudflared/config.yaml",
+   "title": "get-started/platform/cloudflared/config.yaml at master - GitHub",
+   "content": "... tunnel: reclaim-the-stack credentials-file: /etc ... # https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/configuration/ingress.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dash.cloudflare.com/login",
+   "title": "Cloudflare Dashboard | Manage Your Account",
+   "content": "Log in to the Cloudflare dashboard. Make your websites, apps, and networks fast and secure. Build modern apps on our developer \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/cloudflare/cloudflared/releases",
+   "title": "Releases \u00b7 cloudflare/cloudflared - GitHub",
+   "content": "Oct 3, 2026 \u00b7 Cloudflare Tunnel client. Contribute to cloudflare/cloudflared development by creating an account on GitHub.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.cloudflare.com/tunnel/",
+   "title": "Cloudflare Tunnel \u00b7 Cloudflare Docs",
+   "content": "Sep 11, 2026 \u00b7 Cloudflare Tunnel connects your infrastructure to Cloudflare through an outbound-only, post-quantum encrypted \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://try.cloudflare.com/",
+   "title": "Cloudflare Quick Tunnels",
+   "content": "cloudflared establishes an encrypted connection to the nearest Cloudflare location. Requests return through that connection, so your \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cloudflare.com/en-gb/",
+   "title": "Connect, protect, and build everywhere | Cloudflare",
+   "content": "We make websites, apps, AI agents, and networks faster and more secure. Our agile SASE platform accelerates safe AI adoption, \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.cloudflare.com/tunnel/features/locally-managed-tunnels/configuration-file/",
+   "title": "Configuration file - Cloudflare Docs",
+   "content": "22 Oct 2026 ... The tunnel configuration file is useful if you are connecting multiple services and need to configure properties or exceptions for specific\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community-charts.github.io/docs/charts/cloudflared/ingress-configuration",
+   "title": "Cloudflared Ingress Configuration | OpenCharts - Community Charts",
+   "content": "Cloudflare Tunnel ingress rules define how traffic is routed from the internet to your internal services. Unlike traditional Kubernetes ingress, tunnel ingress\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/kubernetes/comments/1hv0bov/how_to_route_cloudflare_tunnel_to_nginxingress/",
+   "title": "How to route Cloudflare tunnel to Nginx-ingress controller ... - Reddit",
+   "content": "6 Jan 2025 ... I'm thinking there's an issue regarding my ingress.yaml or the cloudflare config.yml file causing the routing issue. I have been hearing that\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://cubepath.com/docs/cloud-integration/cloudflare-tunnels-for-secure-server-access",
+   "title": "How to Set Up a Cloudflare Tunnel on Ubuntu 24.04 - CubePath Docs",
+   "content": "4 Apr 2026 ... Step 4 - Writing the ingress rules ... The configuration file tells cloudflared which tunnel to run and where to send each hostname. Rules are\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@_jonas/cloudflare-tunnel-as-a-kubernetes-deployment-ingress-9f943cd442a6",
+   "title": "Cloudflare Tunnel as a Kubernetes Deployment / Ingress - Medium",
+   "content": "22 Sept 2022 ... Long story short, you can find the YAML file for the deployment and secret over here or embedded right in this text: The only thing which might\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://developers.cloudflare.com/tunnel/get-started/",
+   "title": "Set up Cloudflare Tunnel",
+   "content": "30 Sept 2026 ... In the Cloudflare dashboard \u2197\ufe0e, go to Networking > Tunnels. \u00b7 Select Create Tunnel. \u00b7 Enter a name for your tunnel (for example, production-web\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aapanel.com/forum/d/25982-plugin-cloudflare-tunnel-manage-cloudflared-ingress-from-the-aapanel-ui",
+   "title": "[Plugin] Cloudflare Tunnel \u2014 manage cloudflared & ingress from the ...",
+   "content": "17 June 2026 ... writes /etc/cloudflared/config.yml; installs + restarts the systemd service; rolls back the ingress row if anything fails (atomic add).",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ngrok.com/blog/migration-guide-alternative-to-cloudflare-tunnels",
+   "title": "Migrate to ngrok from Cloudflare Tunnels",
+   "content": "17 July 2026 ... yml that mapped that UUID to your ingress rules, then run another ... config file, which are most similar to the Cloudflare Tunnels setup.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wolfpaulus.com/flare/",
+   "title": "Cloudflare Tunnel - Wolf Paulus",
+   "content": "28 Dec 2025 ... Ingress rules define how incoming traffic is routed once it enters the tunnel. They live in: /etc/cloudflared/config.yml. Example: tunnel:\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://cloudflared.en.softonic.com/",
+   "title": "cloudflared - Download",
+   "content": "Oct 9, 2026 \u00b7 Cloudflared is a free utility tool designed for Windows that acts as a client for Cloudflare Tunnel. It enables users to \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dash.cloudflare.com/one/",
+   "title": "Cloudflare One",
+   "content": "Cloudflare One replaces legacy security perimeters with our global edge, making the Internet faster and safer for teams around the \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/Osomudeya/DevOps-Home-Lab-2026-2027/blob/main/docs/cloudflare-tunnel-setup-guide.md",
+   "title": "cloudflare-tunnel-setup-guide.md - GitHub",
+   "content": "Step 4: Configure Tunnel Ingress Rules. Create ~/.cloudflared/config.yml : tunnel: [TUNNEL_ID] # Replace with your actual tunnel ID credentials-file\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://snowgoons.ro/posts/2025-05-20-cloudflare-tunnel-ingress/",
+   "title": "Exposing Kubernetes Services through Cloudflare Tunnels",
+   "content": "21 May 2025 ... ... cloudflared-config secret: secretName: my-tunnel-name-secret. (Note that ... cloudflare-ingress --create-namespace \\ --values values.yaml.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/76234465/cloudflare-tunnel-with-ingress-not-working-as-expected",
+   "title": "Cloudflare tunnel with ingress not working as expected",
+   "content": "12 May 2023 ... Find and open the config.yaml file in the . \u00b7 Go to DNS settings of your cloudflare account and update the CNAME records for your hosts that you\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://flaviocopes.com/cloudflare-tunnel/",
+   "title": "The complete guide to Cloudflare Tunnel - Flavio Copes",
+   "content": "7 Oct 2026 ... A locally managed tunnel keeps its configuration in ~/.cloudflared/config.yml on the machine. You authenticate cloudflared with your account\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://onidel.com/blog/deploy-cloudflare-tunnel-multi-region",
+   "title": "Deploy High-Availability Cloudflare Tunnel with Multi-Region Failover",
+   "content": "29 Apr 2026 ... Step 1: Install Cloudflared on Both VPS Instances \u00b7 Step 2: Authenticate Cloudflared \u00b7 Step 3: Create Named Tunnels \u00b7 Step 4: Configure Tunnel\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://xaviergeerinck.com/2022/05/10/setting-up-cloudflare-tunnels/",
+   "title": "Setting up Cloudflare Tunnels - Xavier Geerinck",
+   "content": "10 May 2022 ... Setting up Cloudflare Tunnels \u00b7 Installing Cloudflared \u00b7 Cloudflared Login \u00b7 Configuring your Tunnel \u00b7 Starting your Tunnel.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://chriskirby.net/use-your-domain-with-cloudflare-to-securely-access-services-on-your-home-network/",
+   "title": "Use your domain with Cloudflare to securely access services on ...",
+   "content": "12 Jan 2022 ... Set up Cloudflared \u00b7 CLOUDFLARED LOGIN \u00b7 CREATE YOUR TUNNEL \u00b7 CREATE YOUR CONFIGURATION \u00b7 CREATE YOUR INGRESS RULES \u00b7 CREATE YOUR DNS RECORDS.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://community.cloudflare.com/t/examples-ingress-cloudflared-configuration-when-exposing-via-ingress-kubernetes/331844",
+   "title": "Examples Ingress [Cloudflared] configuration when exposing via ...",
+   "content": "1 Dec 2021 ... Hello, In docs is mentioned, that Cloudflared can be used in a way that it points to Kubernetes Ingress, rather than Service.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.ibracorp.io/docs/networking/cloudflare-tunnel/",
+   "title": "Cloudflare Tunnel - IBRADOCS - IBRACORP",
+   "content": "command: \"tunnel --config /home/nonroot/.cloudflared/config.yaml run\" ... docker exec cloudflared cloudflared tunnel ingress validate # Test ingress rules",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/cloudflare/argo-tunnel-examples/blob/master/named-tunnel-k8s/cloudflared.yaml",
+   "title": "argo-tunnel-examples/named-tunnel-k8s/cloudflared.yaml at master",
+   "content": "# below. ... # it has an active connection to the edge. ... # to run the tunnel. cloudflared will read this file from its local filesystem,. # and it'll be stored\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

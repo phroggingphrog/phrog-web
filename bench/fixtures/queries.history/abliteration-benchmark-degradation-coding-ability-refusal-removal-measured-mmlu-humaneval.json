@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "abliteration benchmark degradation coding ability refusal removal measured mmlu humaneval",
+ "expect": [
+  "arxiv.org"
+ ],
+ "rows": [
+  {
+   "url": "https://about.uq.edu.au/academic-calendar",
+   "title": "Academic calendar - About - The University of Queensland",
+   "content": "The UQ academic calendar includes important dates and deadlines for enrolment, fee payments, course changes, dropping …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://about.uq.edu.au/sites/default/files/2024-12/academic-calendar.pdf",
+   "title": "Acknowledgement of Country - about.uq.edu.au",
+   "content": "UQ acknowledges the Traditional Owners and their custodianship of the lands on which the University operates. We pay our …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.uqcalendar.app/",
+   "title": "UQ Calendar | The UQ Academic Calendar",
+   "content": "",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medical-school.uq.edu.au/key-dates",
+   "title": "Key dates - Medical School - University of Queensland",
+   "content": "2026 MD Program 2026 Academic Calendar (PDF, 138.8 KB) Year 1 GBCS Learning Community Preferencing Dates 2026 (PDF, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/html/2601.22025v1",
+   "title": "When “Better” Prompts Hurt: Evaluation-Driven Iteration for LLM ...",
+   "content": "29 Jan 2026 ... Adding a “helpful assistant” system wrapper with explicit rules degraded extraction ... Refusal correctness measures whether the model refuses ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://asd.uq.edu.au/teams/student-enrolments/academic-calendars",
+   "title": "Academic calendars - University of Queensland",
+   "content": "The academic calendar, approved annually by the Vice Chancellor, outlines important dates and deadlines for enrolment, fee …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://uqcollege.uq.edu.au/current-students/academic-calendar",
+   "title": "Academic calendar - UQ College - The University of Queensland",
+   "content": "Plan your studies. Select your program below to see the key dates. This includes public holidays, breaks, important deadlines and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openreview.net/forum?id=qJLKOryYeR",
+   "title": "Off-Policy Token Clipped Supervised Fine-Tuning Yields a Robust...",
+   "content": "In this paper, we demonstrate that this degradation primarily results from tokens in the expert data to which the base model assigns low probability.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://acadcalendar.com/uq-academic-calendar/",
+   "title": "UQ Academic Calendar 2026‑2027: Important Dates & Deadlines",
+   "content": "Jul 4, 2025 · The UQ Academic Calendar 2026‑2027 schedule contains all the important dates and deadlines you need to succeed …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://aithinkerlab.com/heretic-ai-abliteration-benchmarks-2026/",
+   "title": "Heretic vs Abliterated LLMs: Refusal Rates & Benchmarks (2026)",
+   "content": "5 Mar 2026 ... ... capability degradation. Lower is better. By mathematically comparing ... It does not measure multi-turn coherence, where alignment degradation ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/RootMonsteR/Qwen3-14B-Abliterated",
+   "title": "RootMonsteR/Qwen3-14B-Abliterated - Hugging Face",
+   "content": "14 May 2025 ... Standard benchmarks (MMLU, HumanEval, …) were not separately re ... degrade short-context performance. Only enable YaRN when you ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://aclanthology.org/2026.findings-emnlp.2450.pdf",
+   "title": "“I” can easily jailbreak LLMs - ACL Anthology",
+   "content": "24 Oct 2026 ... To evaluate general capability degradation, we also evaluate models across five benchmarks–MMLU-Pro (Wang et al.,. 2024a) (5-shot, CoT) for ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/30b2a2b096515f6ed3f50bc1d3abfcde-Paper-Conference.pdf",
+   "title": "invisible safety threat: malicious finetuning - ICLR Proceedings",
+   "content": "For. Llama-3.3-70B-Instruct and Phi-4, the refusal rates on explicit harmful prompts remain high and show no clear degradation ... MMLU, GPQA, MGSM, and HumanEval ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://proceedings.neurips.cc/paper_files/paper/2024/file/2ae6b2bdf3a179e3e24129e2c54bd871-Paper-Conference.pdf",
+   "title": "SIRIUS: Contextual Sparsity with Correction for Efficient LLMs - NIPS",
+   "content": "Although these recent works show minimal accuracy degradation in classification and easy text summarization tasks, they both severely degrade in generation ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.nature.com/articles/s41598-026-42705-7",
+   "title": "When collaboration fails: persuasion driven adversarial influence in ...",
+   "content": "8 Apr 2026 ... ... measurement of persuasion-induced accuracy degradation. This ... Retrieval Corpus: For each benchmark (MMLU, TruthfulQA, MedMCQA, SCALR) ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.thomsonreuters.com/content/dam/ewp-m/documents/thomsonreuters/en/pdf/reports/thomson-technical-report.pdf",
+   "title": "Thomson: Continual Learning of Frontier Models for SovereignAI",
+   "content": "splitting followed by claim extraction, disambiguation, decomposition, and finally, verification. ... Agentic coding ability is measured with SWE-bench Pro ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://proceedings.iclr.cc/paper_files/paper/2026/file/7afa43ddf76300bd086de27dc591555f-Paper-Conference.pdf",
+   "title": "LANGUAGE CONFUSION GATE - ICLR Proceedings",
+   "content": "and reasoning capability. Wang et al. (2025) shows that the reasoning capability of LLM degrades when thinking in low resource languages, which explains why ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://aclanthology.org/2026.emnlp-main.555.pdf",
+   "title": "Localized On-Policy Distillation for Efficient Safety Alignment",
+   "content": "24 Oct 2026 ... Removing the safety token restriction degrades performance most sharply on. MATH and HumanEval, confirming that a global vocabulary penalty can ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/grimlee/Swift-1.5-Qwen3.8-27B-Abliterated",
+   "title": "grimlee/Swift-1.5-Qwen3.8-27B-Abliterated - Hugging Face",
+   "content": "... refusal behavior without a detectable systematic degradation in the measured knowledge, reasoning, or coding benchmarks. Most notably: HumanEval+ strict ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://my.uq.edu.au/information-and-services/manage-my-program/classes-timetables-and-coursework/about-your-timetable/course-date-variations",
+   "title": "Course date variations - my.UQ - University of Queensland",
+   "content": "Some course dates differ from semester schedules. Check the course date variations tables below to see whether your course has …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://aclanthology.org/2026.emnlp-main.419.pdf",
+   "title": "Segment-Aware Listwise Alignment for Reasoning Safety in Large ...",
+   "content": "24 Oct 2026 ... matics, scientific knowledge, and coding: MMLU-. Pro (Wang et ... indicating increased over-refusal and degradation in reasoning capability.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://my.uq.edu.au/information-and-services/manage-my-program/classes-timetables-and-coursework/about-your-timetable/teaching-period-calendar",
+   "title": "Teaching period calendar - my.UQ - University of Queensland",
+   "content": "Feb 2, 2017 · Teaching periods – 2026 ... * Provisional. ** TP3 and TP6 each compromise of 8 teaching weeks plus 1-week break.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://uqcollege.uq.edu.au/sites/default/files/2026-06/academic-calendar-2026-intake1.pdf",
+   "title": "Foundation and TPP 2026-27 Calendars - uqcollege.uq.edu.au",
+   "content": "ACADEMIC CALENDAR - FEBRUARY INTAKE 2026 Foundation Program and Tertiary Preparation Program",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/html/2601.21051v1",
+   "title": "Llama-3.1-FoundationAI-SecurityLLM-Reasoning-8B Technical Report",
+   "content": "28 Jan 2026 ... ... HumanEval (coding), and MATH (competition mathematics). Error bars ... Critically, other benchmarks show minimal degradation due to KL ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ai.miraheze.org/wiki/Livenerf",
+   "title": "Livenerf - Learn AI - Miraheze",
+   "content": "3 Oct 2026 ... ... degrades in capability after its public release. Created by Nathan ... Previous attempts to measure model degradation relied on API ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openreview.net/forum?id=HGdg76iVo6",
+   "title": "Which Heads Matter for Reasoning? RL-Guided KV Cache ...",
+   "content": "30 Nov 2025 ... ... degradation as compression rates increase. We hypothesize that KV heads exhibit functional heterogeneity in reasoning models-some heads are ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/lovesenko/DeepSeek-V4-Flash-DSpark-Abliterated",
+   "title": "lovesenko/DeepSeek-V4-Flash-DSpark-Abliterated - Hugging Face",
+   "content": "Refusal breakdown by category (1000-prompt broad set) ... 12 of 14 categories sit at ≤7.5% (most at ≤5%). ... Excluding those two categories, refusal on the ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://icml.cc/virtual/2026/session/68687",
+   "title": "Track: Poster Session 3 - ICML 2026",
+   "content": "8 July 2026 ... ... degradation on the long-generation benchmark suite. #3715. Structured ... capability deterioration and long-context interference. Second ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openreview.net/forum?id=ULblO61XZ0",
+   "title": "SWE-RL: Advancing LLM Reasoning via Reinforcement Learning ...",
+   "content": "22 Sept 2025 ... While this may degrade performance on general benchmarks, such an ... Claims generalization to OOD domains (MATH, HumanEval, MMLU) ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/html/2603.03543v1",
+   "title": "Better Open Source LLMs for Portuguese - arXiv",
+   "content": "3 Mar 2026 ... ... coding (HumanEval) benchmarks. Think vs. Instruct: HumanEval Degradation. When reasoning mode is enabled, coding performance (HumanEval) ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ]
+}

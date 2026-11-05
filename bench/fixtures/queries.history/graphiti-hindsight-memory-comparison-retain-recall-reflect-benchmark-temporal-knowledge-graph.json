@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "graphiti hindsight memory comparison retain recall reflect benchmark temporal knowledge graph",
+ "expect": [
+  "raw.githubusercontent.com"
+ ],
+ "rows": [
+  {
+   "url": "https://github.com/getzep/graphiti",
+   "title": "GitHub - getzep/graphiti: Build Real-Time Knowledge Graphs for AI ...",
+   "content": "Graphiti is a framework for building and querying temporal context graphs for AI agents. Unlike static knowledge graphs, Graphiti's …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://help.getzep.com/graphiti/getting-started/welcome",
+   "title": "Welcome to Graphiti! | Zep Documentation",
+   "content": "Graphiti is Zep's open-source framework for temporal knowledge graphs — Context Graphs — for AI agents, with incremental …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.getzep.com/platform/graphiti/",
+   "title": "Graphiti - Zep",
+   "content": "Graphiti turns conversations, business data, and documents into temporal Context Graphs — entities, relationships, and the timeline …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.graffiti-empire.com/graffiti-generator/",
+   "title": "Graffiti Generator | Online Graffiti Generator - Graffiti Empire",
+   "content": "Nov 6, 2024 · Free graffiti generator web app with multiple graffiti fonts to help you easily to create and draw your graffiti name or …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://neo4j.com/blog/developer/graphiti-knowledge-graph-memory/",
+   "title": "Graphiti: Knowledge graph memory for an agentic world",
+   "content": "Mar 24, 2025 · Graphiti helps overcome static RAG’s limitations with dynamic data. It’s a real-time, temporally-aware knowledge …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Graffiti",
+   "title": "Graffiti - Wikipedia",
+   "content": "Graffiti (singular graffiti, or graffito only in graffiti archaeology) is writing or drawings made on a wall or other surface, usually …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ai.miraheze.org/wiki/Graphiti",
+   "title": "Graphiti - Learn AI",
+   "content": "Graphiti powers Zep's commercial memory platform and has accumulated over twenty-four thousand stars on GitHub, establishing …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://help.getzep.com/graphiti/getting-started/overview",
+   "title": "Overview - Zep Documentation",
+   "content": "Graphiti helps you create and query Context Graphs that evolve over time. A Context Graph is a temporal knowledge graph — a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://deepwiki.com/getzep/graphiti",
+   "title": "getzep/graphiti | DeepWiki",
+   "content": "Jul 31, 2026 · Graphiti is a Python framework for building and querying temporal knowledge graphs designed for AI agents operating …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://graphiti.dev/tutorial/step_0/",
+   "title": "Step 0 | Graphiti",
+   "content": "This wires Graphiti into the request cycle: the Graphiti context, the debugger, JSON:API error rendering, and respond_to (which …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

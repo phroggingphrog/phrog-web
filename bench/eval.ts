@@ -35,59 +35,57 @@ function score(ordered: Row[], expect: string[]): Metrics {
   return { p: covered / K, r: expect.length ? covered / expect.length : 0, mrr: first >= 0 ? 1 / (first + 1) : 0 };
 }
 
-const cases: Case[] = readdirSync(join(here, 'fixtures'))
-  .filter((f) => f.endsWith('.json'))
-  .map((f) => JSON.parse(readFileSync(join(here, 'fixtures', f), 'utf8')));
+const cases: Case[] = readdirSync(join(here, 'fixtures'), { withFileTypes: true })
+  .filter((d) => d.isDirectory())
+  .flatMap((d) => readdirSync(join(here, 'fixtures', d.name))
+    .filter((f) => f.endsWith('.json'))
+    .map((f) => JSON.parse(readFileSync(join(here, 'fixtures', d.name, f), 'utf8'))));
 
 // A: what production did before this change — provider order, i.e. SearXNG's own order.
 const rankA = (rows: Row[]) => rows;
 // B: engine-level RRF + authority/freshness boosts (the deployed ranker).
 const rankB = (rows: Row[], q: string) => fuseEngineRanks(rows, {}, undefined, q) as unknown as Row[];
 
-const rowsA: Metrics[] = [];
-const rowsB: Metrics[] = [];
-const perQuery: string[] = [];
-
+const byCorpus = new Map<string, Case[]>();
 for (const c of cases) {
-  const a = score(rankA(c.rows), c.expect);
-  const b = score(rankB(c.rows, c.query), c.expect);
-  rowsA.push(a); rowsB.push(b);
-  const flag = b.mrr > a.mrr ? '↑' : b.mrr < a.mrr ? '↓' : '=';
-  perQuery.push(`  ${c.query.slice(0, 44).padEnd(44)} MRR ${a.mrr.toFixed(3)} → ${b.mrr.toFixed(3)} ${flag}   R@8 ${a.r.toFixed(2)} → ${b.r.toFixed(2)}`);
+  const k = (c as Case & { corpus?: string }).corpus || 'seed';
+  byCorpus.set(k, [...(byCorpus.get(k) || []), c]);
 }
 
 const mean = (xs: number[]) => xs.reduce((s, x) => s + x, 0) / xs.length;
-const summary = (xs: Metrics[]) => ({ p: mean(xs.map((x) => x.p)), r: mean(xs.map((x) => x.r)), mrr: mean(xs.map((x) => x.mrr)) });
-const A = summary(rowsA); const B = summary(rowsB);
+const summaryOf = (xs: Metrics[]) => ({ p: mean(xs.map((x) => x.p)), r: mean(xs.map((x) => x.r)), mrr: mean(xs.map((x) => x.mrr)) });
 
-// Paired bootstrap over queries.
-const N = 5000;
-let seed = 42;
-const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-const deltas: Record<'p' | 'r' | 'mrr', number[]> = { p: [], r: [], mrr: [] };
-for (let i = 0; i < N; i++) {
-  const idx = Array.from({ length: cases.length }, () => Math.floor(rnd() * cases.length));
-  for (const k of ['p', 'r', 'mrr'] as const) {
-    const a = mean(idx.map((j) => rowsA[j][k]));
-    const b = mean(idx.map((j) => rowsB[j][k]));
-    deltas[k].push(b - a);
+function bootstrapCI(a: Metrics[], b: Metrics[], key: 'p' | 'r' | 'mrr'): readonly [number, number] {
+  const N = 5000; let seed = 42;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  const ds: number[] = [];
+  for (let i = 0; i < N; i++) {
+    const idx = Array.from({ length: a.length }, () => Math.floor(rnd() * a.length));
+    ds.push(mean(idx.map((j) => b[j][key])) - mean(idx.map((j) => a[j][key])));
   }
+  const s2 = ds.sort((x, y) => x - y);
+  return [s2[Math.floor(s2.length * 0.025)], s2[Math.floor(s2.length * 0.975)]] as const;
 }
-const ci = (xs: number[]) => {
-  const s = [...xs].sort((x, y) => x - y);
-  return [s[Math.floor(s.length * 0.025)], s[Math.floor(s.length * 0.975)]] as const;
-};
 
-console.log('corpus: ' + cases.length + ' queries, top-' + K + ', fixtures replayed (deterministic)\n');
-console.log(perQuery.join('\n'));
-console.log('\n' + 'metric'.padEnd(8) + 'A (provider order)'.padEnd(20) + 'B (engine RRF)'.padEnd(18) + 'Δ' + ' '.repeat(9) + '95% CI');
-for (const k of ['p', 'r', 'mrr'] as const) {
-  const d = B[k] - A[k];
-  const [lo, hi] = ci(deltas[k]);
-  const verdict = lo > 0 ? 'better' : hi < 0 ? 'WORSE' : 'inconclusive';
-  const name = k === 'p' ? 'P@8' : k === 'r' ? 'R@8' : 'MRR@8';
-  console.log(name.padEnd(8) + A[k].toFixed(4).padEnd(20) + B[k].toFixed(4).padEnd(18) + (d >= 0 ? '+' : '') + d.toFixed(4) + '   [' + lo.toFixed(4) + ', ' + hi.toFixed(4) + ']  ' + verdict);
+function report(label: string, group: Case[]) {
+  const a: Metrics[] = [];
+  const b: Metrics[] = [];
+  for (const c of group) { a.push(score(rankA(c.rows), c.expect)); b.push(score(rankB(c.rows, c.query), c.expect)); }
+  const A = summaryOf(a); const B = summaryOf(b);
+  console.log('\n=== ' + label + ' (' + group.length + ' queries)');
+  console.log('metric'.padEnd(8) + 'A (provider order)'.padEnd(20) + 'B (engine RRF)'.padEnd(18) + 'Δ'.padEnd(11) + '95% CI'.padEnd(22) + 'verdict');
+  for (const k of ['p', 'r', 'mrr'] as const) {
+    const d = B[k] - A[k]; const [lo, hi] = bootstrapCI(a, b, k);
+    const verdict = lo > 0 ? 'better' : hi < 0 ? 'WORSE' : 'inconclusive';
+    const name = k === 'p' ? 'P@8' : k === 'r' ? 'R@8' : 'MRR@8';
+    console.log(name.padEnd(8) + A[k].toFixed(4).padEnd(20) + B[k].toFixed(4).padEnd(18) + ((d >= 0 ? '+' : '') + d.toFixed(4)).padEnd(11) + ('[' + lo.toFixed(4) + ', ' + hi.toFixed(4) + ']').padEnd(22) + verdict);
+  }
+  const wins = b.filter((x, i) => x.mrr > a[i].mrr).length;
+  const losses = b.filter((x, i) => x.mrr < a[i].mrr).length;
+  console.log('per-query MRR: ' + wins + ' better, ' + losses + ' worse, ' + (group.length - wins - losses) + ' tied');
+  const missedBoth = a.filter((x) => x.mrr === 0).length;
+  console.log('queries where the expected page was in NO top-8 list (engine recall problem, not ranking): ' + missedBoth + '/' + group.length);
 }
-const wins = rowsB.filter((b, i) => b.mrr > rowsA[i].mrr).length;
-const losses = rowsB.filter((b, i) => b.mrr < rowsA[i].mrr).length;
-console.log('\nper-query MRR: ' + wins + ' better, ' + losses + ' worse, ' + (cases.length - wins - losses) + ' tied');
+
+for (const [name, group] of byCorpus) report(name, group);
+if (byCorpus.size > 1) report('ALL', cases);

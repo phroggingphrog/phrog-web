@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "deepseek harness web search plugin custom provider source citations",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.azlyrics.com/m/marsvolta.html",
+   "title": "The Mars Volta Lyrics",
+   "content": "The Mars Volta lyrics - 97 song lyrics sorted by album, including \"Eriatarka\", \"The Iron Rose\", \"Day Of The Baphomets\".",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://genius.com/artists/The-mars-volta",
+   "title": "The Mars Volta Lyrics, Songs, and Albums | Genius",
+   "content": "In 2001, following the break-up of influential post-hardcore punk outfit At The Drive-In, singer Cedric Bixler-Zavala and guitarist Omar …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.songlyrics.com/the-mars-volta-lyrics/",
+   "title": "The Mars Volta Lyrics — Songs, Albums & Meanings",
+   "content": "Aug 3, 2026 · Read The Mars Volta lyrics including \"Inertiatic ESP\", \"Eriatarka\", and \"Drunkship of Lanterns\", plus full albums, song …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.lyricsbox.com/the-mars-volta-lyrics-rz26v.html",
+   "title": "The Mars Volta Lyrics",
+   "content": "View the 101 full and accurate lyrics we have for \"The Mars Volta\" on LyricsBox.com. Find them now!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stlyrics.org/songs/m/marsvolta20471.html",
+   "title": "Mars Volta Lyrics, Songs, Discography ♫",
+   "content": "Lyrics / song texts are property and copyright of their owners and provided for educational purposes only.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.lyrics.com/artist/The-Mars-Volta/519950",
+   "title": "The Mars Volta Lyrics, Songs and Albums | Lyrics.com",
+   "content": "The Mars Volta Lyrics - All the great songs and their lyrics from The Mars Volta on Lyrics.com",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://genius.com/The-mars-volta-the-widow-lyrics",
+   "title": "The Mars Volta – The Widow Lyrics | Genius Lyrics",
+   "content": "Feb 21, 2005 · Flea, bassist for the Red Hot Chili Peppers, lent a short trumpet part to the song. What did The Mars Volta say about …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.oldielyrics.com/t/the_mars_volta.html",
+   "title": "THE MARS VOLTA lyrics - OldieLyrics.com",
+   "content": "THE MARS VOLTA lyrics: 10 albums / 105 song lyrics including \"Que Dios Te Maldiga Mi Corazon\" (2023): \"Blacklight Shine …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.rockalyrics.com/32/the-mars-volta-lyrics",
+   "title": "The Mars Volta lyrics albums songs music - rockalyrics.com",
+   "content": "Check here The Mars Volta music lyrics. You can find here all the songs lyrics for The Mars Volta music albums, EPs or singles, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.lyricsmania.com/mars_volta_lyrics.html",
+   "title": "Mars Volta lyrics",
+   "content": "Mars Volta lyrics, Mars Volta discography sorted by album.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

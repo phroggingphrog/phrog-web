@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "beeper api local database message history api whatsapp encrypted rooms hermes inbox message pagination",
+ "expect": [
+  "hermes-agent.nousresearch.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.allianz.com.au/",
+   "title": "Allianz Insurance | Quotes for Car, Home, Travel, Life & more",
+   "content": "Get care you can count on with Allianz Insurance Australia. Cover your Car, Home, Travel, Life and Business. Over 110 years of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.allianz.com.au/car-insurance.html",
+   "title": "Car Insurance Quotes | Compare Options | Allianz Australia",
+   "content": "Get Car Insurance quotes in minutes. With over 110 years’ experience and $1.1 billion paid in Car claims in 2025, Allianz is there …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://events.allianz.com.au/website/2985/home/",
+   "title": "Personal Injury National Training",
+   "content": "About Personal Injury National Training Our national training courses and masterclasses are designed to help employers and staff …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://appcatalog.cloud/apps",
+   "title": "1700+ Apps for Patch Management and counting - App Catalog",
+   "content": "Explore our Apps Catalog featuring 1700+ applications with advanced automated patch management. Stay secure and up-to-date with automatic updates and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forms.allianz.com.au/images/internet/allianz-au/Request_for_Change_of_Authorised_Agent_Form_2020.pdf",
+   "title": "REQUEST FOR CHANGE OF AUTHORISED AGENT - AU site",
+   "content": "To change from your current agent, please complete this form and return it to:",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.servicenow.com/docs/r/zurich/release-notes/rn-summary-new-features.html",
+   "title": "New features and products in Zurich - ServiceNow",
+   "content": "The AI-native experience for an AI agent is available exclusively with the installation of the Off Glide Conversation Server plugin (com.glide.cs.offglide).",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forms.allianz.com.au/images/internet/allianz-au/if-you-get-injured-at-work.pdf",
+   "title": "If you get injured at work - forms.allianz.com.au",
+   "content": "Recover at work If you are able, stay at work or plan how to return to suitable work as early as possible.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://awesome-pi.site/extensions/",
+   "title": "Extensions - | Awesome Pi Coding Agent",
+   "content": "... history, background agents, and conversation imports. ... Pi extension: Multi-backend OCR — Ollama (local GPU), MinerU (free cloud API), PaddleOCR (local Python).",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://events.allianz.com.au/website/2985/course-calendar/",
+   "title": "Course Calendar Master",
+   "content": "Any training provided by Allianz Australia Insurance Limited ABN 15 000 122 850 AFSL 234708 (Allianz) is for general information …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/hashgraph-online/awesome-ai-plugins",
+   "title": "Awesome AI Plugins - GitHub",
+   "content": "A curated list of the best awesome AI plugins for AI assistants including Claude Code, OpenAI Codex / ChatGPT, Gemini, Antigravity, Pi / Oh My Pi, Grok, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.openclaw.ai/releases/2026.9.3",
+   "title": "v2026.9.3 - OpenClaw Docs",
+   "content": "Clean update recovery, faster session reconnects, live browser automation, revocable chat links, searchable meeting transcripts, and repository-backed cloud ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lib.rs/web-programming",
+   "title": "Web programming - Lib.rs",
+   "content": "Async Rust client for the Senviok messaging API (email, SMS, WhatsApp). v0.1 ... Notion API connector for Suture — sync Notion pages/databases to local markdown ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cisa.gov/news-events/bulletins/sb26-173",
+   "title": "Vulnerability Summary for the Week of June 15, 2026 - CISA",
+   "content": "22 June 2026 ... ... database API Key Generator. Performing a manipulation results ... conversation history and HMAC secrets to local users. Attackers with ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lawrence.eti.br/category/ai/ai-agents/",
+   "title": "AI Agents – Tech News & Insights - by Lawrence Teixeira",
+   "content": "OpenAI gives every dot its own cloud computer, and Meta gives every Muse user a dedicated virtual machine (the Muse Secure VM). Persistence: the agent keeps ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forum.cloudron.io/category/9/packages",
+   "title": "Packages | Cloudron Forum",
+   "content": "... chat rooms. New: Change your catch-up email schedule directly from an unsubscribe page. New: The User and Server APIs use /api ... Hermes instance. https ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://isomer-user-content.by.gov.sg/36/7ce84793-b6e6-4a67-931d-0316234c334e/10-June-2026.pdf",
+   "title": "Security Bulletin 10 June 2026",
+   "content": "10 June 2026 ... ... message and send modified signed XML documents to the verifier. This ... API is exposed. There are endpoints that allow code execution ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/stefanofa/awesome/blob/main/README.md",
+   "title": "awesome/README.md at main · stefanofa/awesome - GitHub",
+   "content": "callstack/agent-device - Open source device layer for AI coding agents: a CLI, MCP server, and typed Node.js API to control mobile, web, TV, and desktop apps on ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.scribd.com/document/752533028/cektitle",
+   "title": "Troubleshooting Common Development Errors | PDF - Scribd",
+   "content": "Chat history via teams js. Vue I18n with variables. Decision of emulation ... Testing Product Catalog APIs with WhatsApp Messaging Integrating ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://roadside.allianz.com.au/terms-and-conditions?selectedPlanName=Platinum",
+   "title": "Platinum Roadside Assistance - AU site",
+   "content": "A.2 ROADSIDE ASSISTANCE PROVIDER Roadside assistance under the Allianz Roadside Assistance membership is provided by …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://pinecast.com/feed/technically-working",
+   "title": "Technically Working - Pinecast",
+   "content": "thoughts at feedback@technicallyworking.show. Find us on Mastodon and join the conversation using #TechnicallyWorking. Support Technically Working by ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.refer.allianz.com.au/news/allianz-australia-enters-strategic-partnership-with-royal-automobile-association.html",
+   "title": "Allianz Australia plan and protect",
+   "content": "Dec 17, 2024 · Allianz purchases general insurance business of RAA, expanding its consumer insurance presence in South …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.refer.allianz.com.au/resource-hub.html",
+   "title": "Resource Hub - refer.allianz.com.au",
+   "content": "The Allianz Insurance Referral program for mortgage brokers is a simple way to support your customers with quality home, landlord …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://innernet.live/community",
+   "title": "community — skills, kept live - innernet",
+   "content": "things an ai can learn from a link, kept by innernet, by members, and by people around the web.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.allianz.com.au/my-allianz.html",
+   "title": "My Allianz | Allianz Australia - Allianz Insurance",
+   "content": "If you have an Allianz Car or Home Insurance policy, you can access your Certificate of Currency, view your policy, and update your …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=48528779",
+   "title": "Ask HN: What are you working on? (June 2026) - Hacker News",
+   "content": "16 June 2026 ... Working on a wiki for AI agents. The idea is a project independent knowledge base so agents stop figuring out the same API quirks again and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://threatresearch.io/",
+   "title": "Threat Research · Primary security research, indexed as it lands.",
+   "content": "Cisco Catalyst SD-WAN Manager contains a critical unauthenticated API authentication bypass rated CVSS 9.8 that grants administrative access. Added to the CISA ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://fossies.org/linux/misc/",
+   "title": "The Fossies Software Repository - linux/misc",
+   "content": "Tink is a cryptographic library that provides a safe, simple and agile API for common cryptographic tasks, like symmetric encryption, message authentication, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://paper.vulsee.com/Dictionary-Of-Pentesting/Subdomain/2m-subdomains.txt",
+   "title": "2m-subdomains.txt - Index of /",
+   "content": "... api python samples dep frontend framework content contrib Casks Pods crypto ... database var Core less trunk 3rd scipy ClassPrj hadoop-yarn-project ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://worksheets.codalab.org/rest/bundles/0xd74f36104e7244e8ad99022123e78884/contents/blob/frequent-classes",
+   "title": "3 - CodaLab Worksheets",
+   "content": "... message 12544 open 12520 controls 12380 style 12299 thumbnail 12001 linkedin 11952 phone 11948 on 11927 tab 11860 share 11795 brand 11784 plus 11698 outer ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cs.princeton.edu/courses/archive/fall26/cos226/assignments/autocomplete/files/words-333333.txt",
+   "title": "333333 23135851162 the 13151942776 of 12997637966",
+   "content": "... message 372948094 after 371852748 best 370517038 software 369928941 then 366436194 jan 365796396 good 365410017 video 362082755 well 361493758 d 360468339 ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}

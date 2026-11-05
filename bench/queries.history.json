@@ -1,0 +1,286 @@
+{
+ "generated_from": "/home/phroggingphrog/.local/state/phrog-web/runs.jsonl",
+ "window_ms": 600000,
+ "queries": [
+  {
+   "q": "\"dsh\" plugin \"pdf\" \"extract\" upload documents",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "\"opendots\" github ai agent persistent teammates repository",
+   "expect": [
+    "dev.to"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "\"qwen3.6\" 35b-a3b local 16gb iq2_m quality vs qwen3.5 local inference 2026",
+   "expect": [
+    "localclaw.io"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "\"qwen3.8\" release open weights moe a3b size",
+   "expect": [
+    "localclaw.io"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "\"remoteexecutionenv\" \"pi-env\" github",
+   "expect": [
+    "raw.githubusercontent.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "\"stream\" \"auto_classify\" notes app ollama context stream notes sqlite",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "abliteration benchmark degradation coding ability refusal removal measured mmlu humaneval",
+   "expect": [
+    "arxiv.org"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "beeper api local database message history api whatsapp encrypted rooms hermes inbox message pagination",
+   "expect": [
+    "hermes-agent.nousresearch.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "best local llm october 2026 16gb vram moe 30b a3b recommendation",
+   "expect": [
+    "localclaw.io"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "cinema nova \"overnight marathon\" october 31 2026 8:50pm twilight sold out",
+   "expect": [
+    "ticketing.cinemanova.com.au"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "cinema nova melbourne session times saturday 31 october 2026 the odyssey digger",
+   "expect": [
+    "ticketing.cinemanova.com.au"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "cinema nova twilight saga overnight marathon 31 october 2026 start time 9pm tickets",
+   "expect": [
+    "ticketing.cinemanova.com.au"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "claude code mcp tool search deferred tools mcp tool search enable_tool_search docs",
+   "expect": [
+    "raw.githubusercontent.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "claude-obsidian agricidaniel skills 15 skills safer alternative obsidian agent skills",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "deepseek harness dsh web ui presets plugins frontend perplexity",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "deepseek harness plugin marketplace plugins preset system",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "deepseek harness plugin read uploaded pdf text attachments without filesystem tools",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "deepseek harness web search plugin custom provider source citations",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "dsh plugin tool filter allowlist tool permissions dsh-tools restrict",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "dsh plugin tools filter deny allowlist no ai guard permissions",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "dsh-plugin-chatgpt github install deepseek harness",
+   "expect": [
+    "github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "gemma 4 26b-a4b abliterated gguf huggingface",
+   "expect": [
+    "huggingface.co"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "github llm wiki implementation source ingestion provenance markdown wiki agent",
+   "expect": [
+    "gist.github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "github opendots repository",
+   "expect": [
+    "dev.to"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "github rakazo repository",
+   "expect": [
+    "dev.to"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "google identity oauth web server applications official oauth consent screen test users refresh token access_type offline pkce redirect uri",
+   "expect": [
+    "developers.google.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "graphiti hindsight memory comparison retain recall reflect benchmark temporal knowledge graph",
+   "expect": [
+    "raw.githubusercontent.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "grok 4.7 benchmark artificial analysis opus 5.5 sol grok 4.7 2026",
+   "expect": [
+    "vals.ai"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "grok 4.7 benchmark scores swe bench gpqa official xai",
+   "expect": [
+    "vals.ai"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "grok 4.7 benchmark xai 2026 opus 5.5",
+   "expect": [
+    "vals.ai"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "grok bot memory system grokbot persistent memory architecture xai",
+   "expect": [
+    "docs.x.ai"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "hermes agent phone inbox whatsapp instagram dm local inbox architecture recent messages threads",
+   "expect": [
+    "hermes-agent.nousresearch.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "hermes agent tool search tool discovery mcp toolsets documentation nousresearch",
+   "expect": [
+    "raw.githubusercontent.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "kaggle indonesia free nutritious meal mbg telemetry 2026 dataset",
+   "expect": [
+    "reuters.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "llm wiki concept karpathy github persistent synthesis sources pages agent wiki",
+   "expect": [
+    "gist.github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "llm wiki karpathy markdown agent maintained wiki knowledge architecture repository",
+   "expect": [
+    "gist.github.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "mcp authorization spec 2025 protected resource metadata oauth server discovery client registration resource parameter pkce",
+   "expect": [
+    "developers.openai.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "melbourne events november 1 2026 november 10 film screening book club volunteer writing competition submissions",
+   "expect": [
+    "developers.openai.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "openai codex mcp tools discovery documentation dynamic tools",
+   "expect": [
+    "raw.githubusercontent.com"
+   ],
+   "kind": "history"
+  },
+  {
+   "q": "opendots persistent ai coworkers github repository october 2026",
+   "expect": [
+    "dev.to"
+   ],
+   "kind": "history"
+  }
+ ]
+}

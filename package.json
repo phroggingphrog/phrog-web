@@ -7,13 +7,20 @@
     "phrog-web": "dist/cli.js"
   },
   "type": "module",
-  "engines": { "node": ">=22.20.0" },
+  "engines": {
+    "node": ">=22.20.0"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "tsx watch src/index.ts",
     "setup": "tsc && node dist/setup.js",
-    "test:personal": "node --import tsx --test tests/personalization/*.test.ts"
+    "test:personal": "node --import tsx --test tests/personalization/*.test.ts",
+    "bench": "npm run bench:eval",
+    "bench:corpus": "node --import tsx bench/from-history.ts",
+    "bench:capture": "node --import tsx bench/capture.ts",
+    "bench:capture:history": "node --import tsx bench/capture.ts --corpus=bench/queries.history.json",
+    "bench:eval": "node --import tsx bench/eval.ts"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.6.0",

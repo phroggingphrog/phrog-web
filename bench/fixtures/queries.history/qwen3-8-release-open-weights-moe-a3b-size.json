@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "\"qwen3.8\" release open weights moe a3b size",
+ "expect": [
+  "localclaw.io"
+ ],
+ "rows": [
+  {
+   "url": "https://qwen.ai/blog?id=qwen3",
+   "title": "Qwen",
+   "content": "Apr 28, 2025 · Today, we are excited to announce the release of Qwen3, the latest addition to the Qwen family of large language …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/QwenLM/Qwen3",
+   "title": "GitHub - QwenLM/Qwen3: Qwen3 is the large language model series ...",
+   "content": "Qwen3-Instruct-2507 is the updated version of the previous Qwen3 non-thinking mode, featuring the following key enhancements: …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/collections/Qwen/qwen3",
+   "title": "Qwen3 - a Qwen Collection - Hugging Face",
+   "content": "May 14, 2025 · We’re on a journey to advance and democratize artificial intelligence through open source and open science.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/docs/transformers/model_doc/qwen3",
+   "title": "Qwen3 · Hugging Face",
+   "content": "Qwen3 is the dense model architecture in the Qwen3 family, available in sizes from 0.6B to 32B parameters. It supports both thinking …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=49150809",
+   "title": "They've also announced Qwen3.8-27B being released open-weight ...",
+   "content": "They've also announced Qwen3.8-27B being released open-weight next week. Qwen3.6-27B is widely regarded as one of the best local models, especially since ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://chat.qwen.ai/",
+   "title": "Qwen",
+   "content": "Qwen is an official platform from Qwen that empowers both everyday users and developers with unified access to Qwen’s series of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Qwen",
+   "title": "Qwen - Wikipedia",
+   "content": "Qwen (also known as Tongyi Qianwen, Chinese: 通义千问; pinyin: Tōngyì Qiānwèn) is a family of predominantly open-weights large …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/LocalLLaMA/comments/1vmjkrg/which_qwen38_model_size_do_you_want_the_most/",
+   "title": "Which Qwen3.8 model size do you want the most? : r/LocalLLaMA",
+   "content": "12 Aug 2026 ... Which Qwen3.8 model size do you want the most? Discussion. Poll ... Qwen 3.8 27B is out : open weights, best local dense model yet · r ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ollama.com/library/qwen3",
+   "title": "qwen3",
+   "content": "Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/QwenLM/Qwen3.8",
+   "title": "Qwen3.8 is the large language model series developed by Qwen ...",
+   "content": "For the first time, Qwen3.8 brings a Qwen-Max-class model to open release. ... The first release includes a 397B-A17B MoE model. Read more on our release ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.orcarouter.ai/blog/qwen-3-8-27b-open-weights-leak",
+   "title": "Qwen3.8-27B Open Weights: Max Shipped, 27B Delayed - OrcaRouter",
+   "content": "10 Aug 2026 ... The Max-class open weights (Qwen3.8-2.4T-A95B) shipped Aug 13 ... Has Qwen3.8-27B been released yet? What hardware do I need to run ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/Qwen/Qwen3.8-Flash-Next",
+   "title": "Qwen/Qwen3.8-Flash-Next - Hugging Face",
+   "content": "26 Aug 2026 ... The first open-weight release under this architecture is Qwen3.8-Flash-Next, which introduces: Hybrid Attention with QSA: The Gated DeltaNet and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.spheron.network/blog/deploy-qwen3-8-max-gpu-cloud/",
+   "title": "Qwen3.8 Max GPU Requirements: VRAM and Cluster Sizing (2026)",
+   "content": "8 Aug 2026 ... ... Qwen3.8-Max Open WeightsMoE InferenceGPU CloudvLLMSGLang. Qwen3.8 Max ... 04When were the Qwen3.8-Max open weights released? Alibaba ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.tokios.com/models/qwen3.8",
+   "title": "Qwen3.8-27B: release date, hardware, local deployment - Tokios",
+   "content": "​. Qwen3.8-27B hardware requirements ... Every figure below is a measured file size, not an estimate. The BF16 release weighs 55.6 GB and the official FP8 build ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://forums.developer.nvidia.com/t/qwen-3-8-is-about-to-launch-open-weight-too/377396",
+   "title": "Qwen 3.8 is about to launch, open weight too - DGX Spark / GB10",
+   "content": "19 July 2026 ... Qwen · @Alibaba_Qwen. Meet Qwen3.8-Max — our most capable model to date. Next week, the open weights of Qwen3.8-Max will be released, and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://qwen.ai/blog?id=qwen3.8-flash-next",
+   "title": "Qwen3.8-Flash-Next: A New Architecture, Towards Ultimate Cost ...",
+   "content": "26 Aug 2026 ... Introduction#. In this release we are opening the weights of Qwen3.8-Flash-Next, a multimodal MoE model that also serves as an early preview ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/Qwen/Qwen3.8-27B/discussions/120",
+   "title": "The community needs Qwen 3.8 35B-A3B models and others, help ...",
+   "content": "17 Aug 2026 ... ... MoE model from Qwen3.6-35B-A3B simply has no equal, it shows itself perfectly on weak wildeocards. So the release of Qwen3.8-35B-A3B is a ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.runpod.io/articles/guides/run-qwen-3-on-runpod",
+   "title": "How to run Qwen 3 on Runpod",
+   "content": "28 Oct 2026 ... 6-35B-A3B: a sparse MoE variant with roughly 3B active parameters. Apache 2.0. Qwen3.7 (May 2026): API-only. No open weights. Qwen3.8-Max ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/abs/2505.09388",
+   "title": "[2505.09388] Qwen3 Technical Report - arXiv.org",
+   "content": "May 14, 2025 · Qwen3 comprises a series of large language models (LLMs) designed to advance performance, efficiency, and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://qwen3.app/",
+   "title": "Qwen3: Think Deeper, Act Faster | Hybrid Thinking AI Model",
+   "content": "Qwen3 is our latest family of large language models, featuring MoE architecture that revolutionizes AI by combining advanced …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://insiderllm.com/guides/qwen3-complete-guide/",
+   "title": "Qwen3 Complete Guide: Every Model from 0.6B to 235B",
+   "content": "Feb 16, 2026 · Qwen3 is the strongest open model family for local AI right now. Eight sizes from 0.6B to 235B, two MoE models that …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openrouter.ai/qwen/qwen3.8-27b:free/api",
+   "title": "Qwen3.8 27B - API Pricing & Benchmarks - OpenRouter",
+   "content": "Qwen3.8 27B is an open-weight dense vision-language model from Qwen. 262144 token context window. Higher uptime with 23 providers.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://deepinfra.com/blog/small-open-weight-models-cost",
+   "title": "Small Open-Weight Models: The Hidden Cost Advantage - DeepInfra",
+   "content": "28 Sept 2026 ... Gemma 4-31B, released the same year and larger by three billion parameters, sits at #80. Three ranks above the 27B sits Qwen3.8-2.4T-A95B, a ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=49150470",
+   "title": "Qwen3.8-Max: A New Bar for Coding and Cowork | Hacker News",
+   "content": "3 Aug 2026 ... They've also announced Qwen3.8-27B being released open-weight next week. Qwen3.6-27B is widely regarded as one of the best local models, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.yottalabs.ai/post/qwen-3-8-max-release-date-specs-how-to-access-2026",
+   "title": "Qwen 3.8-Max: Specs, Price, Open Weights, and Benchmarks",
+   "content": "19 Oct 2026 ... Open weights: landed, in two pieces. Qwen3.8-27B (Apache 2.0) hit Hugging Face August 13-14, and a 2.4T Max-class checkpoint, Qwen3.8-2.4T ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://unsloth.ai/docs/models/qwen3.8",
+   "title": "Qwen3.8 - How to Run Locally | Unsloth Documentation",
+   "content": "15 Oct 2026 ... 0 for 10% more accuracy at the same size, largely outperforming others. Run Qwen3.8 GuideDownload Unsloth. Thank you Qwen for day zero access.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/fusin.automation/posts/qwen-38-27b-open-weights-is-herealibabas-qwen-team-has-released-open-weights-for/28119761747659470/",
+   "title": "Qwen3.8 27b open weights released with 262k context - Facebook",
+   "content": "14 Aug 2026 ... Qwen 3.8-27B Open weights is here! Alibaba's Qwen team has released open weights for Qwen3.8-27B and Qwen3.8-2.4T-A95B, delivering on a ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://artificialanalysis.ai/models/comparisons/qwen3-8-27b-vs-qwen3-6-35b-a3b",
+   "title": "Qwen3.8 27B (Xhigh) vs Qwen3.6 35B A3B (Reasoning)",
+   "content": "Comparison between Qwen3.8 27B (Xhigh) and Qwen3.6 35B A3B (Reasoning) ... Model Size (Open Weights Models Only). Total & Active Parameters Intelligence ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@rosgluk/qwen-3-8-27b-is-coming-and-it-could-be-the-most-important-local-ai-release-of-2026-c1cf381d5292",
+   "title": "Qwen 3.8 27B Is Just Released - and It Could Be the Most Important ...",
+   "content": "5 Aug 2026 ... “Next week, the open weights of Qwen3.8-Max will be released, and Qwen3.8–27B is also going open-weights to meet you all!” The weights have ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.linkedin.com/posts/qwen_meet-qwen38-flash-a-multimodal-moe-and-activity-7498356251966431232-JcQq",
+   "title": "Qwen3.8-Flash: Efficient Multimodal MoE with GDN + QSA Hybrid ...",
+   "content": "26 Aug 2026 ... Meet Qwen3.8-Flash, a multimodal MoE and an early preview of the Qwen4 architecture, now open-weight! The production version Qwen3.8-Flash ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ]
+}

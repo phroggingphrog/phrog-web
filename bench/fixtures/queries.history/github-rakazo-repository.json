@@ -1,0 +1,381 @@
+{
+ "corpus": "queries.history",
+ "query": "github rakazo repository",
+ "expect": [
+  "dev.to"
+ ],
+ "rows": [
+  {
+   "url": "https://github.com/init-lunacy/rakazo-ultrafast",
+   "title": "GitHub - init-lunacy/rakazo-ultrafast: A Rakazo fork for fast browser and computer use. A per-bot page decider runs confident steps without a frontier-model round trip. Self-hosted; choose your own model and sandbox.",
+   "content": "Rakazo ... Rakazo is an open source AI agent for persistent teammates, and a self-hosted AI assistant you can run on your own machine. It is available on the web, as an Electron desktop app, and on iPhone and Android. Bring your own model and computer provider, or run the complete stack locally. It is an open source, self-hosted alternative to Grok Bot, Meta Muse, OpenAI Dots, Instinct,",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/",
+   "title": "GitHub · Change is constant. GitHub keeps you ahead. · GitHub",
+   "content": "GitHub has been critical to evolving our software development lifecycle. We now average about 4,000 commits daily, a speed that …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/elie222/rakazo/releases",
+   "title": "Releases · elie222/rakazo · GitHub",
+   "content": "You signed in with another tab or window. Reload to refresh your session.You signed out in another tab or window. Reload to refresh your session.You swit…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/github",
+   "title": "GitHub",
+   "content": "How people build software. GitHub has 572 repositories available. Follow their code on GitHub.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/elie222/rakazo",
+   "title": "GitHub - elie222/rakazo: Open-source Grok Bot alternative. Choos…",
+   "content": "You signed in with another tab or window. Reload to refresh your session.You signed out in another tab or window. Reload to refresh your session.You swit…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://desktop.github.com/download/",
+   "title": "Download GitHub Desktop",
+   "content": "Download GitHub Desktop Focus on what matters instead of fighting with Git. Whether you're new to Git or a seasoned user, GitHub …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://github.com/v8/v8",
+   "title": "GitHub - v8/v8: The official mirror of the V8 Git repository",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/GitHub",
+   "title": "GitHub - Wikipedia",
+   "content": "On November 3, 2021, GitHub announced that CEO Nat Friedman, who became CEO when Microsoft acquired GitHub, was …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://github.com/lua/lua",
+   "title": "GitHub - lua/lua: A copy of the Lua development repository, as s…",
+   "content": "GitHub - lua/lua: A copy of the Lua development repository, as seen by the Lua team. Mirrored irregularly. Please DO NOT send pull requests or any other s…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/en",
+   "title": "GitHub Docs",
+   "content": "Get started, troubleshoot, and make the most of GitHub. Documentation for new users, developers, administrators, and all of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/enterprise-server@2.19/v3/repos",
+   "title": "Repositorys - GitHub Docs",
+   "content": "Specifies the types of repositories you want returned. Can be one of all, public, private, forks, sources, member, internal. Default: all. If your organi…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.blog/",
+   "title": "Home - The GitHub Blog",
+   "content": "Updates, ideas, and inspiration from GitHub to help developers build and design software.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.github.com/woome/veh",
+   "title": "GitHub - woome/veh: tie virtualenvs to mercurial repositorys",
+   "content": "You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You swi…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/login",
+   "title": "Sign in to GitHub · GitHub",
+   "content": "GitHub is where people build software. More than 225 million people use GitHub to discover, fork, and contribute to over 800 million …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/repository",
+   "title": "repository · GitHub",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/search",
+   "title": "Search · GitHub",
+   "content": "GitHub is where people build software. More than 225 million people use GitHub to discover, fork, and contribute to over 800 million …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/pam-lab",
+   "title": "Repository for NLP Group Projects · GitHub",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/signup?source=login",
+   "title": "Sign up for GitHub",
+   "content": "GitHub is where people build software. More than 225 million people use GitHub to discover, fork, and contribute to over 800 million …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/qusers",
+   "title": "Repository for Q development · GitHub",
+   "content": "You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You swi…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/git-guides",
+   "title": "Git · GitHub",
+   "content": "GitHub is where people build software. More than 225 million people use GitHub to discover, fork, and contribute to over 800 million …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/mysqludf",
+   "title": "UDF Repository for MySQL · GitHub",
+   "content": "You signed in with another tab or window. Reload to refresh your session. You signed out in another tab or window. Reload to refresh your session. You swi…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://github.com/git/git",
+   "title": "GitHub - git/git: Git Source Code Mirror - This is a publish-onl…",
+   "content": "GitHub - git/git: Git Source Code Mirror - This is a publish-only repository but pull requests can be turned into patches to the mailing list via GitGitGa…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://github.com/search?q=lua",
+   "title": "Repository search results · GitHub",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/rest/repos",
+   "title": "REST-API-Endpunkte für Repositorys - GitHub-Dokumentation",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/repositories",
+   "title": "Dokumentation zu Repositorys - GitHub-Dokumentation",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/enterprise-server@3.12/repositories",
+   "title": "Dokumentation zu Repositorys - GitHub Enterprise Server 3.12 Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/enterprise-server@3.8/repositories",
+   "title": "Dokumentation zu Repositorys - GitHub Enterprise Server 3.8 Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/enterprise-server@3.9/repositories",
+   "title": "Dokumentation zu Repositorys - GitHub Enterprise Server 3.9 Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/enterprise-server@3.11/repositories",
+   "title": "Dokumentation zu Repositorys - GitHub Enterprise Server 3.11 Docs",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/articles/searching-for-repositories/",
+   "title": "Nach Repositorys suchen - GitHub-Dokumentation",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.github.com/de/desktop/adding-and-cloning-repositories",
+   "title": "Repositorys hinzufügen und klonen - GitHub-Dokumentation",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    21
+   ],
+   "publishedDate": null
+  }
+ ]
+}

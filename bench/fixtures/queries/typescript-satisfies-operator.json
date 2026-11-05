@@ -1,0 +1,459 @@
+{
+ "query": "typescript satisfies operator",
+ "expect": [
+  "typescriptlang.org"
+ ],
+ "rows": [
+  {
+   "url": "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html",
+   "title": "TypeScript: Documentation - TypeScript 4.9",
+   "content": "The satisfies Operator. TypeScript developers are often faced with a dilemma: we want to ensure that some expression matches some type, but also want to\u00a0...",
+   "engines": [
+    "google cse",
+    "mwmbl"
+   ],
+   "positions": [
+    3,
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.freecodecamp.org/news/typescript-satisfies-operator/",
+   "title": "How to Use the TypeScript satisfies Operator - freeCodeCamp",
+   "content": "10 July 2023 ... The satisfies operator tells you whether a given type satisfies a particular condition \u2013 and it provides this information before running your\u00a0...",
+   "engines": [
+    "google cse",
+    "mwmbl"
+   ],
+   "positions": [
+    1,
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.logrocket.com/getting-started-typescript-satisfies-operator/",
+   "title": "Getting started with the TypeScript satisfies operator - LogRocket Blog",
+   "content": "5 May 2023 ... The satisfies operator is a feature in TypeScript that allows you to check if a given type satisfies a specific interface or condition. In other\u00a0...",
+   "engines": [
+    "google cse",
+    "mwmbl"
+   ],
+   "positions": [
+    2,
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://publications.ersnet.org/content/erj/60/1/2101499",
+   "title": "ERS/ATS technical standard on interpretive strategies for routine lung ...",
+   "content": "In 2005, the American Thoracic Society (ATS) and European Respiratory Society (ERS) jointly adopted technical standards for the \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://publications.ersnet.org/content/erj/60/1/2101499/DC1/embed/inline-supplementary-material-1.pdf",
+   "title": "ERS/ATS Technical Standard on Interpretive Strategies for Routine Lung ...",
+   "content": "ERS/ATS Technical Standard on Interpretive Strategies for Routine Lung Function Tests",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.thoracic.org/statements/guideline-implementation-tools/technical-standards-interpretive-strategies-lung-function-tests.php",
+   "title": "Interpretive Strategies for Routine Lung Function Tests: ERS/ATS ...",
+   "content": "May 4, 2021 \u00b7 Stanojevic S, Kaminsky DA, Miller M, Thompson B, Aliverti A, Barjaktarevic I, et al. ERS/ATS technical standard on \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://channel.ersnet.org/media-241-ersats-technical-standard-on-interpretive-strategies-for-routine-lung-function-tests",
+   "title": "ERS/ATS technical standard on interpretive strategies for routine lung ...",
+   "content": "In 2005, the American Thoracic Society (ATS) and European Respiratory Society (ERS) jointly adopted technical standards for the \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@cefn/typescript-satisfies-6ba52e74cb2f",
+   "title": "Typescript\u2019s new \u2018satisfies\u2019 operator | by Cefn Hoile | Medium",
+   "content": "Typescript\u2019s new \u2018satisfies\u2019 operator The satisfies operator has arrived in Typescript 4.9. This article explains the purpose of the new keyword, illustr\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.researchgate.net/publication/357289625_ERSATS_technical_standard_on_interpretive_strategies_for_routine_lung_function_tests",
+   "title": "ERS/ATS technical standard on interpretive strategies for routine lung ...",
+   "content": "Dec 23, 2021 \u00b7 In 2005, the American Thoracic Society and the European Respiratory Society jointly adopted technical standards for \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://openlibrary.org//works/OL12439399W",
+   "title": "Cartesian meditations",
+   "content": "",
+   "engines": [
+    "openlibrary"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": "1960-01-01T00:00:00"
+  },
+  {
+   "url": "https://medium.com/@robinviktorsson/a-comprehensive-guide-to-the-satisfies-operator-in-typescript-with-practical-examples-3d77a873dcf8",
+   "title": "A Comprehensive Guide to the satisfies Operator in TypeScript with ...",
+   "content": "19 Feb 2025 ... The satisfies operator sits between explicit type annotations ( : ) and type assertions ( as ). It ensures that a value conforms to a specific\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/78636946/what-are-the-differences-between-typescript-s-satisfies-operator-and-type-assert",
+   "title": "What are the differences Between TypeScript's satisfies operator ...",
+   "content": "18 June 2024 ... I'd like to add that satisfies allows TypeScript to infer the \"narrower\" type based on the actual value assigned while explicit type declaration\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.totaltypescript.com/clarifying-the-satisfies-operator",
+   "title": "Clarifying the `satisfies` Operator - Total TypeScript",
+   "content": "Clarifying the `satisfies` Operator \u00b7 You want the EXACT type of the variable, not the WIDER type. \u00b7 The type is complex enough that you want to make sure you\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.convex.dev/typescript/advanced/type-operators-manipulation/typescript-satisfies",
+   "title": "Understanding TypeScript's satisfies Operator - Convex",
+   "content": "TypeScript's satisfies operator gives you the best of both worlds: strict type checking plus precise type inference. Introduced in TypeScript 4.9, it solves a\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://mimo.org/glossary/typescript/satisfies",
+   "title": "TypeScript satisfies Operator: Purpose, Usage, and Examples - Mimo",
+   "content": "The satisfies operator, introduced in TypeScript 4.9, lets you check that a value conforms to a particular type without changing its inferred structure. This\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=r1L35zxZQPE",
+   "title": "Most TS devs don't understand 'satisfies' - YouTube",
+   "content": "1 Jan 2024 ... ... Intro 00:33 Variable annotations 00:53 What satisfies does 02:01 When satisfies ... TypeScript Wizard with my free beginners TypeScript Course:\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://refine.dev/blog/typescript-satisfies-operator/",
+   "title": "How to Use the TypeScript satisfies Operator - Refine.dev",
+   "content": "14 Jan 2025 ... TypeScript's satisfies operator is a syntax that helps developers validate the type of a variable's value after assignment. It does this by\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://coddy.tech/docs/typescript/satisfies",
+   "title": "Runnable TypeScript Docs: satisfies Operator - Coddy Tech",
+   "content": "24 Sept 2026 ... Frequently Asked Questions. What does satisfies do in TypeScript? expression satisfies Type checks at compile time that the expression is\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/shorts/MC1Jx2kTKCM",
+   "title": "TypeScript Satisfies Operator Can Be Very Useful - YouTube",
+   "content": "4 June 2023 ... Web Dev Roadmap for Beginners (Free!): https://bit.ly/DaveGrayWebDevRoadmap TypeScript Satisfies Operator Can Be Very Useful TypeScript Docs\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/ayc0/typescript-49-satisfies-operator-1e4i",
+   "title": "TypeScript 4.9: satisfies operator - DEV Community",
+   "content": "It's used because using as const on an array creates a readonly tuple. So I had to use it to make the 2 types compatible. so if myColor can be a string O\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lwfiles.mycourse.app/6438c06a5d76f37a1d904274-public/publicFiles/ATS%20ERS%20interpretative%20strategies%202022.pdf",
+   "title": "ERS/ATS technical standard on interpretive strategies for routine lung ...",
+   "content": "Technical aspects of PFT measurement, equipment and biological controls are summarized in the ERS/ATS standards for each PFT \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.prisma.io/blog/satisfies-operator-ur8ys8ccq7zb",
+   "title": "How TypeScript 4.9 `satisfies` Your Prisma Workflows",
+   "content": "How TypeScript 4.9 `satisfies` Your Prisma Workflows TypeScript's new satisfies operator allows some new, type-safe patterns that previously required len\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://channel.ersnet.org/media-113710-interpretation",
+   "title": "Interpretation - ERS Respiratory Channel",
+   "content": "Interpretation of spirometry results should be based on the recent ERS/ATS technical standard on interpretive strategies for routine \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/q/77935367",
+   "title": "Typescript satisfies turns boolean type to literal. Is this norm\u2026",
+   "content": "1 Answer 1 This is the expected behavior, as described in microsoft/TypeScript#55189. The satisfies operator as implemented in microsoft/TypeScript#46827\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/typescript/comments/10s8q4g/can_someone_help_me_understand_why_satisfies_is_a/",
+   "title": "Can someone help me understand why 'satisfies' is a big deal?",
+   "content": "3 Feb 2023 ... Satisfies means that what you write must be compatible with a type, but doesn't cast to that type. It's very useful when you want to infer a\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://eguideline.guidelinecentral.com/ats-guidelines-bundle/routine-lung-function-tests",
+   "title": "Routine Lung Function Tests - eguideline.guidelinecentral.com",
+   "content": "Apr 6, 2022 \u00b7 INSIDE Key Points Interpretation Figures Tables Routine Lung Function Tests Technical Standard on Interpretive \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://exploringjs.com/ts/book/ch_satisfies.html",
+   "title": "The satisfies operator \u2022 Exploring TypeScript",
+   "content": "In the previous example, we checked the shapes of property values. Sometimes we are additionally dealing with a limited set of property keys and would li\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://publications.ersnet.org/content/erj/26/5/948",
+   "title": "Interpretative strategies for lung function tests | European ...",
+   "content": "This section is written to provide guidance in interpreting pulmonary function tests (PFTs) to medical directors of hospital-based \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/JavaScript_syntax",
+   "title": "JavaScript syntax",
+   "content": "console.log(iterator.next().done) //displays true The await operator in JavaScript (and TypeScript) can only be used from inside an async function or at the",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tiptopdesign.pl/blog/typescript-satisfies-operator/",
+   "title": "TypeScript's `satisfies` Operator: When and How to Use It",
+   "content": "6 July 2026 ... Summary. The satisfies operator is a practical tool in TypeScript that enforces type constraints while keeping inferred types intact. It retains\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://publications.ersnet.org/content/erj/60/2/2200252.full.pdf",
+   "title": "The new ERS/ATS standards on lung function test interpretation: \u2026",
+   "content": "The recently published European Respiratory Society (ERS)/American Thoracic Society (ATS) document on testing interpretation is \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.builder.io/blog/satisfies-operator",
+   "title": "Better Configuration in TypeScript with the `satisfies` Operator",
+   "content": "17 Jan 2023 ... Compared to a standard type declaration, it can strike an elegant balance between type checking and understanding the exact details of your\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/microsoft/TypeScript/issues/51556",
+   "title": "Support satisfies operator on functions #51556 - TypeScript - GitHub",
+   "content": "16 Nov 2022 ... satisfies is super handy to use, and you can already use it for arrow functions. Not having support for it on functions feels unintuitive and\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://jsmanifest.com/typescript-satisfies-operator-guide",
+   "title": "The Power of TypeScript's Satisfies Operator - jsmanifest",
+   "content": "16 Jan 2026 ... The satisfies operator, introduced in TypeScript 4.9, gives you something remarkable: the ability to validate that an expression matches a type\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/benarambide/understanding-typescripts-satisfies-vs-as-3d6",
+   "title": "Understanding TypeScript's `satisfies` vs `as` - DEV Community",
+   "content": "14 May 2025 ... In TypeScript, the satisfies operator is a safer, more precise alternative to as when you want to ensure a value conforms to a type without\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://realcoding.blog/en/2026/02/24/typescript-satisfies-operator-type-safety/",
+   "title": "TypeScript satisfies Operator: Type Safety Without Losing Inference",
+   "content": "24 Feb 2026 ... Key Points \u00b7 satisfies gives you both type validation and narrow type inference \u00b7 Unlike as , satisfies validates the actual value against the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.learningtypescript.com/articles/the-satisfies-operator",
+   "title": "The satisfies Operator - Learning TypeScript",
+   "content": "14 Nov 2022 ... The satisfies Operator ... TypeScript 4.9 introduces a new operator, satisfies , that allows opting into a different kind of type inference from\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

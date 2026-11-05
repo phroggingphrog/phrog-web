@@ -1,0 +1,408 @@
+{
+ "query": "systemd timer vs cron",
+ "expect": [
+  "freedesktop.org",
+  "archlinux.org",
+  "digitalocean.com"
+ ],
+ "rows": [
+  {
+   "url": "https://openlibrary.org//works/OL42717925W",
+   "title": "The Linux HandBook",
+   "content": "Linux is not just an operating system; it is a philosophy, a movement, and the foundation of modern computing, powering everything from personal devices to enterprise servers and supercomputers.",
+   "engines": [
+    "openlibrary"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": "2025-03-15T00:00:00"
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Systemd",
+   "title": "Systemd",
+   "content": "device (automatically initiated by systemd) .mount .automount .swap .target .path .timer (which can be used as a cron-like job scheduler) .snapshot .slice",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.blogger.com/about/?hl=en",
+   "title": "Blogger.com - Create a unique and beautiful blog easily.",
+   "content": "Create a beautiful blog that fits your style. Choose from a selection of easy-to-use templates \u2013 all with flexible layouts and hundreds \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://unix.stackexchange.com/a/685547",
+   "title": "cron - Prevent systemd timer from running on startup - Unix & Li\u2026",
+   "content": "My timers work but they also execute on system reboot. I would like my OnCalendar events to only run at the specified times, not whatever random time I r\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://accounts.google.com/login?service=blogger",
+   "title": "Blogger - Google Accounts",
+   "content": "Weblog publishing tool from Google, for sharing text, photos and video.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/linuxadmin/comments/k8l272/systemdtimers_vs_cron/",
+   "title": "systemd-timers vs. cron : r/linuxadmin - Reddit",
+   "content": "7 Dec 2020 ... Systemd timers are intergrated into systemd ecosystem so you can easily do things like \u201ctwo hours after reboot\u201d or \u201cwhen machine is idle\u201d and\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.blogger.com/go/createyourblog",
+   "title": "301 Moved",
+   "content": "The document has moved here.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9,
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://unix.stackexchange.com/q/203254",
+   "title": "cron - Does systemd timer unit skip the next run if the process \u2026",
+   "content": "I want to use systemd to run a command every 5 minutes. However, there is a risk that occasionally the task may take longer than 5 minutes to run. At tha\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.blogger.com/?authuser=1",
+   "title": "Blogger",
+   "content": "Create and customize your own blog easily to share your passions, knowledge, or latest news in a unique and attractive way.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://accounts.google.com/login?serviceblogger",
+   "title": "Sign in - Google Accounts",
+   "content": "Use a private browsing window to sign in. Learn more about using Guest mode.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://unix.stackexchange.com/questions/278564/cron-vs-systemd-timers",
+   "title": "Cron vs systemd timers - Unix & Linux Stack Exchange",
+   "content": "23 Apr 2016 ... Cron vs systemd timers \u00b7 Cron is guaranteed to be in any Unix-like system, in the sense of being an installable supported piece of software.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ryansouthgate.com/systemd-timer/",
+   "title": "Cronjob vs systemd timers - how to create a systemd timer",
+   "content": "11 Mar 2025 ... A quick comparison with Cron \u00b7 dependency management - systemd allows you to define dependencies between services. \u00b7 logging - detailed logs and\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@tolulinux/linux-scheduled-cron-vs-systemd-timer-738dedcc6a71",
+   "title": "Linux Scheduled: Cron vs Systemd timers - Medium",
+   "content": "15 June 2025 ... When to use cron and systemd timers \u00b7 Use cron for quick and simple time scheduling tasks. Also for systems that is always on (e.g production\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://coady.tech/systemd-timer-vs-cron/",
+   "title": "Stop using cron! Systemd Timers Explained - Coady.Tech",
+   "content": "4 Sept 2023 ... Cron and systemd timers serve distinct roles in the Linux world. While cron remains the go-to for straightforward scheduling, systemd timers\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=xFgLHcz9TH0",
+   "title": "Cron vs Systemd differences explained for Beginners - YouTube",
+   "content": "17 Oct 2026 ... ... unavailable. This content isn't available. Cron vs Systemd differences explained for Beginners. @BitByteTalks 363 likes 14K views 2w ago. more.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://xtom.com/blog/systemd-vs-cron-linux-task-scheduling/",
+   "title": "Systemd Timers vs. Cron: Which One Should You Use? - xTom",
+   "content": "3 Dec 2025 ... Conclusion. For Linux sysadmins and developers, cron is an old friend: simple, predictable, and reliable for basic time-based tasks. It's not\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://opensource.com/article/20/7/systemd-timers",
+   "title": "Use systemd timers instead of cronjobs | Opensource.com",
+   "content": "7 July 2020 ... systemd and its timers use a different style for time and date specifications than the format used in crontab. It is more flexible than crontab\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://linuxcert.guru/blog/systemd-timers-vs-cron/",
+   "title": "Systemd Timers vs Cron: Modern Task Scheduling for RHCSA 2026",
+   "content": "20 Feb 2026 ... Systemd timers represent a modern approach to task scheduling that addresses many of cron's limitations. The key architectural difference is\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/kingyou/replacing-crontab-with-systemd-timer-benefits-examples-and-migration-guide-3eim",
+   "title": "Replacing Crontab with Systemd Timer: Benefits, Examples, and ...",
+   "content": "4 Nov 2025 ... Systemd timers provide a powerful, modern alternative to cron with better integration, logging, and flexibility. While they require more initial\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blogger.googleblog.com/",
+   "title": "Official Blogger Blog",
+   "content": "May 20, 2020 \u00b7 Since 1999, millions of people have expressed themselves on Blogger. From detailed posts about almost every apple \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/blogger?hl=en",
+   "title": "Blogger Help - Google Help",
+   "content": "Official Blogger Help Center where you can find tips and tutorials on using Blogger and other answers to frequently asked questions.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Blogger_(service)",
+   "title": "Blogger (service) - Wikipedia",
+   "content": "Blogger is an American online content management system founded in 1999 that enables its users to write blogs with time-stamped \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.blogger.com/onboarding",
+   "title": "Blogger",
+   "content": "",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wiki.archlinux.org/title/Systemd/Timers",
+   "title": "systemd/Timers - ArchWiki",
+   "content": "15 Feb 2026 ... Timers are systemd unit files whose name ends in .timer that control .service files or events. Timers can be used as an alternative to cron\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://trstringer.com/systemd-timer-vs-cronjob/",
+   "title": "Why I Prefer systemd Timers Over Cron | Thomas Stringer",
+   "content": "23 Apr 2020 ... systemd has become a mainstay for the Linux world, but one of the things that still seems to stick around is cron jobs.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=21152432",
+   "title": "Better use systemd as a reliable cron replacement https://wiki ...",
+   "content": "For quick and dirty things (like manual logging/system performance), cron works just fine and is quicker to set up. For tasks that require dependencies or have\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.anteru.net/blog/2024/replacing-cron-with-systemd-timers/",
+   "title": "Replacing cron with systemd-timers - Anteru's Blog",
+   "content": "21 Apr 2024 ... This may seem like the most boring task in the world, but it turns out that systemd-timer is so much better than cron that it was actually quite\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/deekay99/cron-vs-systemd-timers-vs-daemontools-understanding-the-evolution-of-linux-job-scheduling--31mm",
+   "title": "Cron vs Systemd Timers vs daemontools \u2014 Understanding the ...",
+   "content": "5 Aug 2026 ... Cron vs Systemd Timers vs daemontools \u2014 Understanding the Evolution of Linux Job Scheduling & Service Management \u00b7 \u2713 I'll still use cron for\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://linuxblog.io/systemd-timers-alternative-cron-linux/",
+   "title": "Systemd Timers: Alternative to cron on Linux - LinuxBlog.io",
+   "content": "16 Apr 2026 ... Introducing systemd Timers. Anatomy of a systemd Timer \u00b7 OnCalendar Syntax \u00b7 Monotonic Timers: Running Relative to Boot or Last Run \u00b7 Persistent\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@tolulinux/systemd-timers-the-alternative-to-cron-jobs-be479172ae12",
+   "title": "Systemd timers \u2014 The alternative to cron jobs | by Tolulope Makinde",
+   "content": "22 June 2025 ... Cron and system timers are powerful scheduling tools. While both are efficient and reliable, it's important to understand their use case.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://akashrajpurohit.com/blog/systemd-timers-vs-cron-jobs/",
+   "title": "SystemD Timers vs. Cron Jobs | Akash Rajpurohit",
+   "content": "18 Sept 2023 ... Choosing the Right One \u00b7 Choose Cron Jobs if: You need simple time-based scheduling, and you're already familiar with Cron. \u00b7 Choose SystemD\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.howtogeek.com/ditch-cron-3-ways-to-schedule-scripts-with-systemd-timers-on-ubuntu/",
+   "title": "3 reasons to dump cron for systemd timers on Ubuntu - How-To Geek",
+   "content": "31 Jan 2026 ... As you can see, compared to Cron, systemd timers are the smarter, more reliable way to run and schedule scripts. Even if you're a die-hard Cron\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.neteye-blog.com/blog/2022/12/30/start-using-systemd-timers-instead-of-cron-anacron/",
+   "title": "Start Using systemd Timers instead of cron/anacron - NetEye Blog",
+   "content": "30 Dec 2022 ... systemd timers are a way to schedule tasks in Linux systems using the systemd initialization system. They provide finer granularity for\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

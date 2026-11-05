@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "\"opendots\" github ai agent persistent teammates repository",
+ "expect": [
+  "dev.to"
+ ],
+ "rows": [
+  {
+   "url": "https://www.jbhifi.com.au/products/shokz-opendots-one-open-ear-tws-earbuds-black",
+   "title": "Shokz OpenDots One Open-Ear TWS Earbuds (Black) - JB Hi-Fi",
+   "content": "OpenDots ONE are Shokz's smallest open-ear earbuds, each weighing just 6.5g 2, making them feel almost weightless on your ears. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com.au/products/opendots-one",
+   "title": "OpenDots ONE Open-Ear Bluetooth Earbuds",
+   "content": "Experience Shokz OpenDots One open ear headphones. Open-ear design, comfortable fit, immersive audio, and up to 40 hours …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://open-dots.dev/",
+   "title": "OpenDots · always-on open agents",
+   "content": "OpenDots are always-on agents that run on open weights, live on their own cloud computer, hold their own wallet and learn your …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.jbhifi.com.au/products/shokz-opendots-2-open-ear-earbuds-black",
+   "title": "Shokz OpenDots 2 Open-Ear Earbuds (Black) - JB Hi-Fi",
+   "content": "OpenDots 2 delivers big, powerful sound while keeping you aware of your surroundings. Designed to fit comfortably and securely, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com/pages/opendots-one",
+   "title": "Shokz OpenDots ONE - Comfortable Open Earbuds for Sports & All …",
+   "content": "Discover OpenDots ONE open-ear earbuds with Dolby Audio, wireless charging, and all-day comfort—perfect for sports, workouts, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com.au/pages/opendots-2",
+   "title": "Shokz OpenDots 2 | Flagship Open Ear Clip-On Earbuds",
+   "content": "Meet Shokz OpenDots 2, flagship open-ear clip-on earbuds with premium sound, secure clip-on design and all-day comfort for an …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.amazon.com.au/SHOKZ-OpenDots-Headphones-Bluetooth-Earphones/dp/B0DWF69VGQ",
+   "title": "SHOKZ OpenDots ONE Open-Ear Headphones, Premium Dolby …",
+   "content": "OpenDots ONE uses DirectPitch technology to minimize leakage. Enabling \"Privacy Mode\" in the Shokz App further reduces high …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.copilotkit.ai/blog/introducing-opendots",
+   "title": "Introducing OpenDots: the Open-Source Alternative to OpenAI Dots",
+   "content": "Oct 1, 2026 · Today we're releasing OpenDots, the open-source alternative to OpenAI Dots. Every Dot is an always-on AI coworker …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.99bikes.com.au/products/shokz-opendots-one-grey",
+   "title": "Shokz OpenDots ONE True Wireless Earbuds Grey - 99 Bikes",
+   "content": "The Shokz OpenDots ONE True Wireless Earbuds in Grey offer a unique open-ear, clip-on design that combines style and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/r2hu1/openbots",
+   "title": "GitHub - r2hu1/openbots: AI coworkers built to get things done. They ...",
+   "content": "5 days ago ... ... opendotsorchestrator. Resources. Readme. Activity. Stars. 12 stars ... Build a team of AI agents that research, write and execute code, use ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/BestGitHubRepos/comments/1x3vmmj/opendots_opensource_selfhosted_alternative_to/",
+   "title": "open-source, self-hosted alternative to OpenAI Dots where every AI ...",
+   "content": "12 Oct 2026 ... OpenDots: open-source, self-hosted alternative to OpenAI Dots where every AI coworker gets its own computer (4.9k stars). AI repositories.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/csells/awesome-jarvis",
+   "title": "GitHub - csells/awesome-jarvis: Curated list for building a real-life ...",
+   "content": "Nerve - Web cockpit for OpenClaw with wake-phrase voice, a sub-agent session tree and a kanban board for delegating and reviewing work. OpenDots - Self ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/IkramRana.aiautomation/posts/a-free-open-source-alternative-to-openai-dots-is-already-live-on-github-run-mult/122143050087216756/",
+   "title": "A free, open-source alternative to OpenAI Dots is already live on ...",
+   "content": "6 Oct 2026 ... GitHub - CopilotKit/OpenDots: Your always-on AI coworkers that move ... I JUST FOUND 5 open source AI agent repositories you should star on GitHub ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/ikaijua/Awesome-AITools",
+   "title": "GitHub - ikaijua/Awesome-AITools: Collection of AI-related utilities ...",
+   "content": "Manage and schedule existing agents, tasks, sessions, workspaces, and team collaboration. Name, Description, Links, Fees. OpenDots, CopilotKit's open-source ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/groups/vibecodinglife/posts/2150130665575459/",
+   "title": "OpenAI Introduces Dots: AI Agents for Automated Tasks - Facebook",
+   "content": "29 Sept 2026 ... Meet OpenDots - an open-source, model-agnostic alternative to OpenAI ... Comment “DOTS” and I'll send you the GitHub repo and full setup ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/100090263898034/videos/opendots-is-a-self-hosted-template-for-always-on-ai-coworkers-each-one-gets-its-/1427466752683475/",
+   "title": "CopilotKit Open-Sources OpenDots: Self-Hosted Always-On AI ...",
+   "content": "3 Oct 2026 ... OpenDots is a self-hosted template for always-on AI coworkers. Each one gets its own computer, files, and browser. Ships with: • Real-time agent ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.instagram.com/p/DeJ3JKYIx5j/",
+   "title": "\"You can now run your own OpenAI-style agents for free. It's called ...",
+   "content": "6 Oct 2026 ... It's called OpenDots and it just dropped on GitHub. Each Dot is its own AI coworker. It has a name, a role, a browser, files, and a terminal.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.instagram.com/reel/DcJgryICewx/",
+   "title": "Buzz is a free open-source workspace where people and AI agents ...",
+   "content": "17 Aug 2026 ... OpenDots is a free, self-hosted template for always-on AI coworkers ... → Git repositories → Search → Code reviews → Workflows ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com/pages/opendots-2",
+   "title": "OpenDots 2 Clip-on Earbuds - Upgraded Sound, Secure Fit & Clear …",
+   "content": "OpenDots 2, upgraded clip-on earbuds designed for secure fit and all-day comfort with reduced ear canal pressure. Featuring AI …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@creativeaininja/claude-code-ultraplan-explained-multi-agent-planning-the-source-code-leak-and-the-mythos-27373e897a63",
+   "title": "Claude Code /ultraplan Explained: Multi-Agent Planning, the Source ...",
+   "content": "11 Apr 2026 ... 1.91 or later, a Claude Code on the web account, and a GitHub repository. ... OpenDots Lets AI Agents Work While You Sleep. Put Limits on Them ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ai.miraheze.org/wiki/OpenVuln",
+   "title": "OpenVuln - Learn AI - Miraheze",
+   "content": "16 Sept 2026 ... Loki (agent) · Loopa · MAI-UI · Manus · Mobile-Agent · MudrikNow · MUE-X · MuleRun · OpenAI Dots · OpenAmer · OpenDots; OpenVuln; Ouroboros ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://mausbot.com/alternatives",
+   "title": "AI agent alternatives: MausBot vs every agent app (2026)",
+   "content": "6 Oct 2026 ... Open Dots: none on disk, 5,517 on a 2023 repo. OpenDots: MIT, 4,270, A Mac app you build; a Telegram bot plus web UI; a web template, OpenAI ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.instagram.com/reel/DeCxpiejnOG/",
+   "title": "Today's GitHub Star: dots — an open-source AI agent with its own ...",
+   "content": "3 Oct 2026 ... Meet OpenDots - an open-source, model-agnostic alternative to OpenAI Dots that lets you create AI agents that can actually work on tasks for you ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/wangrongding/github-university/blob/main/README.md",
+   "title": "github-university/README.md at main",
+   "content": "AG-UI: the Agent-User Interaction Protocol. Bring Agents into Frontend Applications. OpenDots ... Cross-platform team chat where AI agents are first-class ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.linkedin.com/posts/aaronbartell_ive-been-messing-with-grok-bot-this-week-activity-7507771188677386240-d3h5",
+   "title": "Building a virtual team with Grok Bot and Social Media Sam - LinkedIn",
+   "content": "21 Sept 2026 ... The alternative is OpenDots, CopilotKit's MIT-licensed template. It ... → Grok Bot is a team of AI agents on its own cloud computer.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.instagram.com/reel/Dd6fdb-jQbq/",
+   "title": "Switch brings your AI agents into Slack, Teams and Discord, right ...",
+   "content": "30 Sept 2026 ... OpenDots is a free, self-hosted template for always-on AI coworkers ... GitHub repo in the comments! Over to you: Which platform ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.copilotkit.ai/blog",
+   "title": "Blog | CopilotKit",
+   "content": "22 Oct 2026 ... Here's what it is, why agents need it and how it works under the hood, all in 60 seconds! Introducing OpenDots: the Open-Source Alternative to ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/FastCompany/posts/openais-new-dots-agent-comes-with-a-crew-of-friendly-mascots/1469191798408611/",
+   "title": "OpenAI's new dots agent comes with a crew of friendly mascots.",
+   "content": "29 Sept 2026 ... OpenAI just launched Dots… and now there's an open-source alternative on Github. Meet OpenDots - an open-source, model-agnostic alternative ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/@AIStackEngineer",
+   "title": "AI Stack Engineer - YouTube",
+   "content": "1 day ago ... OpenBot: Free Desktop App for Persistent AI Agent Teams with Claude Code, OpenCode ... OpenDots: 100% Free Self-Hosted AI Agents That Actually ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tiktok.com/discover/open-dots-github",
+   "title": "Open Dots Github - TikTok",
+   "content": "26 Oct 2026 ... OpenDots gives you persistent AI agents with their own computers that work across text, calls, and Slack. Open source template. Comment ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}

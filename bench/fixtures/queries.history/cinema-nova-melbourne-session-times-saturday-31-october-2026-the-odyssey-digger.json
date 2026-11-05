@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "cinema nova melbourne session times saturday 31 october 2026 the odyssey digger",
+ "expect": [
+  "ticketing.cinemanova.com.au"
+ ],
+ "rows": [
+  {
+   "url": "https://www.kfc.com.au/restaurants/kfc-bunbury-south/6230",
+   "title": "KFC",
+   "content": "KFC ... KFC",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ubereats.com/au/store/kfc-bunbury-south/E4-0u7adUcW1i3OI5HfLrg?msockid=3d6c8c083483655b1e77940035fd64c9",
+   "title": "Order KFC (Bunbury South) | Menu & Prices - Uber Eats",
+   "content": "KFC (Bunbury South) is a fast food outlet located in Bunbury, specialising in a variety of chicken-based dishes. The menu includes …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.all-opening-hours.com.au/places/kfc-bunbury-south/",
+   "title": "KFC Bunbury South - All Opening Hours",
+   "content": "Situated at 1 Brittain Rd, cnr Bussell Hwy, Gelorup WA 6230, Australia the place of business is easily accessible for all your Meal …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wanderboat.ai/restaurants/australia/western-australia/kfc-bunbury-south/KLfSPLIlSh2VwZJ3ckXy3g",
+   "title": "KFC Bunbury South - 140 Bussell Hwy, South Bunbury WA 6230, …",
+   "content": "Restaurant chain known for its buckets of fried chicken, plus combo meals & sides. Located at 140 Bussell Hwy, South Bunbury WA …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.onlinedining.com.au/venue/kfc-bunbury-south",
+   "title": "KFC Bunbury South – Gelorup, Western Australia | Online Dining",
+   "content": "KFC Bunbury South in Gelorup, Western Australia. View menus, opening hours, photos, cuisine, popular dishes, reviews and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://menuweb.menu/restaurants/koombana-drive-bunbury/kfc-bunbury-south/menu",
+   "title": "Menu - Kfc Bunbury South Koombana Drive, Bunbury",
+   "content": "The menu of Kfc Bunbury South in Koombana Drive, Bunbury, with 52 dishes listed right now.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://quokkahub.com.au/australia/south-bunbury/food-beverage/kfc-bunbury-south",
+   "title": "kfc bunbury souths - Local Business & Community Connections in South ...",
+   "content": "KFC Bunbury South serves as a premier fast food restaurant located at 140 Bussell Hwy in South Bunbury, Western Australia. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.mapquest.com/au/western-australia/kfc-bunbury-south-525486356",
+   "title": "KFC Bunbury South - MapQuest",
+   "content": "KFC Bunbury South is a typical fast-food restaurant offering the familiar menu of fried chicken and sides. It is conveniently located …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.kfc.com.au/find-store",
+   "title": "Find a KFC",
+   "content": "Error: [react-places-autocomplete]: Google Maps JavaScript API library must be loaded. See: https://github.com/kenny-hibino/react …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/p/KFC-100089618335642/",
+   "title": "KFC | South Bunbury WA - Facebook",
+   "content": "KFC, South Bunbury. 25 followers · 117 were here. KFC Bunbury South remains open during COVID-19 and offers Drive-Thru and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "dsh plugin tool filter allowlist tool permissions dsh-tools restrict",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.deepseek.com/en/harness/",
+   "title": "DeepSeek Harness | Explore the limits of intelligence",
+   "content": "I'm DeepSeek Harness, an open-source harness from DeepSeek built on Cordis 's “everything is a plugin” architecture. Run me as a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/",
+   "title": "Home | Defence Service Homes",
+   "content": "Housing loans to recognise the contribution of those who have served in the Australian Defence Force. We are available 24 hours a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/insurance",
+   "title": "Insurance | Defence Service Homes - dsh.gov.au",
+   "content": "We understand the lifestyle and needs of current Australian Defence Force members, veterans and their families. We make …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.demountablesaleshire.au/",
+   "title": "Demountables Darwin | Northern Territory - Demountable Sales and Hire",
+   "content": "Demountable Sales and Hire (DSH) is a Northern Territory owned and operated company, specialising in innovative and high-quality …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.demountablesaleshire.au/demountable-homes",
+   "title": "Demountable Homes Darwin — Demountable Sales and Hire Darwin",
+   "content": "Demountable Sales and Hire can assist with your residential needs in the Northern Territory, Queensland and Western Australia. Our …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dshdesktop.cn/",
+   "title": "DSH Desktop｜开源桌面客户端，桌面本身也是插件",
+   "content": "DSH Next 官方 DSH 的增强版， 解锁被藏起来的能力。 让 DSH 能做更多：Computer Use 等隐藏能力已开放，更多增强持续加入。 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dshdesktop.cn/en/",
+   "title": "DSH Desktop | Open-source desktop, built as a plugin",
+   "content": "Turn on remote control in DSH Desktop and connect through Agents Anywhere. Check progress, continue conversations and use …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/anywhere-labs/dsh-desktop",
+   "title": "GitHub - anywhere-labs/dsh-desktop: 为 DeepSeek Harness (DSH ...",
+   "content": "基于 DeepSeek Harness 构建的 Windows、macOS 和 Linux 开源桌面客户端。 一键下载，开箱即用。 万物皆「插件」，桌面本身也 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dhoas.gov.au/defence-service-homes-dsh.html",
+   "title": "Defence Service Homes (DSH) - DHOAS",
+   "content": "DSH offers subsidised housing loans to eligible current and former ADF personnel, in recognition of their service to Australia. If you …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.dsh.gov.au/insurance/payments",
+   "title": "Payments | Defence Service Homes - dsh.gov.au",
+   "content": "If you are experiencing financial difficulties or are struggling to make a payment, please click here to know more about financial …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

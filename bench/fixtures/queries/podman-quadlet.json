@@ -1,0 +1,517 @@
+{
+ "query": "podman quadlet",
+ "expect": [
+  "podman.io",
+  "docs.podman.io",
+  "redhat.com"
+ ],
+ "rows": [
+  {
+   "url": "https://podman.io/",
+   "title": "Podman",
+   "content": "Podman is open source first and won't lock you in. Podman Desktop can be used as one tool to manage all your containers, \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/en/v6.1.0/markdown/podman-quadlet.1.html",
+   "title": "podman-quadlet",
+   "content": "DESCRIPTION\u00b6. podman quadlet is a set of subcommands that manage Quadlets. Podman Quadlets allow users to manage containers, pods, volumes, networks, and images\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.mankier.com/5/podman-systemd.unit",
+   "title": "podman-systemd.unit: systemd units using Podman Quadlet | podman\u2026",
+   "content": "Podman supports starting containers (and creating volumes) via systemd by using a systemd generator. These files are read during boot (and when systemctl\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://podman.io/docs/installation",
+   "title": "Podman Installation | Podman",
+   "content": "While \"containers are Linux,\" Podman also runs on Mac and Windows, where it provides a native podman CLI and embeds a guest \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html",
+   "title": "podman-systemd.unit",
+   "content": "Quadlets support these in two ways. First of all, a quadlet unit with a template form will generate a systemd service with a template form, and the template\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/containers/podman/issues/17359",
+   "title": "[Bug]: Quadlet generating services with wrong podman path \u00b7 Issu\u2026",
+   "content": "Comments Issue Description Quadlet is generating systemd service files with the wrong podman path. It is filling out the ExecStart and ExecStopPost optio\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/topics/containers/what-is-podman",
+   "title": "What is Podman? - Red Hat",
+   "content": "Jan 28, 2026 \u00b7 Podman (short for pod manager) is an open source tool for developing, managing, and running containers. Developed \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/selfhosted/comments/1dodflf/a_simple_guide_on_why_and_how_to_use_podman/",
+   "title": "A simple guide on why and how to use Podman Quadlets ... - Reddit",
+   "content": "26 June 2024 ... With the quadlets you just need a name.volume file, and also write that in your host mount instead of a bind mount folder path you have to\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://mo8it.com/blog/quadlet/",
+   "title": "Quadlet: Running Podman containers under systemd",
+   "content": "Quadlet: Running Podman containers under systemd Quadlet lets you run your Podman containers as systemd services. This is especially useful for running c\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/blog/quadlet-podman",
+   "title": "Make systemd better for Podman with Quadlet - Red Hat",
+   "content": "17 Feb 2023 ... Quadlet is a tool for running Podman containers under systemd in an optimal way by allowing containers to run under systemd in a declarative way\u00a0...",
+   "engines": [
+    "google cse",
+    "mwmbl"
+   ],
+   "positions": [
+    4,
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://podman-desktop.io/blog/podman-quadlet",
+   "title": "Podman Quadlets with Podman Desktop",
+   "content": "29 Jan 2025 ... What Are Quadlets?\u200b. Podman Quadlets allow you to manage containers declaratively using systemd. Since version 4.4, Podman can create, start,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/podman-quadlet-for-container-management/",
+   "title": "What is Podman Quadlet for Container Management?",
+   "content": "23 July 2025 ... Quadlet is a feature that helps convert simplified Podman configuration files to systemd service unit files. This integration enables you to\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=go8LCGe_eBA",
+   "title": "Podman containers, quadlets, and automation | Into the Terminal 178",
+   "content": "6 Mar 2026 ... Podman is very similar to docker, but in some cases it is very different. For instance, podman does not maintain all of your containers\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/mcheremnov/podman-quadlet-modern-systemd-integration-2i7g",
+   "title": "Podman Quadlet: Modern systemd Integration - DEV Community",
+   "content": "3 Oct 2025 ... How Quadlet Works. Quadlet uses .container , .volume , .network , and .pod files that systemd automatically converts to service units at boot\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.ansible.com/projects/ansible/latest/collections/containers/podman/podman_quadlet_module.html",
+   "title": "containers.podman.podman_quadlet module \u2013 Install or remove ...",
+   "content": "Install or remove Podman Quadlets using podman quadlet install and podman quadlet rm . \u00b7 Creation of quadlet files is handled by resource modules with state=\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.twilio.com/en-us/blog/developers/tutorials/building-blocks/getting-started-with-podman-quadlets",
+   "title": "Getting Started with Podman Quadlets | Twilio",
+   "content": "31 Mar 2026 ... Getting Started with Podman Quadlets \u00b7 Podman Quadlets simplify container management using declarative systemd unit files. \u00b7 Quadlets enable\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Podman",
+   "title": "Podman - Wikipedia",
+   "content": "Podman is a \"daemonless\" tool, [15] as opposed to other containerization systems like Docker, which uses a background service \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://docs.fedoraproject.org/sw/fedora-coreos/running-containers/",
+   "title": "Running Containers :: Fedora Docs",
+   "content": "Podman Quadlet is functionality included in podman that allows starting containers via systemd using a systemd generator. The example below is the same h\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/",
+   "title": "What is Podman? \u2014 Podman documentation",
+   "content": "Podman is a daemonless, open source, Linux native tool designed to make it easy to find, run, build, share and deploy applications \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/podman-container-tools/podman",
+   "title": "Podman: A tool for managing OCI containers and pods - GitHub",
+   "content": "Podman (the POD MANager) is a tool for managing containers and images, volumes mounted into those containers, and pods made \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/en/latest/markdown/podman-quadlet-basic-usage.7.html",
+   "title": "podman-quadlet-basic-usage",
+   "content": "DESCRIPTION\u00b6. This guide introduces common usage patterns for Podman Quadlet. It provides step-by-step examples for defining containers, exposing ports,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/k9withabone/podlet",
+   "title": "GitHub - k9withabone/podlet: Generate podman quadlet files from \u2026",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://podman-desktop.io/",
+   "title": "Podman Desktop - Containers and Kubernetes | Podman Desktop",
+   "content": "Podman is a secure container runtime through its focus on daemonless, rootless containers, SELinux support, network policy \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://serverfault.com/tags/podman/hot",
+   "title": "Hottest 'podman' Answers - Server Fault",
+   "content": "Update 2024 April 11 The command-line tool podlet generates podman quadlet files from a podman command or a compose file. The command podman generate sys\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/en/latest/Tutorials.html",
+   "title": "Tutorials \u2014 Podman documentation",
+   "content": "Here are a number of useful tutorials to get you up and running with Podman. If you are familiar with the Docker Container Engine \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/containers/podlet",
+   "title": "GitHub - containers/podlet: Generate podman quadlet files from a\u2026",
+   "content": "Saved searches Use saved searches to filter your results more quickly You signed in with another tab or window. Reload to refresh your session.You signed\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/devops/podman/",
+   "title": "What is Podman?: Complete Processes to Setup on Linux",
+   "content": "Jul 23, 2025 \u00b7 Podman stands for \"Pod Manager\" and is a Red Hat-designed open-source container and containerized application \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://lib.rs/crates/podlet",
+   "title": "Podlet \u2014 command-line utility in Rust // Lib.rs",
+   "content": "Usage $ podlet -hGenerate Podman Quadlet files from a Podman command, compose file, or existing objectUsage: podlet [OPTIONS]<COMMAND>Commands:podman Gen\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://podman.io/get-started",
+   "title": "Podman",
+   "content": "Podman can search for images on remote registries with some simple keywords. You can also enhance your search with filters. \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://lobste.rs/s/nimat2/quadlet_easier_way_run_system_containers",
+   "title": "Quadlet, an easier way to run system containers [with podman] | \u2026",
+   "content": "This is pretty neat. I know I have one or two system services on my home network running as podman containers that are managed by systemd, and the unit f\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://fale.io/tags/quadlet",
+   "title": "Quadlet - (Fabio Alessandro Locati|Fale)'s blog",
+   "content": "Since the merge of Quadlet in Podman, I\u2019ve been moving multiple services to Podman Systemd services. I find them to be easy to create, manage, and automa\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://news.ycombinator.com/item?id=43685989",
+   "title": "I prefer quadlet for 2 reasons: 1. Podman is simpler than Docker ...",
+   "content": "except there is NO good orchestration system for doing that. podman compose is a steaming pile of shit. quadlets requires systemd which requires root. docker\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://www.redhat.com/sysadmin/quadlet-podman",
+   "title": "Make systemd better for Podman with Quadlet | Enable Sysadmin",
+   "content": "\"Running containerized workloads in systemd is a simple yet powerful means for reliable and rock-solid deployments. The systemd integration further lays t\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://mag37.org/posts/guide_podman_quadlets/",
+   "title": "Guide: Getting started with Podman Quadlets - mag37.org",
+   "content": "15 Sept 2024 ... Setting up the environment/server/VM for rootless podman# \u00b7 Quadlets require Podman version 4.4+ and cgroups v2 \u00b7 Rootless containers require\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.fedoraproject.org/pt_BR/fedora-coreos/running-containers/",
+   "title": "Usando cont\u00eaineres :: Fedora Docs",
+   "content": "Podman Quadlet is functionality included in podman that allows starting containers via systemd using a systemd generator. The example below is the same h\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://major.io/p/quadlet-networking/",
+   "title": "Getting podman quadlets talking to each other - Major Hayden",
+   "content": "25 Sept 2025 ... Getting podman quadlets talking to each other ... Quadlets are a handy way to manage containers using systemd unit files. Containers running via\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.oracle.com/en/operating-systems/oracle-linux/podman/quadlets.html",
+   "title": "9 Podman Quadlets - Oracle Help Center",
+   "content": "Creating Quadlets. Create Podman Quadlets that run containers, pods, volumes, and other Podman objects, using a systemd unit file, either for the root user, or\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.podman.io/en/stable/markdown/podman-quadlet-install.1.html",
+   "title": "podman-quadlet-install",
+   "content": "DESCRIPTION\u00b6. Install a Quadlet file or an application (which may include multiple Quadlet files) for the current user. You can specify Quadlet files as local\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://man.archlinux.org/man/quadlet.5.en",
+   "title": "quadlet(5) - Arch manual pages",
+   "content": "The Podman files use the same format as regular systemd unit files. Each file type has a custom section (for example, [Container]) that is handled by Podman,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=LsZB_mI7TcQ",
+   "title": "Quadlets, Pods, and working with the latest Podman ... - YouTube",
+   "content": "19 Feb 2025 ... In the Considerations guide is the following note: Beginning with Podman v5.0, you can use Quadlet to automatically generate a systemd\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.redhat.com/en/blog/multi-container-application-podman-quadlet",
+   "title": "Deploying a multi-container application using Podman and Quadlet",
+   "content": "2 Mar 2023 ... Deploy the application. Quadlet is a systemd generator installed as part of the Podman package. As a result, once Podman is installed, you can\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/dholth/self-updating-containers-on-linux-with-quadlet-aka-podman-system-generator-41l5",
+   "title": "Self-updating Containers on Linux with Quadlet aka podman-system ...",
+   "content": "30 Oct 2024 ... Self-updating Containers on Linux with Quadlet aka podman-system-generator. If you are using a modern Linux system like Fedora 40, you may want\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

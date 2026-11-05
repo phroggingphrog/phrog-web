@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "best local llm october 2026 16gb vram moe 30b a3b recommendation",
+ "expect": [
+  "localclaw.io"
+ ],
+ "rows": [
+  {
+   "url": "https://www.bestandless.com.au/",
+   "title": "Best&Less - Womens Mens Kids & Baby Clothes and Homewares",
+   "content": "Shop the Best&Less range online for everyday low prices with 100 day Quality Guarantee.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dictionary.cambridge.org/dictionary/english/best",
+   "title": "BEST | English meaning - Cambridge Dictionary",
+   "content": "best adjective, adverb (HIGHEST QUALITY) of the highest quality, to the greatest degree, in the most effective way, or being the …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/LocalLLM/comments/1wiynyo/best_moe/",
+   "title": "Best MoE : r/LocalLLM - Reddit",
+   "content": "17 Sept 2026 ... Hi! I'm using Qwen 3.8 27B (UD-IQ3_XXS) on a system with the following specs: Processor: AMD Ryzen 9950 X3D. GPU: Nvidia RTX 5060 Ti 16 GB.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.merriam-webster.com/dictionary/best",
+   "title": "BEST Definition & Meaning - Merriam-Webster",
+   "content": "2 days ago · In the best of all possible worlds, no one would be without food and clean water. I have a wonderful family and a great …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.timeout.com/sydney/restaurants/the-best-restaurants-in-sydney",
+   "title": "The best restaurants in Sydney right now - Time Out",
+   "content": "1 day ago · Our up-to-date insider's guide to the best restaurants in Sydney in November 2026.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tripadvisor.com.au/Restaurants-g255060-Sydney_New_South_Wales.html",
+   "title": "THE 10 BEST Restaurants in Sydney",
+   "content": "Some of the best restaurants in Sydney for families with children include: Thai Pothong Harvest Buffet Sydney The Ternary - Novotel …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.tripadvisor.com/Restaurants-g255060-Sydney_New_South_Wales.html",
+   "title": "THE 10 BEST Restaurants in Sydney - Tripadvisor",
+   "content": "Best Dining in Sydney, New South Wales: See 302,242 Tripadvisor traveler reviews of 6,804 Sydney restaurants and search by …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.bestbuy.com/",
+   "title": "Best Buy | Official Online Store | Shop Now & Save",
+   "content": "Shop Best Buy for electronics, computers, appliances, cell phones, video games & more new tech. Store pickup & free 2-day …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.smh.com.au/goodfood/best-of",
+   "title": "Best of Food: Best Restaurants in Sydney and New South Wales, …",
+   "content": "Top picks for Australia's best dining options for every occasion. Find all the best places to eat out in Sydney and New South Wales …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://daily.dev/blog/best-local-llm-models-run/",
+   "title": "The Best Local LLM Models to Run in 2026 - daily.dev",
+   "content": "22 June 2026 ... On a 12 GB GPU, Qwen3 14B comes in at around 8–9 GB VRAM. On a 24 GB GPU, Qwen3 32B or Qwen3 30B-A3B use about 18–20 GB. For 48 GB+ workstations ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://llmconfigurator.com/en/best-local-llm",
+   "title": "Best local LLM for every task | LLM Configurator",
+   "content": "Leaderboard · updated October 24, 2026. Best local LLM for every task. Each task publishes its own requirements — capability mix, context floor, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.compute-market.com/blog/best-gpu-local-coding-llm-2026",
+   "title": "Best GPU for a Local Coding LLM in 2026 (by VRAM Tier)",
+   "content": "27 June 2026 ... A 12–16GB card runs a 14B FIM coder at Q5 for instant tab-complete and a 30B-A3B MoE model at Q4 (with light offload on 12GB) for chat and ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://onyx.app/self-hosted-llm-leaderboard",
+   "title": "Best Self-Hosted LLM Leaderboard 2026 | Onyx AI - Onyx",
+   "content": "13 Oct 2026 ... Self-Hosted LLM Benchmark Scores & Hardware Requirements. Complete benchmark results, VRAM requirements, and licensing for every major self- ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://pinggy.io/blog/top_5_local_llm_tools_and_models/",
+   "title": "Best Local LLM Tools and Models in 2026: What Fits in 128GB",
+   "content": "5 Oct 2026 ... Two numbers decide almost everything: the size of the quantized model file and the RAM plus VRAM you can give it. Qwen3.8-27B needs 16-19GB at 4 ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@trends24/10-open-source-coding-llms-i-spent-a-few-weeks-actually-trying-to-run-2026-d581fccde8f4",
+   "title": "10 Open-Source Coding LLMs I Spent a Few Weeks Actually Trying ...",
+   "content": "24 Aug 2026 ... For a single consumer GPU (24GB or less): Qwen3-Coder-30B-A3B or Qwen3. ... Run it: 16GB VRAM minimum (RTX 4070 Ti Super / RTX 4080 class) ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://s5labs.io/resources/local-llm-machines/",
+   "title": "Best Local LLM Machines: 2026 Buying Guide - S5 Labs",
+   "content": "28 Oct 2026 ... Check the exact SKU, memory and Arm software support. Discrete-GPU workstations. A discrete GPU supplies its own VRAM. System RAM is separate; ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shop.zimaspace.com/blogs/tech-ai-hub/best-local-coding-models-8gb-12gb-16gb-24gb-vram?srsltid=AYCX9vLco2z3xtT7agQLEshHpg1t7s_uw16-NxTcJIv16CiUFv6CJS_r",
+   "title": "Best Local Coding Models for 8GB, 12GB, 16GB & 24GB VRAM",
+   "content": "21 Sept 2026 ... Twenty-four gigabytes is where Qwen3-Coder-30B-A3B starts to make much more sense. A Q4_K_M build is roughly 18GB, leaving significantly more ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.linkedin.com/pulse/local-llms-consumer-hardware-2026-what-you-can-run-16gb-riedl--otnhf",
+   "title": "What You Can Actually Run With 16GB, 32GB, 64GB or 128GB of ...",
+   "content": "29 July 2026 ... The short answer: how much memory do you need for a good local LLM in 2026? As of July 2026: Available memoryPractical local-model ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.gourmettraveller.com.au/dining-out/restaurant-guide/best-restaurants-sydney-4475/",
+   "title": "Our expert food reviewers' picks for the best Sydney restaurants",
+   "content": "Oct 21, 2026 · Many of these Sydney restaurants also feature in the 2026 Gourmet Traveller Restaurant Guide: our selection of the …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.theurbanlist.com/sydney/a-list/best-restaurants-sydney",
+   "title": "The Best Restaurants In Sydney To Book In 2026 - Urban List",
+   "content": "Aug 25, 2026 · It’s a slick, vibey affair at one of the best restaurants in Sydney with the ubiquitous Italian-style coffee bar for …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.rushis.com/how-to-pick-the-right-model-to-run-on-your-local-machine/",
+   "title": "How to Pick the Right Model to Run on Your Local Machine - Rushi's",
+   "content": "31 May 2026 ... Check for MoE options — Qwen3-30B-A3B and similar models can give you much more capability per GB of VRAM than dense models. Cap context to ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.morphllm.com/best-ollama-models",
+   "title": "Best Ollama Models 2026: 25+ Ranked by VRAM & SWE-Bench ...",
+   "content": "30B MoE, 3.3B active. 19GB at Q4_K_M, 256K context (1M via extrapolation). Trained with long-horizon RL on SWE-Bench-style tasks. Best local coder for ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://local-ai-zone.github.io/guides/best-ai-coding-assistant-models-ultimate-ranking-2025.html",
+   "title": "Top 20 Open-Source Coding Models 2026 | Local AI Guide",
+   "content": "20 Oct 2026 ... October 2026 ranking of the best open-source coding models, from DeepSeek V4.1 Flash and Kimi K3 to Qwen3.8-27B, with benchmarks and local ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.laozhang.ai/en/posts/best-local-coding-llm-16gb-vram",
+   "title": "Best Local Coding LLM for 16GB VRAM: gpt-oss, Qwen3.8, Gemma 4",
+   "content": "3 July 2026 ... For a 16GB VRAM GPU, start with gpt-oss-20b. Try Qwen3.8-27B only as a 3-bit file with a q8_0 cache, and use Gemma 4 12B when you need long ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://contabo.com/blog/open-source-llms/",
+   "title": "Best Open Source LLMs: Complete 2026 Guide - Contabo",
+   "content": "9 Jan 2026 ... 05Local LLM Deployment Guide; 06Open Source LLM FAQs; 07Conclusion ... Qwen3-30B-A3B fits on a single 80GB A100. Runs with 3B active ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.orcarouter.ai/blog/best-local-llm-for-coding",
+   "title": "Best Local LLM for Coding 2026, by VRAM - OrcaRouter",
+   "content": "10 Aug 2026 ... Qwen3-Coder 30B at 24GB VRAM, gpt-oss-20b at 16GB, Qwen 2.5 Coder 7B at 8GB — real benchmarks, measured speeds, and when running local is ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://localaimaster.com/blog/best-ollama-model-for-coding",
+   "title": "Best Ollama Model for Coding: Picks by VRAM Tier - Local AI Master",
+   "content": "31 Aug 2026 ... On a 24GB card run qwen3-coder:30b . On 16GB, devstral-small-2:24b . On 12GB, qwen2.5-coder:14b . On 8GB, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://computingforgeeks.com/ollama-models-cheat-sheet/",
+   "title": "Ollama Models Cheat Sheet: Best Models by VRAM, Tested (PDF)",
+   "content": "26 Oct 2026 ... 6 in October 2026 on an RTX 4090, an RTX 5060 Ti 16 GB and a ... 256K (to 1M), yes, The new local-coding leader. 30b (18 GB) is a 30B-A3B MoE ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://benchlm.ai/best/ollama-models",
+   "title": "Best Ollama Models (November 2026): Ranked + Pull Commands",
+   "content": "Download sizes and context windows are Ollama's own figures for each tag, read from ollama.com/library on October 28, 2026. Data. From BenchLM · Data. Give your ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://discuss.huggingface.co/t/top-local-ai-models-gguf-for-complete-web-app-development-no-coding-for-2026/174336",
+   "title": "TOP local AI models (gguf) for complete web app development (no ...",
+   "content": "17 Mar 2026 ... Pls some one tell me , the best local ai models (GGUF) for complete web app development (no coding) for 2026. And the best linux/unix ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  }
+ ]
+}

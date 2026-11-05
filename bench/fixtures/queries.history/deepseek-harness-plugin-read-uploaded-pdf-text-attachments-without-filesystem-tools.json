@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "deepseek harness plugin read uploaded pdf text attachments without filesystem tools",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.li-ming.com/caddownload/servobox/ST/PDF/ST90-YO.PDF",
+   "title": "ST90-YO - li-ming.com",
+   "content": "20.5 A-A SECTION Ya-Shiuan 1 1/1,2,3,4,5 ST90 ST90-YO 2015/01/29 High Precision Spiral Bevel Gearbox LI MING MACHINERY …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.nospartsnow.com/honda/st90/",
+   "title": "New Old Stock NOS Honda ST90 Parts",
+   "content": "Nos Parts Now is Buying and Selling Vintage New Old Stock Motorcycle Parts Honda, Kawasaki, Suzuki, Yamaha and More",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://yumbo-jp.com/en/catalog/motorcycle/honda/st90.html",
+   "title": "Spare parts for HONDA motorcycles ST90 - yumbo-jp.com",
+   "content": "ST90 ST90 | Region JAPAN | frame number ST90– | serial number 1000002– | engine number ST90E– 1000002– (NEW)",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://oldbikebarn.com/collections/honda-st90-parts",
+   "title": "Honda ST90 Parts (1973-1975) | TrailSport 90",
+   "content": "Shop Honda ST90 parts for 1973-1975 ST90 models. Find OEM and aftermarket repair, maintenance and restoration parts where …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ebay.com/b/Motorcycle-Drivetrain-Transmission-Parts-for-Honda-ST90/180029/bn_21501961?msockid=3ff9a73a8b8069770877bf328a866886",
+   "title": "Motorcycle Drivetrain & Transmission Parts for Honda ST90",
+   "content": "Shop Motorcycle Drivetrain & Transmission Parts for Honda ST90 with eBay Guaranteed Fit. Great deals. Massive selection from top …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hondarestoration.com/nosResults.asp?models=st90",
+   "title": "Honda st90 Parts",
+   "content": "See all of the parts we have in stock for your vintage Honda motorcycle. Honda st90 Parts IN STOCK! The inventory is reasonably …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.ebay.com/b/Honda-Motorcycle-Parts-for-Honda-ST90/10063/bn_7066075167?msockid=3ff9a73a8b8069770877bf328a866886",
+   "title": "25+ Honda Motorcycle Parts for Honda ST90 for sale - eBay",
+   "content": "Shop Honda Motorcycle Parts for Honda ST90 with eBay Guaranteed Fit. Great deals. Massive selection from top brands on eBay.com.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cmsnl.com/honda-st90-trailsport-1974-k1-usa_model737/partslist/",
+   "title": "Honda ST90 TRAILSPORT 1974 K1 USA parts lists and schematics",
+   "content": "Honda ST90 TRAILSPORT 1974 K1 USA parts lists and schematics Easy repairs with Honda diagrams Free access!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cmsnl.com/st90_model296/info/",
+   "title": "Honda ST90 parts: order spare parts online at CMSNL",
+   "content": "Aug 7, 2026 · The overall impression is of a ‘properly’ proportioned small motorcycle, with the exception of retaining the automatic …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.firestormmotorcycles.com.au/pf3/honda/st90/",
+   "title": "Honda ST90 parts, accessories and performance products",
+   "content": "Highly recommend using this shop. Great store both online and in store, no motorcycles but all extras and loads of clothing accessories.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

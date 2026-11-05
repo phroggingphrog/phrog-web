@@ -1,0 +1,501 @@
+{
+ "query": "postgres vacuum full lock",
+ "expect": [
+  "postgresql.org"
+ ],
+ "rows": [
+  {
+   "url": "https://mail.google.com/mail/",
+   "title": "Gmail - Email from Google",
+   "content": "Gmail is email that's intuitive, efficient, and useful. 15 GB of storage, less spam, and mobile access.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://wiki.postgresql.org/wiki/VACUUM_FULL/ja",
+   "title": "VACUUM FULL/ja - PostgreSQL wiki",
+   "content": "VACUUM \u30b3\u30de\u30f3\u30c9\u3068\u95a2\u9023\u3059\u308b\u81ea\u52d5\u30d0\u30ad\u30e5\u30fc\u30e0\u30d7\u30ed\u30bb\u30b9\u306fPostgreSQL\u306eMVCC\u306e\u81a8\u5f35\u5316\u3092\u5236\u5fa1\u3059\u308b\u624b\u6bb5\u3067\u3059\u3002 VACUUM \u306b\u306f\u5927\u304d\u304f2\u3064\u306e\u5f62\u5f0f\u304c\u3042\u308a\u307e\u3059\u3002\u901a\u5e38\u306e VACUUM \u3068 VACUUM FULL \u3067\u3059\u3002 \u3053\u308c\u3089\u306e2\u30b3\u30de\u30f3\u30c9\u306f\u5b9f\u969b\u306b\u306f\u5927\u304d\u304f\u7570\u306a\u308b\u3082\u306e\u3067\u3059\u306e\u3067\u3001\u6df7\u4e71\u3057\u3066\u306f\u3044\u3051\u307e\u305b\u3093\u3002",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=id&co=GENIE.Platform%3DDesktop",
+   "title": "Login ke Gmail",
+   "content": "Login ke Gmail Untuk membuka Gmail, Anda dapat login dari komputer atau menambahkan akun Anda ke aplikasi Gmail di ponsel \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.postgresql.org/message-id/20190830142655.GA14011@telsasoft.com",
+   "title": "PostgreSQL: Re: postgres=# VACUUM FULL pg_statistic => ERROR: mi\u2026",
+   "content": "Note that my original report was for \"missing\" chunk during \"VACUUM FULL\", and the current error is \"unexpected chunk\" during CLUSTER. I imagine that's r\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/PostgreSQL/comments/1d705i7/vacuum_vs_vacuum_full_simple_explanation/",
+   "title": "Vacuum vs Vacuum full - Simple explanation ? : r/PostgreSQL - Reddit",
+   "content": "3 June 2024 ... VACUUM FULL rewrites the entire contents of the table into a new disk file with no extra space, allowing unused space to be returned to the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=it&co=GENIE.Platform%3DDesktop",
+   "title": "Accedere a Gmail - Computer - Guida di Gmail",
+   "content": "Accedere a Gmail Per aprire Gmail, puoi accedere da un computer o aggiungere il tuo account all'app Gmail sul tuo telefono o tablet. \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://malisper.me/postgres-vacuum-full/",
+   "title": "Postgres Vacuum Full - malisper.me",
+   "content": "Subscribe to Blog via Email Postgres Vacuum Full One detail to note about the Postgres vacuum is that it doesn\u2019t not return the space it frees back to th\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=en-GB&co=GENIE.Platform%3DDesktop",
+   "title": "Sign in to Gmail",
+   "content": "To open Gmail, you can log in from a computer, or add your account to the Gmail app on your phone or tablet. Once you've signed \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://www.postgresql.org/message-id/12179.1101591711@sss.pgh.pa.us",
+   "title": "PostgreSQL: VACUUM FULL FREEZE is unsafe",
+   "content": "The point of VACUUM FREEZE is to ensure that there are no tuples present in the database whose commit status depends on \"normal\" XIDs. Without this guara\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.postgresql.org/docs/current/sql-vacuum.html",
+   "title": "Documentation: 18: VACUUM - PostgreSQL",
+   "content": "Selects \u201cfull\u201d vacuum, which can reclaim more space, but takes much longer and exclusively locks the table. This method also requires extra disk space, since it\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.postgresql.org/docs/current/routine-vacuuming.html",
+   "title": "Documentation: 18: 24.1. Routine Vacuuming - PostgreSQL",
+   "content": "VACUUM FULL requires an ACCESS EXCLUSIVE lock on the table it is working on, and therefore cannot be done in parallel with other use of the table. Generally\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dba.stackexchange.com/questions/56374/vacuum-freeze-vs-vacuum-full",
+   "title": "postgresql - VACUUM FREEZE vs. VACUUM FULL",
+   "content": "8 Jan 2014 ... Vacuum full takes out an exclusive lock and rebuilds the table so that it has no empty blocks (we'll pretend fill factor is 100% for now).",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@x0goe/postgresql-vacuum-explained-5-things-you-must-understand-about-database-maintenance-a1d811621600",
+   "title": "PostgreSQL VACUUM explained \u2014 5 things you must understand ...",
+   "content": "22 Feb 2026 ... It holds minimal locks, so it usually won't block your application. VACUUM FULL is different. It rewrites the entire table into a new file,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/gabrielanhaia/vacuum-full-locks-your-table-the-whole-time-postgres-19s-repack-concurrently-doesnt-186",
+   "title": "VACUUM FULL Locks Your Table the Whole Time. Postgres 19's ...",
+   "content": "15 Oct 2026 ... VACUUM FULL Locks Your Table the Whole Time. Postgres 19's REPACK CONCURRENTLY Doesn't ... You deleted 80% of a 200-million-row table and the disk\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://virtual-dba.com/blog/why-vacuum-full-can-be-dangerous-what-to-use-instead/",
+   "title": "Why VACUUM FULL Can Be Dangerous - What to Use Instead",
+   "content": "20 Nov 2025 ... PostgreSQL database administrators must avoid using the VACUUM FULL command in live environments because its exclusive locking mechanism\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://learn.microsoft.com/en-us/answers/questions/1514837/what-is-the-difference-between-vacuum-and-full-vac",
+   "title": "what is the difference between vacuum and full vacuum in postgresql",
+   "content": "30 Jan 2024 ... VACUUM FULL requires an ACCESS EXCLUSIVE lock on the table it is working on, and therefore cannot be done in parallel with other use of the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.doubleslash.de/software-technologien/datenbanktechnologien/alternatives-to-vacuum-full-in-postgres/",
+   "title": "Alternatives to VACUUM FULL in Postgres - doubleSlash Blog",
+   "content": "16 Oct 2023 ... Autovacuum needs to be enabled \u00b7 Requires table permissions. \u00b7 Low. \u00b7 Weak Lock: Interrupts the clean-up as soon as another process is blocked.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://jessehanley.com/snippets/autovacuum-full-no-lock",
+   "title": "Postgres VACUUM FULL without a lock - Code Snippet - Jesse Hanley",
+   "content": "Using declarative partitioning on PG 11 and above. \u00b7 # setup the partition master table and the new table \u00b7 CREATE \u00b7 CREATE \u00b7 ALTER \u00b7 -- We need to add the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.depesz.com/2023/02/06/when-to-use-vacuum-full/",
+   "title": "When to use VACUUM FULL \u2013 select * from depesz;",
+   "content": "6 Feb 2023 ... Instead of using VACUUM FULL, I strongly suggest that you install and use pg_repack. This is well tested tool that does table rewrite without\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=pt-BR&co=GENIE.Platform%3DDesktop",
+   "title": "Fazer login no Gmail",
+   "content": "Fazer login no Gmail Para abrir o Gmail, fa\u00e7a login em um computador ou adicione sua conta ao app Gmail no smartphone ou \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.postgresql.org/message-id/YBTC0IYIGmyYfiIn%40paquier.xyz",
+   "title": "PostgreSQL: Re: Allow CLUSTER, VACUUM FULL and REINDEX to change\u2026",
+   "content": "On Fri, Jan 29, 2021 at 08:56:47PM +0300, Alexey Kondratov wrote: > On 2021-01-28 14:42, Alexey Kondratov wrote: >> No, you are right, we are doing REIND\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/?hl=en-GB",
+   "title": "Gmail Help",
+   "content": "Official Gmail Help Center where you can find tips and tutorials on using Gmail and other answers to frequently asked questions.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.postgresql.org/message-id/2668.1720594587%40antos",
+   "title": "PostgreSQL: Re: why there is not VACUUM FULL CONCURRENTLY?",
+   "content": "> On 2024-Jul-09, Antonin Houska wrote: > > > Alvaro Herrera <alvherre(at)alvh(dot)no-ip(dot)org> wrote: > > > > > > Is your plan to work on it soon or s\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=ko&co=GENIE.Platform%3DDesktop",
+   "title": "Gmail\uc5d0 \ub85c\uadf8\uc778\ud558\uae30",
+   "content": "Gmail\uc5d0 \ub85c\uadf8\uc778\ud558\uae30 \ucef4\ud4e8\ud130\uc5d0\uc11c \ub85c\uadf8\uc778\ud558\uac70\ub098 \uc2a4\ub9c8\ud2b8\ud3f0 \ub610\ub294 \ud0dc\ube14\ub9bf\uc758 Gmail \uc571\uc5d0 \uacc4\uc815\uc744 \ucd94\uac00\ud558\uc5ec Gmail\uc744 \uc5f4 \uc218 \uc788\uc2b5\ub2c8\ub2e4. \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://rhaas.blogspot.com/2014/03/vacuum-full-doesnt-mean-vacuum-but.html",
+   "title": "Robert Haas: VACUUM FULL doesn't mean \"VACUUM, but better\"",
+   "content": "Tuesday, March 04, 2014 VACUUM FULL doesn't mean \"VACUUM, but better\" There's a persistent belief among some users of PostgreSQL that VACUUM and VACUUM F\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.atlassian.com/atlassian-knowledge-base/kb/optimize-and-improve-postgresql-performance-with-vacuum-analyze-and-reindex/",
+   "title": "Optimize and Improve PostgreSQL Performance with VACUUM ...",
+   "content": "26 Sept 2025 ... Examples \u00b7 Full VACUUM: Locks the database table, and reclaims more space than a plain VACUUM VACUUM FULL \u00b7 Full VACUUM and ANALYZE: Performs a\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/accounts/answer/176347?hl=pt-br&co=GENIE.Platform%3DDesktop",
+   "title": "Fazer login na sua Conta do Google com outro endere\u00e7o de e-mail",
+   "content": "Ao criar uma Conta do Google, voc\u00ea recebe automaticamente um endere\u00e7o do Gmail. Mas se preferir usar outro endere\u00e7o de e-mail \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://wiki.postgresql.org/wiki/VACUUM_FULL",
+   "title": "VACUUM FULL - PostgreSQL wiki",
+   "content": "VACUUM vs VACUUM FULL (PostgreSQL 8.4 and older) This document is obsolete for PostgreSQL 9.0 and above. Much of the content applies only to PostgreSQL 8\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/mail/answer/8494?hl=de&co=GENIE.Platform%3DDesktop",
+   "title": "In Gmail anmelden",
+   "content": "In Gmail anmelden Um Gmail zu \u00f6ffnen, k\u00f6nnen Sie sich \u00fcber einen Computer anmelden oder Ihr Konto in der Gmail App auf Ihrem \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ardentperf.com/tag/vacuum-full/",
+   "title": "vacuum full | Ardent Performance Computing",
+   "content": "vacuum full TLDR: Note to future self\u2026 (1) Read this before you modify a table on a live PostgreSQL database. If you do it wrong then your app might tota\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://support.google.com/accounts/answer/7564124?hl=en",
+   "title": "Create a replacement Google Account",
+   "content": "If you can't sign in to your Google Account, go to the Account support page. As you complete the steps, follow these tips to increase \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://wiki.postgresql.org/wiki/Special:WhatLinksHere/VACUUM_FULL/ja",
+   "title": "Pages that link to \"VACUUM FULL/ja\" - PostgreSQL wiki",
+   "content": "",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://www.postgresql.org/message-id/4781F387.6070801%40met.no",
+   "title": "PostgreSQL: Re: VACUUM FULL out of memory",
+   "content": "As suggested, I tested a VACUUM FULL ANALYZE with 128MB shared_buffers and 512 MB reserved for maintenance_work_mem (on a 32 bit machine with 4 GB RAM). \u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.linkedin.com/pulse/vacuum-vs-full-postgresql-neelesh-ranjan-srivastava-cexbc",
+   "title": "Vacuum vs Vacuum Full - PostgreSQL - LinkedIn",
+   "content": "26 Feb 2024 ... Concurrency: VACUUM allows for database operations to continue unimpeded, while VACUUM FULL locks tables, preventing access until the operation\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.summercat.com/postgres-vacuum-taking-an-access-exclusive-lock.html",
+   "title": "PostgreSQL VACUUM taking an access exclusive lock",
+   "content": "10 Dec 2022 ... The fact that a VACUUM other than VACUUM FULL could take an ACCESS EXCLUSIVE lock was a surprise to me. However, the Postgres docs say this\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@_lukasz_/postgresql-table-maintenance-a-comprehensive-guide-to-vacuum-vacuum-full-and-pg-repack-d85a926b6510",
+   "title": "PostgreSQL Table Maintenance: A Comprehensive Guide ... - Medium",
+   "content": "29 June 2025 ... Unlike standard VACUUM, which only makes space available for reuse within the table structure, VACUUM FULL physically shrinks table files. This\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://learnomate.org/vacuum-analyze-and-vacuum-full-in-postgresql/",
+   "title": "vacuum ,analyze and vacuum full in postgresql",
+   "content": "12 June 2025 ... VACUUM FULL \u00b7 It rebuilds the entire table, compacting it by removing all dead space. \u00b7 It actually shrinks the physical file on disk. \u00b7 However,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=Dv2RmcKkhEs",
+   "title": "Tutorial 31-Postgresql vacuum full - YouTube",
+   "content": "2 Aug 2020 ... In this session, we are going to discuss Postgresql vacuum full. What is vacuum full? - The VACUUM full rewrites the entire table with data\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://documentation.censhare.com/classic/latest/Public/vacuum-process-for-postgresql-databases",
+   "title": "Vacuum process for PostgreSQL databases",
+   "content": "Plain VACUUM: Frees up space for reuse. \u00b7 Full VACUUM: Locks the database table and puts the exclusive lock on the table but reclaims more space than a plain\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/37261697/how-to-efficiently-vacuum-analyze-tables-in-postgres",
+   "title": "How to efficiently vacuum analyze tables in Postgres - Stack Overflow",
+   "content": "16 May 2016 ... 2 Answers 2 \u00b7 \"Vacuum Analyze\" Vacuum is used to free up space occupied by dead tuples/rows. \u00b7 \"Vacuum Analyze\" \u00b7 When to use VACUUM FULL and\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://boringsql.com/posts/vacuum-is-lie/",
+   "title": "VACUUM Is a Lie (About Your Indexes) - boringSQL",
+   "content": "11 Dec 2025 ... When VACUUM runs, it removes those dead tuples and compacts the remaining rows within each page. If an entire page becomes empty, PostgreSQL can\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

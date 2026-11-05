@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "mcp authorization spec 2025 protected resource metadata oauth server discovery client registration resource parameter pkce",
+ "expect": [
+  "developers.openai.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.aami.com.au/car-insurance",
+   "title": "Car Insurance - Get a Car Insurance Quote | AAMI",
+   "content": "Whether you’re after Third Party Property Damage or Comprehensive Car Insurance, AAMI can help with car insurance. Get an …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aami.com.au/",
+   "title": "AAMI – Insuring Cars, Home, Businesses & More!",
+   "content": "AAMI has been a trusted Australian insurance brand since 1969, providing coverage for home, business, car, and more. Explore …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://online.aami.com.au/onesuncorp/",
+   "title": "Online Services - AAMI",
+   "content": "AAMI Online Services Portal",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://insurance.aami.com.au/distAuth/",
+   "title": "Login - insurance.aami.com.au",
+   "content": "About AAMI Online Terms & Privacy Statement Contact us AAI Limited ABN 48 005 297 807 trading as AAMI",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://payonline.aami.com.au/",
+   "title": "AAMI Online Payments - Secure Online Payments",
+   "content": "How to pay To pay your premium, use either your policy number or Payment Reference Number (PRN). To pay an excess or claims …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://online.aami.com.au/macmotor/",
+   "title": "AAMI",
+   "content": "Manage your AAMI insurance policies online, including making claims, renewing policies, and accessing important documents at …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.comparethemarket.com.au/car-insurance/",
+   "title": "Compare Car Insurance Quotes | Lizzie Paid $1426 Less!*",
+   "content": "Compare car insurance quotes in minutes from a range of Australian brands. Compare today with Compare the Market.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.canstar.com.au/providers/aami-car-insurance/",
+   "title": "AAMI Car Insurance: Review & Compare Policies | Canstar",
+   "content": "Apr 16, 2024 · Find out more about AAMI Car Insurance. Canstar provides comparisons and reviews for all major Car Insurance …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aami.com.au/car-insurance/comprehensive",
+   "title": "Comprehensive Car Insurance Quote Online | AAMI Australia",
+   "content": "Our Comprehensive Car Insurance provides cover for your car & damage you may accidentally cause plus a few extra covers. Buy …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aami.com.au/car-insurance/switch",
+   "title": "Get a Car Insurance Quote & Save - AAMI",
+   "content": "Get a Car Insurance Quote From AAMI. Save Even More With AAMI's ROADSIDE ASSIST option for less than $86 per year!",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

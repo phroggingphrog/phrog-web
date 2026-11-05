@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "opendots persistent ai coworkers github repository october 2026",
+ "expect": [
+  "dev.to"
+ ],
+ "rows": [
+  {
+   "url": "https://www.jbhifi.com.au/products/shokz-opendots-one-open-ear-tws-earbuds-black",
+   "title": "Shokz OpenDots One Open-Ear TWS Earbuds (Black) - JB Hi-Fi",
+   "content": "OpenDots ONE are Shokz's smallest open-ear earbuds, each weighing just 6.5g 2, making them feel almost weightless on your ears. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com.au/products/opendots-one",
+   "title": "OpenDots ONE Open-Ear Bluetooth Earbuds",
+   "content": "Experience Shokz OpenDots One open ear headphones. Open-ear design, comfortable fit, immersive audio, and up to 40 hours …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://open-dots.dev/",
+   "title": "OpenDots · always-on open agents",
+   "content": "OpenDots are always-on agents that run on open weights, live on their own cloud computer, hold their own wallet and learn your …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.jbhifi.com.au/products/shokz-opendots-2-open-ear-earbuds-black",
+   "title": "Shokz OpenDots 2 Open-Ear Earbuds (Black) - JB Hi-Fi",
+   "content": "OpenDots 2 delivers big, powerful sound while keeping you aware of your surroundings. Designed to fit comfortably and securely, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com/pages/opendots-one",
+   "title": "Shokz OpenDots ONE - Comfortable Open Earbuds for Sports & All …",
+   "content": "Discover OpenDots ONE open-ear earbuds with Dolby Audio, wireless charging, and all-day comfort—perfect for sports, workouts, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com.au/pages/opendots-2",
+   "title": "Shokz OpenDots 2 | Flagship Open Ear Clip-On Earbuds",
+   "content": "Meet Shokz OpenDots 2, flagship open-ear clip-on earbuds with premium sound, secure clip-on design and all-day comfort for an …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.amazon.com.au/SHOKZ-OpenDots-Headphones-Bluetooth-Earphones/dp/B0DWF69VGQ",
+   "title": "SHOKZ OpenDots ONE Open-Ear Headphones, Premium Dolby …",
+   "content": "OpenDots ONE uses DirectPitch technology to minimize leakage. Enabling \"Privacy Mode\" in the Shokz App further reduces high …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.copilotkit.ai/blog/introducing-opendots",
+   "title": "Introducing OpenDots: the Open-Source Alternative to OpenAI Dots",
+   "content": "Oct 1, 2026 · Today we're releasing OpenDots, the open-source alternative to OpenAI Dots. Every Dot is an always-on AI coworker …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.99bikes.com.au/products/shokz-opendots-one-grey",
+   "title": "Shokz OpenDots ONE True Wireless Earbuds Grey - 99 Bikes",
+   "content": "The Shokz OpenDots ONE True Wireless Earbuds in Grey offer a unique open-ear, clip-on design that combines style and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shokz.com/pages/opendots-2",
+   "title": "OpenDots 2 Clip-on Earbuds - Upgraded Sound, Secure Fit & Clear …",
+   "content": "OpenDots 2, upgraded clip-on earbuds designed for secure fit and all-day comfort with reduced ear canal pressure. Featuring AI …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

@@ -1,0 +1,213 @@
+{
+ "corpus": "queries.history",
+ "query": "cinema nova \"overnight marathon\" october 31 2026 8:50pm twilight sold out",
+ "expect": [
+  "ticketing.cinemanova.com.au"
+ ],
+ "rows": [
+  {
+   "url": "https://www.news.com.au/",
+   "title": "news.com.au - Official Site",
+   "content": "We say what people are thinking and cover the issues that get people talking balancing Australian and global moments — from …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.berliner-zeitung.de/article/ein-anruf-genuegte-warum-trump-einen-verbuendeten-fuer-eine-terrormiliz-opferte-10419185",
+   "title": "Ein Anruf genügte: Warum Trump einen Verbündeten für eine …",
+   "content": "Sep 27, 2026 · Donald Trump gab den Einsatzbefehl gegen die Huthis und nahm ihn Stunden vor dem Start zurück. Für Amerikas …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://punchng.com/topics/education/",
+   "title": "Education Archives - Punch Newspapers",
+   "content": "1 day ago · A Nigerian newspaper, Breaking News, Nigerian News & Multimedia, Daily publication in Nigeria covering Niger delta, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.berliner-zeitung.de/article/ab-40-waechst-im-gehirn-eine-zweite-intelligenz-harvard-professor-erklaert-was-sie-kann-10414847",
+   "title": "Ab 40 wächst im Gehirn eine zweite Intelligenz: Harvard-Professor ...",
+   "content": "Sep 21, 2026 · Kristalline Intelligenz steigt bis ins hohe Alter: Was Studien über das Gehirn ab 40 zeigen und warum viele im Beruf in …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://allevents.in/melbourne/you-can-see-everything-opening-weekend-nov-12-15-tickets-on-sale/200030922416202",
+   "title": "You Can See Everything: Opening Weekend (Nov 12-15) tickets on ...",
+   "content": "You may also like the following events from Cinema Nova: This Saturday, 31st October, 08:50 pm, Twilight Saga Overnight Marathon (Oct 31) in Melbourne; Next ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://punchng.com/2027-inec-final-list-sets-off-senate-race/",
+   "title": "2027: INEC final list sets off Senate race - Punch Newspapers",
+   "content": "Sep 14, 2026 · INEC's release of the final candidate list for the 2027 general elections has officially kicked off a fierce race for the 109 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://rss.punchng.com/v1/category/latest_news",
+   "title": "Punch Newspapers - Latest News",
+   "content": "Discover the highest-scoring Champions League matches in history, including Borussia Dortmund’s record 8-4 victory over Legia …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://allevents.in/melbourne/erupcja-advance-screening-nov-5/200030937626133",
+   "title": "Erupcja: Advance Screening (Nov 5) - AllEvents",
+   "content": "This Saturday, 31st October, 08:50 pm, Twilight Saga Overnight Marathon (Oct 31) in Melbourne · Next Friday, 6th November, 06:45 pm, Animal Liberation Film ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://healthwise.punchng.com/",
+   "title": "Homepage New - Healthwise",
+   "content": "By Olufemi Adediran, Deborah Tolu-Kolawole, Chijioke Iremeka, Daniel Ayantoye and Yusuf Oketola The Federal Government has …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ma.to/event/twilight-overnight-marathon-31-oct-2026",
+   "title": "Twilight Overnight Marathon at Cinema Nova in Melbourne | Mato",
+   "content": "4 days ago ... Cinema Nova is bringing back the Twilight Overnight Marathon for Halloween. Catch all five films in the saga back-to-back for a proper all-night ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.instagram.com/p/DQgTJzoiaYy/",
+   "title": "TWILIGHT, but make it a now showing film. Our ... - Instagram",
+   "content": "1 Nov 2025 ... ... cinemanova on November 1, 2025: \"TWILIGHT, but make it a now showing film. Our TWILIGHT overnight marathon is tonight, 8:50pm & 9:30pm. Last ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.facebook.com/CinemaNova/posts/twilight-but-make-it-a-nova-now-showingcoming-soon-film-the-2026-edtwihards-youv/1488285813323146/",
+   "title": "TWILIGHT, but make it a Nova now showing/coming soon film (the ...",
+   "content": "9 Aug 2026 ... 2. Relevant locations. Cinema Nova. Carlton. Victoria. Australia. Recent posts. Cinema Nova. 2y · Public ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.cinemanova.com.au/index.php/films/cosi-fan-tutte-met-opera",
+   "title": "Così fan tutte: Met Opera - Cinema Nova",
+   "content": "Twilight Saga: Overnight Marathon · V For Vendetta and Civil War · Verity ... Saturday, 31 Oct 2026. Rating, E. Genre, To Be Advised. Running Time, 237. Language ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://allevents.in/melbourne/animal-liberation-film-festival-nov-6-8/200030922385213",
+   "title": "Animal Liberation Film Festival (Nov 6-8) - Melbourne - AllEvents",
+   "content": "2026 Animal Liberation Film Festival (Nov 6-8) Nova Exclusive! ... This Saturday, 31st October, 08:50 pm, Twilight Saga Overnight Marathon (Oct 31) in Melbourne ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.berliner-zeitung.de/article/pakistan-schule-dach-einsturz-kinder-tote-peschawar-10498710",
+   "title": "Pakistan: Schuldach stürzt ein – mindestens 35 Tote, Besitzer …",
+   "content": "Oct 15, 2026 · In Pakistan stürzt während des Unterrichts das Dach einer Privatschule ein. Mindestens 35 Menschen sterben, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.berliner-zeitung.de/article/iran-krieg-trump-friedensplan-hormus-10435027",
+   "title": "Trump lehnt Friedensplan ab – so reagiert der Iran",
+   "content": "Sep 27, 2026 · Trump lehnt einen iranischen Plan zur Öffnung der Straße von Hormus ab. Teheran setzt weiter auf Verhandlungen, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.berliner-zeitung.de/article/ruecktritt-von-baerbel-bas-reaktionen-aus-spd-cdu-und-afd-10483356",
+   "title": "Bärbel Bas tritt als Ministerin und SPD-Chefin zurück: Reaktionen auf ...",
+   "content": "Oct 12, 2026 · Bärbel Bas legt alle politischen Ämter nieder. Sie nennt Trauer und Angriffe aus der Koalition als Gründe dafür.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

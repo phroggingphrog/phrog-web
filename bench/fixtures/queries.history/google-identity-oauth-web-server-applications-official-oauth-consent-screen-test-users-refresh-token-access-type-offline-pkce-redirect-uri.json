@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "google identity oauth web server applications official oauth consent screen test users refresh token access_type offline pkce redirect uri",
+ "expect": [
+  "developers.google.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.google.com.au/",
+   "title": "Google",
+   "content": "Search the world's information, including webpages, images, videos and more. Google has many special features to help you find …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://about.google/",
+   "title": "About Google: Our products, technology and company information",
+   "content": "Learn more about Google. Explore our innovative AI products and services, and how we're using technology to help improve lives …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://about.google/products/",
+   "title": "Google's products and services - About Google",
+   "content": "Explore Google's helpful products and services, including Android, Gemini, Pixel and Search.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.google/intl/en-au/",
+   "title": "Google Australia Blog - The Keyword",
+   "content": "The Digital Future Initiative builds on Google’s work in Australia over the last two decades. It's a $1 billion investment over five years, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.google.com.au/intl/en_au/",
+   "title": "Google",
+   "content": "We would like to show you a description here but the site won’t allow us.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://search.google/",
+   "title": "Google Search - A new kind of help",
+   "content": "Explore a new kind of help for your everyday with breakthroughs in Search intelligence from Google I/O.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ogs.google.com/widget/empty",
+   "title": "Google Search",
+   "content": "Google Search provides a fast, easy way to find information, images, videos and more across the web.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://accounts.google.com/?authuser=1",
+   "title": "Sign in - Google Accounts",
+   "content": "Sign in to your Google Account to access and manage all Google services securely.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/History_of_Google",
+   "title": "History of Google - Wikipedia",
+   "content": "The company launched Google News in 2002, Gmail in 2004, Google Maps in 2005, Google Chrome in 2008, and the social network …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://accounts.google.com/",
+   "title": "Sign in - Google Accounts",
+   "content": "Not your computer? Use a private browsing window to sign in. Learn more about using Guest mode Next Create account",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

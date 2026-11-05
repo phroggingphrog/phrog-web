@@ -1,0 +1,418 @@
+{
+ "query": "python asyncio gather exception handling",
+ "expect": [
+  "docs.python.org",
+  "realpython.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.python.org/",
+   "title": "Welcome to Python.org",
+   "content": "The mission of the Python Software Foundation is to promote, protect, and advance the Python programming language, and to \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "http://stackoverflow.com/a/14519268",
+   "title": "Python exception handling - line number - Stack Overflow",
+   "content": "I'm using python to evaluate some measured data. Because of many possible results it is difficult to handle or possible combinations. Sometimes an error \u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.python.org/downloads/",
+   "title": "Download Python | Python.org",
+   "content": "Starting with the Python 3.11.0, Python 3.10.7, and Python 3.9.14 releases, CPython release artifacts are signed with Sigstore. See \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/a/59112003",
+   "title": "Exception handling in Python - Stack Overflow",
+   "content": "I have created the below code and I would like to put an exception in userId1 and userid2. For example, the total amount of users is 943, so when the use\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://superfastpython.com/asyncio-gather-exception/",
+   "title": "Asyncio gather() Handle Exceptions - SuperFastPython",
+   "content": "23 Apr 2024 ... We can automatically handle exceptions in coroutines executed via asyncio.gather() by setting the \"return_exceptions\" argument to True.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.online-python.com/",
+   "title": "Online Python - IDE, Editor, Compiler, Interpreter",
+   "content": "Python, which was initially developed by Guido van Rossum and made available to the public in 1991, is currently one of the most \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://groups.google.com/g/grpc-io/c/JcyOS0H3s0w",
+   "title": "In python asyncio grpc server, handling a client-triggered cance\u2026",
+   "content": "So I cannot rely on catching the asyncio.CancelledError in my own code, because it's caught beforehand and not reraised. The shared context is supposed t\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.w3schools.com/python/",
+   "title": "Python Tutorial - W3Schools",
+   "content": "Learn Python Python is a popular programming language. Python can be used on a server to create web applications. Python is \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/a/7022197",
+   "title": "python exception handling - Stack Overflow",
+   "content": "Well, you do have to keep the \"**RSU...\" message somewhere, right? Your exception inherits from Exception class, thus Exception.__init__(self, message) in\u2026",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://stackoverflow.com/questions/54987361/python-asyncio-handling-exceptions-in-gather-documentation-unclear",
+   "title": "Python asyncio: handling exceptions in gather() - Stack Overflow",
+   "content": "4 Mar 2019 ... If you set return_exceptions=True the exception object will be returned and put in the results of gather() . For your example, it will print out\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.python.org/3/library/asyncio-task.html",
+   "title": "Coroutines and tasks \u2014 Python 3.15.2 documentation",
+   "content": "The asyncio.create_task() function to run coroutines concurrently as asyncio Tasks . Let's modify the above example and run two say_after\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/theauroraai/the-async-error-handling-patterns-that-actually-work-in-production-13cc",
+   "title": "The Async Error Handling Patterns That Actually Work in Production",
+   "content": "22 Feb 2026 ... Async Python can fail silently in ways that are genuinely hard to debug: import asyncio async def fetch_data(): raise ValueError(\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.educative.io/answers/what-is-asynciogather",
+   "title": "What is asyncio.gather()? - Educative.io",
+   "content": "gather() , handling exceptions properly and canceling tasks when necessary is important. We use try/except blocks to catch and handle exceptions our coroutines\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.youtube.com/watch?v=8m0sFhIhTyE",
+   "title": "Exception handling in python asyncio - YouTube",
+   "content": "9 July 2024 ... Exception handling in python asyncio. @faciletutorials3447 14 likes 613 views 2y ago. more. Subscribe. Comments. 1. Comment.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://yeraydiazdiaz.medium.com/asyncio-coroutine-patterns-errors-and-cancellation-3bb422e961ff",
+   "title": "Asyncio Coroutine Patterns: Errors and cancellation - Medium",
+   "content": "29 Aug 2017 ... If return_exceptions is True , exceptions in the tasks are treated the same as successful results, and gathered in the result list; otherwise,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://realpython.com/async-io-python/",
+   "title": "Python's asyncio: A Hands-On Walkthrough",
+   "content": "24 Oct 2026 ... Async Exception Handling. Starting with Python 3.11, you can use the ... I Believe this exception is caused by not awaiting gather, when\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://discuss.python.org/t/asyncio-tasks-and-exception-handling-recommended-idioms/23806",
+   "title": "Asyncio, tasks, and exception handling - recommended idioms?",
+   "content": "12 Feb 2023 ... In asyncio you can set an exception handler with loop.set_exception_handler Event Loop \u2014 Python 3.12.1 documentation. Rosuav (Chris Angelico)\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://shanechang.com/p/python-asyncio-gather-explained/",
+   "title": "Running Parallel Operations with Asyncio Gather",
+   "content": "9 Mar 2025 ... Use return_exceptions=True to get per-task exceptions in the results list instead of a single exception aborting everything. Cancelling the\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://piccolo-orm.com/blog/exception-handling-in-asyncio/",
+   "title": "Exception handling in asyncio - Piccolo Blog",
+   "content": "22 Feb 2020 ... gather to launch several coroutines, which are then executed concurrently. ... What happens if one of the coroutines raises an exception? The\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.programiz.com/python-programming/online-compiler/",
+   "title": "Online Python Compiler (Editor) - Programiz",
+   "content": "Write and run your code using our online Python compiler (editor). Enjoy additional features like code sharing, dark mode and code \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Python_(programming_language)",
+   "title": "Python (programming language) - Wikipedia",
+   "content": "Python supports multiple programming paradigms but with an emphasis on object-oriented programming and dynamic typing. Guido \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://docs.python.org/",
+   "title": "Python 3.15.2 documentation",
+   "content": "1 day ago \u00b7 This page is licensed under the Python Software Foundation License Version 2. Examples, recipes, and other code in \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.w3schools.com/python/python_intro.asp",
+   "title": "Introduction to Python - W3Schools",
+   "content": "The most recent major version of Python is Python 3, which we shall be using in this tutorial. In this tutorial Python will be written in \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Python",
+   "title": "Python - Wikipedia",
+   "content": "This disambiguation page lists articles associated with the title Python. If an internal link incorrectly led you here, you may wish to \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.geeksforgeeks.org/python/python-programming-language-tutorial/",
+   "title": "Python Tutorial - GeeksforGeeks",
+   "content": "Oct 24, 2026 \u00b7 This section provides a collection of commonly asked Python interview questions and practice problems to help you \u2026",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.pythontutorial.net/python-concurrency/python-asyncio-gather/",
+   "title": "Python asyncio.gather() - Run Multiple Asynchronous Operations",
+   "content": "return_exceptions is False by default. If an exception occurs in an awaitable object, it is immediately propagated to the task that awaits on asyncio.gather() .",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://plainenglish.io/python/how-to-manage-exceptions-when-waiting-on-multiple-asyncio",
+   "title": "How to Manage Exceptions When Waiting On Multiple Asyncio Tasks",
+   "content": "13 Mar 2022 ... Handling exceptions in asyncio requires careful management to ensure that code does not become unstable. \u00b7 Waiting on a single coroutine \u00b7 It's\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/Python/comments/stvoff/asynciotaskgroup_and_exceptiongroup_to_be_added/",
+   "title": "asyncio.TaskGroup and ExceptionGroup to be added to Python 3.11",
+   "content": "16 Feb 2022 ... the task groups here are an extension of gather that allow better exception handling (if on of the gathered tasks fails), and also allow you\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://jacobpadilla.com/writing/handling-asyncio-tasks",
+   "title": "Handling Tasks in Asyncio Like a Pro - Jacob Padilla",
+   "content": "14 Feb 2024 ... FIRST_COMPLETED returns when the first task finishes or is canceled. \u00b7 FIRST_EXCEPTION returns when one of the tasks causes an exception or they\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/tqdm/tqdm/issues/1286",
+   "title": "Add return_exceptions to asyncio.gather wrapper #1286 - GitHub",
+   "content": "7 Jan 2022 ... The function gather of asyncio has a parameter \"return_exceptions\" with which exceptions occurring in the tasks are packed into the result\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://apxml.com/courses/langchain-production-llm/chapter-1-advanced-langchain-architecture/async-concurrency",
+   "title": "Async Operations in LangChain - ApX Machine Learning",
+   "content": "Error Handling: When using asyncio.gather , if one coroutine raises an exception, gather will propagate that exception immediately, potentially cancelling\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://streamhacker.com/2025/09/15/python-async-gather-in-batches/",
+   "title": "Python Async Gather in Batches - StreamHacker",
+   "content": "15 Sept 2025 ... And process_async is an async function that would just do whatever processing you need to do on that object. Assuming it is mostly I/O bound,\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://superfastpython.com/asyncio-gather-exception-not-cancel/",
+   "title": "Asyncio gather() Exception in Task Does Not Cancel",
+   "content": "7 May 2024 ... We can execute coroutines concurrently with asyncio.gather(). By default, an exception in asyncio.gather() will be propagated to the caller\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://python.useinstructor.com/blog/2023/11/13/learn-async/",
+   "title": "Mastering Python asyncio.gather and asyncio.as_completed for LLM ...",
+   "content": "13 Nov 2023 ... Master Python asyncio.gather and asyncio.as_completed for efficient concurrent LLM processing with Instructor ... Error handling should be\u00a0...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ],
+ "corpus": "queries"
+}

@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "kaggle indonesia free nutritious meal mbg telemetry 2026 dataset",
+ "expect": [
+  "reuters.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.kaggle.com/",
+   "title": "Kaggle: The World's AI Proving Ground",
+   "content": "Kaggle is the leading platform for independent, crowdsourced AI evaluation. Our competitions, benchmarks, and hackathons attract …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.kaggle.com/datasets",
+   "title": "Find Open Datasets and Machine Learning Projects | Kaggle",
+   "content": "Browse and download hundreds of thousands of open datasets for AI research, model training, and analysis. Join a community of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://blog.csdn.net/Dontla/article/details/143453455",
+   "title": "Kaggle入门指南（Kaggle竞赛）-CSDN博客",
+   "content": "Nov 2, 2024 · 本文是Kaggle入门指南，介绍其功能，涵盖竞赛、数据集、学习教程和社区等。 还说明了注册设置、探索数据集、参与 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Kaggle",
+   "title": "Kaggle - Wikipedia",
+   "content": "Kaggle is a data science competition platform and online community for data scientists and machine learning practitioners under …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://zh.wikipedia.org/wiki/Kaggle",
+   "title": "Kaggle - 维基百科，自由的百科全书",
+   "content": "Kaggle 是一个 数据建模 和 数据分析 竞赛平台。 企业和研究者可在其上发布数据，统计学者和数据挖掘专家可在其上进行竞赛以产生 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.kaggle.com/account/login",
+   "title": "Login or Register | Kaggle",
+   "content": "Discover what actually works in AI. Join millions of builders, researchers, and labs evaluating agents, models, and frontier technology …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.kaggle.com/code",
+   "title": "Kaggle Notebooks",
+   "content": "Explore and run AI code in free cloud notebooks with GPUs. Access public datasets, share your work, and collaborate with a …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.kaggle.com/competitions",
+   "title": "Kaggle Competitions",
+   "content": "Compete in AI competitions and hackathons. Win prizes, build your portfolio, and discover the boundaries of what’s possible.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://zhuanlan.zhihu.com/p/25686876",
+   "title": "Kaggle入门，看这一篇就够了 - 知乎",
+   "content": "Mar 10, 2017 · Kaggle成立于2010年，是一个进行数据发掘和预测竞赛的在线平台。 从公司的角度来讲，可以提供一些数据，进而提 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.hlkaggle.org.cn/news/114.html",
+   "title": "Kaggle 是什么？数据科学竞赛平台完整入门指南（2026 中文版）",
+   "content": "Jul 17, 2026 · Kaggle 是全球最大的数据科学与机器学习竞赛平台（Google 旗下），免费注册、全球开放。 这篇中文指南讲清 Kaggle …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

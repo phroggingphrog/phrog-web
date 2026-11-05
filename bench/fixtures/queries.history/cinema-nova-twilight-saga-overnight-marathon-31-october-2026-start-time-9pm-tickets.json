@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "cinema nova twilight saga overnight marathon 31 october 2026 start time 9pm tickets",
+ "expect": [
+  "ticketing.cinemanova.com.au"
+ ],
+ "rows": [
+  {
+   "url": "https://classic.austlii.edu.au/au/legis/nsw/consol_act/ssma2015242/",
+   "title": "STRATA SCHEMES MANAGEMENT ACT 2015 - Australasian Legal …",
+   "content": "Constitution of owners corporation Division 2 - Management of strata schemes 9. Owners corporation responsible for management of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://legislation.nsw.gov.au/view/pdf/inforce/2021-10-11/act-2015-050",
+   "title": "Strata Schemes Management Act 2015 No 50 - NSW legislation",
+   "content": "Oct 11, 2021 · Strata Schemes Management Act 2015 No 50 Historicalversion for 11 October 2021 to 28 November 2021 (accessed 8 …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://legislation.nsw.gov.au/view/html/inforce/current/act-2015-050",
+   "title": "Home - NSW legislation",
+   "content": "",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.smsnsw.com.au/wp-content/uploads/2026/06/nsw-strata-law.pdf",
+   "title": "Strata Schemes Management Act 2015 - smsnsw.com.au",
+   "content": "An Act with respect to the management of strata schemes and disputes related to strata schemes and other matters; and to repeal …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://classic.austlii.edu.au/au/legis/nsw/consol_act/ssma2015242/sch1.html",
+   "title": "STRATA SCHEMES MANAGEMENT ACT 2015 - SCHEDULE 1",
+   "content": "This Schedule applies to annual general meetings and other general meetings of an owners corporation for a strata scheme. The …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.parliament.nsw.gov.au/bills/Pages/bill-details.aspx?pk=3202",
+   "title": "Strata Schemes Management Bill 2015 - Parliament of NSW",
+   "content": "Strata Schemes Management Bill 2015 An Act with respect to the management of strata schemes and disputes related to strata …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www5.austlii.edu.au/au/legis/nsw/consol_act/ssma2015242/longtitle.html",
+   "title": "STRATA SCHEMES MANAGEMENT ACT 2015 - LONG TITLE",
+   "content": "An Act with respect to the management of strata schemes and disputes related to strata schemes and other matters; and to repeal …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://strataone.com.au/strata-schemes-management-act-2015/",
+   "title": "Strata Schemes Management Act 2015",
+   "content": "It outlines the duties and powers of owners’ corporations, committees, and strata managers, ensuring that strata schemes are run …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://strataone.com.au/strata-schemes-management-act-of-2015/",
+   "title": "Guide to the Strata Schemes Management Act 2015",
+   "content": "From transparent financial practices to by-law enforcement, this guide breaks down everything you need to know about the Act and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.barristerai.com.au/legislation/jurisdiction/nsw/strata-schemes-management-act-2015/whole-act",
+   "title": "Strata Schemes Management Act 2015 (New South Wales) — Whole Act",
+   "content": "Strata Schemes Management Act 2015 (New South Wales) — read the complete Act in one continuous, searchable view on Barrister …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

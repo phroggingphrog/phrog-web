@@ -1,0 +1,369 @@
+{
+ "corpus": "queries.history",
+ "query": "\"qwen3.6\" 35b-a3b local 16gb iq2_m quality vs qwen3.5 local inference 2026",
+ "expect": [
+  "localclaw.io"
+ ],
+ "rows": [
+  {
+   "url": "https://qwen.ai/blog?id=qwen3",
+   "title": "Qwen",
+   "content": "Apr 28, 2025 · Today, we are excited to announce the release of Qwen3, the latest addition to the Qwen family of large language …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/LocalLLM/comments/1sj9c4c/which_is_the_best_local_llm_in_april_2026_for_a/",
+   "title": "Best local LLM for 16 GB GPU in April 2026 - Reddit",
+   "content": "13 Apr 2026 ... **For 16 GB VRAM: Qwen3.6-35B-A3B in IQ2_M is the sweet spot.**. - 100-130 tok/s decoding. - 73.4 on SWE-bench Verified. - 11.5 GB VRAM ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/QwenLM/Qwen3",
+   "title": "GitHub - QwenLM/Qwen3: Qwen3 is the large language model series ...",
+   "content": "Qwen3-Instruct-2507 is the updated version of the previous Qwen3 non-thinking mode, featuring the following key enhancements: …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/collections/Qwen/qwen3",
+   "title": "Qwen3 - a Qwen Collection - Hugging Face",
+   "content": "May 14, 2025 · We’re on a journey to advance and democratize artificial intelligence through open source and open science.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://huggingface.co/docs/transformers/model_doc/qwen3",
+   "title": "Qwen3 · Hugging Face",
+   "content": "Qwen3 is the dense model architecture in the Qwen3 family, available in sizes from 0.6B to 32B parameters. It supports both thinking …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://chat.qwen.ai/",
+   "title": "Qwen",
+   "content": "Qwen is an official platform from Qwen that empowers both everyday users and developers with unified access to Qwen’s series of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://en.wikipedia.org/wiki/Qwen",
+   "title": "Qwen - Wikipedia",
+   "content": "Qwen (also known as Tongyi Qianwen, Chinese: 通义千问; pinyin: Tōngyì Qiānwèn) is a family of predominantly open-weights large …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://localai.io/docs/gallery.html",
+   "title": "LocalAI models",
+   "content": "5 is a 35B mixture-of-experts model based on Qwen3.6 for scientific reasoning, coding, and tool use. This official Q4_K_M GGUF build uses llama.cpp and includes ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://ollama.com/library/qwen3",
+   "title": "qwen3",
+   "content": "Qwen3 is the latest generation of large language models in Qwen series, offering a comprehensive suite of dense and mixture-of …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@borislavbankov/your-mac-just-became-a-frontier-ai-workstation-again-51696ea6a014",
+   "title": "Your Mac Just Became a Frontier AI Workstation. Again. - Medium",
+   "content": "17 Apr 2026 ... The ratio that matters for local AI is no longer parameter count. It is active parameters per token at a given capability level. Qwen3.6–35B- ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dev.to/purpledoubled/how-to-run-qwen36-35b-a3b-locally-the-coding-moe-that-beats-models-10x-its-active-size-3pbh",
+   "title": "How to run Qwen3.6-35B-A3B locally — the coding MoE that beats ...",
+   "content": "16 Apr 2026 ... Qwen3.6 scores 4x higher with 10x fewer active parameters. 51.5 on Terminal-Bench 2.0 — agentic terminal coding. It beats Qwen3.5-27B ( ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://dnhkng.github.io/posts/jetson-orin-nx-vram-tuning/",
+   "title": "Building & Benchmarking: LLMs on a 16GB Jetson Orin NX for ...",
+   "content": "8 June 2026 ... The slower duplicates were removed locally after this pass: Qwen3.6-35B-A3B-Uncensored-HauhauCS-Aggressive-IQ2_M.gguf; Qwen3.6-35B-A3B ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://willitrunai.com/blog/qwen-3-6-27b-vram-requirements",
+   "title": "Qwen 3.6 27B VRAM & Hardware Requirements — Dense 27B GPU ...",
+   "content": "23 Apr 2026 ... Qwen released Qwen3.6-27B on April 22, 2026 — a dense 27B model with vision capability that beats the previous-gen flagship Qwen3.5-397B-A17B ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://allthings.how/qwen3-6-35b-a3b-gguf-quants-sizes-and-how-to-run-it/",
+   "title": "Qwen3.6-35B-A3B GGUF: Quants, Sizes, and How to Run It",
+   "content": "23 Apr 2026 ... Qwen3.6-35B-A3B is the first open-weight model in the Qwen3.6 family, packaged as GGUF for local inference through llama.cpp and compatible ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://leetllm.com/blog/run-qwen36-local-unsloth-gguf",
+   "title": "Run Qwen3.6 Locally with llama.cpp and Unsloth GGUF - LeetLLM",
+   "content": "13 May 2026 ... The two checkpoints here are Qwen3.6-27B and Qwen3.6-35B-A3B , both Apache-2.0 licensed. The 27B model uses dense feed-forward layers ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://localclaw.io/llm-list",
+   "title": "LLM List — Local & API AI Models | LocalClaw",
+   "content": "... Qwen3.6-35B-A3B. Text-only release with 262K context, 35B total / 3B active parameters and established GGUF paths from bartowski and LocalAI/APEX for LM ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/akandr/bc250",
+   "title": "GitHub - akandr/bc250: AMD BC-250 (PS5 APU) setup guide ...",
+   "content": "qwen3.5-35b-a3b IQ2_M (MoE 35B/3B active):. Prompt Size, Tokens, Prefill ... Qwen3.6-35B-A3B IQ2_M, 35B total / 3B active, 59.6. gpt-oss-20b MXFP4, 20B total ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    11
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://medium.com/@omprakash.work96/running-a-35b-coding-model-on-a-16gb-mac-mini-4ae7ffaf32c6",
+   "title": "Running a 35B Coding Model on a 16GB Mac Mini - Medium",
+   "content": "3 May 2026 ... ➡️ This is why MoE models are changing local inference. ... -m ~/.lmstudio/models/qwen3.6-35b-a3b-iq2_m.gguf \\ -ngl 99 \\ -c ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    12
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://arxiv.org/abs/2505.09388",
+   "title": "[2505.09388] Qwen3 Technical Report - arXiv.org",
+   "content": "May 14, 2025 · Qwen3 comprises a series of large language models (LLMs) designed to advance performance, efficiency, and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://qwen3.app/",
+   "title": "Qwen3: Think Deeper, Act Faster | Hybrid Thinking AI Model",
+   "content": "Qwen3 is our latest family of large language models, featuring MoE architecture that revolutionizes AI by combining advanced …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://llmrun.dev/model/qwen-qwen3-6-35b-a3b",
+   "title": "Qwen3.6 35B A3B — Hardware Requirements & Compatibility - llmrun",
+   "content": "15 Apr 2026 ... Published in April 2026, it gives Qwen 3.6 users a faster-inference alternative to the dense Qwen3.6 27B model released the same generation.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://insiderllm.com/guides/qwen3-complete-guide/",
+   "title": "Qwen3 Complete Guide: Every Model from 0.6B to 235B",
+   "content": "Feb 16, 2026 · Qwen3 is the strongest open model family for local AI right now. Eight sizes from 0.6B to 235B, two MoE models that …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://infersec.ai/recommended-models",
+   "title": "Recommended Models - Infersec.ai",
+   "content": "6-35B-A3B-v1-GGUF. Jackrong. 24 GB VRAM. 35BQ4_K_MGGUF19.7 GB. Qwopus is a Qwen3.6 35B MoE blend tuned for coding and agentic tool use. A solid all-rounder for ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    14
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://llmrun.dev/model/qwen-qwen3-5-27b",
+   "title": "Qwen3.5 27B — Hardware Requirements & Compatibility - llmrun",
+   "content": "24 Feb 2026 ... At this size, local inference calls for quantization and a ... Compare with Qwen3.5 27B →Open Qwen3.6 35B A3B →. Fits in less VRAM ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    16
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://llamaperf.com/gpu/rtx-pro-6000-blackwell",
+   "title": "NVIDIA RTX Pro 6000 Blackwell local LLM performance - llamaperf",
+   "content": "User benchmarks Qwen3.6 27B BF16 and Qwen3.6 35B BF16. For the 35B, best generation throughput is 3500 t/s at 128 concurrency with MTP off, and prompt ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    19
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://atomic.chat/blog/guides/self-hosted-llm",
+   "title": "Self-Hosted LLM: Models and Setup Guide - Atomic Chat",
+   "content": "15 Aug 2026 ... Qwen3.6 35B A3B works well for coding, multimodal prompts, and long-context tasks. Local file sizes vary between publishers and quantizations, ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    13
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/LocalLLM/",
+   "title": "r/LocalLLM - Reddit",
+   "content": "26 Mar 2023 ... Qwen3.6 35B-A3B, 8-bit, 194.7 tok/s, 2,319 tok/s, 37.1 GB. Nemotron 3.5 ... - I have been using Qwen 3.8 27B, Qwen moe 3.6 35b a3b, and Gemma 4.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    15
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://github.com/Iman/javid-no-code-uncensored",
+   "title": "GitHub - Iman/javid-no-code-uncensored",
+   "content": "2-Speciale reported gold-level results at IMO, IOI, and ICPC 2026. Open weights at deepseek-ai; smaller R1 distills run locally (Part F). Qwen3.5 / Qwen3.6 Plus ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    17
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.reddit.com/r/LocalLLM/best/",
+   "title": "r/LocalLLM - Reddit",
+   "content": "6-35B-A3B GGUF Q4 I'm averaging 80token/sec but context is 131k. RTX 3090 on Qwen3.6-35B ... Flash-Next vs 27B vs Sonnet 5.5 on 5 agentic coding tasks ...",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    18
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://sergiiob.dev/posts/rx7800-xt-llama-cpp-benchmarks-moe-context/",
+   "title": "Running 35B MoE at 128K Context with llama.cpp + ROCm | Sergio B.",
+   "content": "9 June 2026 ... 5-3B as draft for Qwen3.6-27B), at the cost of additional VRAM and ... Qwen3.6-35B-A3B-MTP, UD-IQ2_XXS, 12G, MoE + multi-token prediction.",
+   "engines": [
+    "google cse"
+   ],
+   "positions": [
+    20
+   ],
+   "publishedDate": null
+  }
+ ]
+}

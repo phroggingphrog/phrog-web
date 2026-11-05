@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "melbourne events november 1 2026 november 10 film screening book club volunteer writing competition submissions",
+ "expect": [
+  "developers.openai.com"
+ ],
+ "rows": [
+  {
+   "url": "https://en.wikipedia.org/wiki/Melbourne",
+   "title": "Melbourne - Wikipedia",
+   "content": "Its inhabitants are known as \"Melburnians\". The area of Melbourne has been home to Aboriginal Victorians for over 40,000 years. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.melbourne.vic.gov.au/",
+   "title": "City of Melbourne :: Homepage",
+   "content": "Welcome to the City of Melbourne. We are the local government authority for central Melbourne and the surrounding suburbs. Find …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.lonelyplanet.com/articles/things-to-know-before-traveling-to-melbourne",
+   "title": "12 Things to Know Before Going to Melbourne",
+   "content": "Take a deep breath and relax; you're incredibly unlikely to encounter any of these critters in a built-up urban area such as Melbourne. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.melbournetourism.org/things-to-do-in-melbourne/",
+   "title": "100+ Best Things to Do in Melbourne (2026)",
+   "content": "Oct 25, 2026 · This definitive 2026 guide to things to do in Melbourne breaks the city down into twelve clear categories — prices, …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.britannica.com/place/Melbourne",
+   "title": "Melbourne | History, Population, Map, Climate, & Facts | Britannica",
+   "content": "1 day ago · Melbourne has a reputation for conservatism and financial soundness—attributes that have contributed to its growth and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://whatson.melbourne.vic.gov.au/",
+   "title": "What's On - City of Melbourne",
+   "content": "Find out what's on in Melbourne with all the latest events, restaurants, bars, shopping destinations and things to do. Brought to you …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.bom.gov.au/location/australia/victoria/central/bvic_pt042-melbourne",
+   "title": "Melbourne, Victoria | The Bureau of Meteorology",
+   "content": "Wind and wave forecasts are averages. Wind gusts can be 40 per cent stronger than the forecast, and stronger still in squalls and …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.visitmelbourne.com/Regions/Melbourne/",
+   "title": "Melbourne, Victoria, Australia",
+   "content": "Check out all the biggest, edge-of-your-seat sporting moments happening in Melbourne, from AFL to netball, cricket and more. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://7news.com.au/news/melbourne",
+   "title": "Melbourne News: Latest & Breaking News Today - Local News …",
+   "content": "1 day ago · Today's Melbourne news, live updates & all the latest breaking news stories from 7NEWS.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.melbourne.vic.gov.au/visitor-information",
+   "title": "Visitor information - City of Melbourne",
+   "content": "Whether you're from halfway across the world or just a few hours away, visitors to the City of Melbourne are welcome. Learn more …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

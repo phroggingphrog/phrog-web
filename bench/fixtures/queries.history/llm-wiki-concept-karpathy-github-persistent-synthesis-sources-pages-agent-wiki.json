@@ -1,0 +1,165 @@
+{
+ "corpus": "queries.history",
+ "query": "llm wiki concept karpathy github persistent synthesis sources pages agent wiki",
+ "expect": [
+  "gist.github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.nsw.gov.au/business-and-economy/licences-and-credentials/building-certifiers/applying",
+   "title": "Applying to become a certifier - NSW Government",
+   "content": "Oct 19, 2026 · Learn how to apply for registration, the qualifications and experience you need, and the documents to submit. …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://angiejones.tech/blog/",
+   "title": "Blog - Angie Jones",
+   "content": "A practical look at how Karpathy’s LLM Wiki pattern can serve as long term agent memory, turning raw sources, markdown pages, and schema instructions int…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.nsw.gov.au/housing-and-construction/appointing-a-certifier/finding-and-appointing",
+   "title": "Finding and appointing a certifier - NSW Government",
+   "content": "Nov 27, 2025 · To appoint a certifier, first work out what class of certifier you need, then look up our register of certifiers.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://angiejones.tech/author/angieluvboo/",
+   "title": "Angie Jones, Author at Angie Jones",
+   "content": "A practical look at how Karpathy’s LLM Wiki pattern can serve as long term agent memory, turning raw sources, markdown pages, and schema instructions int…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aacertifiers.com.au/classes-of-registration/",
+   "title": "Understanding the Different Classes of Registered Certifiers",
+   "content": "Before hiring a registered certifier you must confirm their level of registration to ensure they can issue the certificates you need. What …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://angiejones.tech/category/ai/",
+   "title": "AI Archives - Angie Jones",
+   "content": "A practical look at how Karpathy’s LLM Wiki pattern can serve as long term agent memory, turning raw sources, markdown pages, and schema instructions int…",
+   "engines": [
+    "mwmbl"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.uts.edu.au/research/centres/institute-public-policy-and-governance/learning/building-regulation-courses/certification-short-course",
+   "title": "Certification Short Course - University of Technology Sydney",
+   "content": "This course is designed for building professionals wishing to become registered certifiers or renew their registration.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://buildingcertifiershub.com.au/guides/building-certification-nsw",
+   "title": "How Building Certification Works in New South Wales",
+   "content": "Mar 19, 2026 · A guide to the NSW building certification process, including principal certifiers, registration classes, complying …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.service.nsw.gov.au/services/certifier-accreditation-and-registration",
+   "title": "Certifier accreditation and registration - Service NSW",
+   "content": "May 29, 2025 · Browse information about Certifier accreditation and registration.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://buildcert.com.au/work-with-us/becoming-a-certifier-nsw/",
+   "title": "How to Become a Building Certifier in NSW | Buildcert Careers",
+   "content": "Explore how to become a registered building certifier in NSW, including qualifications, experience, registration pathways and career …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://open.uts.edu.au/faculty/institute-for-public-policy-and-governance/BPB-Certification/",
+   "title": "Certification Short Course - UTS Open",
+   "content": "This certification short course is designed those wishing to become registered certifiers or renew their registration",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.planning.nsw.gov.au/the-planning-system/buildings/building-certification/qualifying-as-a-certifier",
+   "title": "Qualifying as a certifier - Planning",
+   "content": "May 4, 2023 · To become an accredited certifier in NSW, you need to obtain between one and three years of practical experience in …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.aacertifiers.com.au/how-to-become-a-certifier/",
+   "title": "Become a certifier",
+   "content": "To become a registered certifier in NSW, you must apply to Fair Trading, using the prescribed application form submitted via the …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}

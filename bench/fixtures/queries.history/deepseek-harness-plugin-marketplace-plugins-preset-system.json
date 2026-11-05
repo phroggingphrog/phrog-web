@@ -1,0 +1,129 @@
+{
+ "corpus": "queries.history",
+ "query": "deepseek harness plugin marketplace plugins preset system",
+ "expect": [
+  "github.com"
+ ],
+ "rows": [
+  {
+   "url": "https://www.woolworths.com.au/?msockid=17470f9e416a66f3334d1796407d6785",
+   "title": "Woolworths Supermarket - Buy Groceries Online",
+   "content": "Shop online at Woolworths for your groceries. We’re here to help you eat fresher & healthier food, 7 days a week with low prices …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    1
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.woolworths.com.au/%C2%A0?msockid=17470f9e416a66f3334d1796407d6785",
+   "title": "Woolworths Supermarket - Buy Groceries Online",
+   "content": "",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    2
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://contact.woolworths.com.au/storelocator//service/storefinder/supermarkets",
+   "title": "Woolworths Locator",
+   "content": "Woolworths | Store locator Supermarkets Store Locator Find your nearest Woolworths supermarkets by postcode Postcode OR Find …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    3
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://atwork.woolworths.com.au/business-solutions/small-business/",
+   "title": "Groceries and office supplies for small businesses | Woolworths at Work",
+   "content": "Need business supplies online? BusinessOne by Woolworths at WorkTM has you covered with groceries, stationery & more. Free …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    4
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://contact.woolworths.com.au/storelocator/service/storefinder/bws",
+   "title": "Woolworths Locator",
+   "content": "<?xml version=\"1.0\" encoding=\"UTF-8\"?> Woolworths | Store locator BWS Store Locator Find your nearest BWS store by postcode …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    5
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://atwork.woolworths.com.au/",
+   "title": "Woolworths at Work",
+   "content": "Woolworths at Work is the B2B ordering platform for businesses—shop groceries, office supplies, cleaning and more with business …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    6
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://storeportal.woolworths.com.au/login",
+   "title": "storeportal.woolworths.com.au",
+   "content": "Sign in with your Google Account to access Woolworths Store Portal.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    7
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://autoorder.woolworths.com.au/info.html",
+   "title": "Online Supermarket: Woolworths online",
+   "content": "&#8220The Auto-order subscription trial has now ended!&#8221 Should you require any assistance with previous orders please …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    8
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.woolworths.com.au/shop/about?msockid=17470f9e416a66f3334d1796407d6785",
+   "title": "About | Woolworths",
+   "content": "Find out more about our people, our stores, news & other information about Woolworths.",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    9
+   ],
+   "publishedDate": null
+  },
+  {
+   "url": "https://www.woolworths.com.au/shop/services/shopping-online?msockid=17470f9e416a66f3334d1796407d6785",
+   "title": "Shopping Online - Woolworths",
+   "content": "Shop online at Woolworths for your groceries. We’re here to help you eat fresher & healthier food, 7 days a week with low prices …",
+   "engines": [
+    "bing"
+   ],
+   "positions": [
+    10
+   ],
+   "publishedDate": null
+  }
+ ]
+}
