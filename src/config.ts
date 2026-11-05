@@ -79,10 +79,14 @@ export function loadConfig(): AppConfig {
   cachedConfig = {
     server: { host: '127.0.0.1', port: 8890 },
     search: {
-      pipeline: ['searxng', 'tinyfish'],
+      // exa is keyless (anonymous MCP) and fast enough for the interactive path. anysearch is
+      // registered but NOT in the default pipeline: 2.7-4.6 s per call and CJK-tuned results.
+      pipeline: ['searxng', 'tinyfish', 'exa'],
       providers: {
         searxng: { url: 'http://127.0.0.1:8888', timeoutMs: 4500, defaultCategories: ['general'] },
         tinyfish: { url: 'https://api.search.tinyfish.ai', timeoutMs: 5000 },
+        exa: { url: 'https://mcp.exa.ai/mcp', timeoutMs: 6000 },
+        anysearch: { url: 'https://api.anysearch.com/v1/search', timeoutMs: 7000 },
       },
     },
     fetch: {

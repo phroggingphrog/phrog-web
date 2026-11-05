@@ -3,6 +3,7 @@ import { canonicalKey, fuseEngineRanks, type EngineRankedRow } from './rank.js';
 import { shapeQuery } from './query-shape.js';
 import { refineEnabled, refineQuery } from './query-llm.js';
 import { rerank, rerankEnabled, rerankMaxCandidates } from './rerank.js';
+import { searchAnySearch, searchExaMcp } from './free-engines.js';
 
 export interface SearchResult {
   title: string;
@@ -327,8 +328,11 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   } else if (isAcademic) {
     pipeline = ['consensus', 'searxng'];
   } else {
-    pipeline = config.search.pipeline;
+    pipeline = [...config.search.pipeline];
   }
+  // Deep research can afford AnySearch's 2.7-4.6 s and benefits from a CJK-capable index;
+  // interactive searches never pay that cost (measured, see free-engines.ts).
+  if (options.mode === 'deep' && !pipeline.includes('anysearch')) pipeline.push('anysearch');
 
   const limit = Math.max(1, Math.min(50, Number.isFinite(options.limit) ? Math.floor(options.limit!) : 15));
   const cacheKey = JSON.stringify([query.trim(), { ...options, limit, provider: pipeline.join(',') }]);
@@ -354,6 +358,8 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
       }
       else if (engine === 'tinyfish') results = await searchTinyFish(query, { ...options, limit: Math.max(limit, 30) });
       else if (engine === 'consensus') results = await searchConsensus(query, { ...options, limit: Math.max(limit, 30) });
+      else if (engine === 'exa') results = await searchExaMcp(query, { ...options, limit: Math.max(limit, 10) });
+      else if (engine === 'anysearch') results = await searchAnySearch(query, { ...options, limit: Math.max(limit, 10) });
       else throw new Error(`Unknown search provider: ${engine}`);
       engineCooldowns.delete(engine);
       return { engine, results, envelope };
@@ -393,8 +399,12 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   // stay single-second, and the cross-encoder's measured gain concentrates in multi-hop
   // research where precision on the head of the list compounds into the final answer.
   const deepRequest = options.mode === 'deep' || isAcademic || options.provider === 'feynman' || options.provider === 'vane';
-  if (rerankEnabled() && deepRequest && rankedAll.length > 1 && rankedAll.length <= rerankMaxCandidates()) {
-    const head = rankedAll.slice(0, Math.max(limit, 20));
+  if (rerankEnabled() && deepRequest && rankedAll.length > 1) {
+    // The cap bounds the payload we send, it does not disqualify the query. With five providers
+    // feeding RRF a deep search routinely exceeds 40 candidates, and the old
+    // `rankedAll.length <= cap` test silently turned reranking off for exactly the queries with
+    // the most to gain from it.
+    const head = rankedAll.slice(0, Math.min(rerankMaxCandidates(), Math.max(limit, 20)));
     const outcome = await rerank(query, head.map((r) => ({ title: r.title, snippet: r.snippet, url: r.url })));
     rerankInfo = { model: outcome.model, ms: outcome.ms, applied: outcome.order.length === head.length, ...(outcome.reason ? { reason: outcome.reason } : {}) };
     if (outcome.order.length === head.length) {

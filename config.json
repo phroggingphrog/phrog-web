@@ -6,7 +6,8 @@
   "search": {
     "pipeline": [
       "searxng",
-      "tinyfish"
+      "tinyfish",
+      "exa"
     ],
     "providers": {
       "searxng": {
@@ -19,6 +20,14 @@
       "tinyfish": {
         "url": "https://api.search.tinyfish.ai",
         "timeoutMs": 5000
+      },
+      "exa": {
+        "url": "https://mcp.exa.ai/mcp",
+        "timeoutMs": 6000
+      },
+      "anysearch": {
+        "url": "https://api.anysearch.com/v1/search",
+        "timeoutMs": 7000
       }
     }
   },
