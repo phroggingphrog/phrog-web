@@ -215,6 +215,21 @@ export async function searchFirecrawl(query: string, options: SearchOptions = {}
   const limit = Math.max(1, Math.min(20, options.limit || 10));
   const body = JSON.stringify({ query, limit });
 
+  // 0. A direct key is the cleanest route: real quota, no proxy, no third party. The owner holds
+  //    one, so try it first and fall back to omniroute and then the tunnel only on failure.
+  const directKey = process.env.FIRECRAWL_API_KEY;
+  if (directKey) {
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        signal: AbortSignal.timeout(timeoutMs),
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${directKey}` },
+        body,
+      });
+      if (res.ok) return parseFirecrawl(await res.json() as FirecrawlPayload).slice(0, limit);
+    } catch { /* fall through to omniroute, then the tunnel */ }
+  }
+
   // 1. omniroute holds the owner's key, so prefer it: real quota, cached repeats, no secret here.
   if (process.env.OMNIROUTE_API_KEY && process.env.PHROG_WEB_FIRECRAWL_VIA_OMNIROUTE !== '0') {
     try {
