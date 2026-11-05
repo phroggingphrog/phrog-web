@@ -6,7 +6,10 @@ import { z } from 'zod';
 import { loadConfig } from '../../config.js';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
-import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from '../../providers/research.js';
+import { executeQuickResearch, dispatchDeepResearch, getResearchJob, resumeDeepResearchJob, cancelDeepResearchJob } from '../../providers/research.js';
+import { keyStatus, keysOverview, setKey, removeKey } from '../../provider-keys.js';
+import { listJars, writeJar, deleteJar, fetchWithProfile } from '../../providers/profiles.js';
+import { createMonitor, listMonitors, checkMonitor } from '../../providers/cookbook.js';
 import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from '../../providers/github.js';
 import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from '../../providers/deepwiki.js';
 import { searchMedia } from '../../providers/media.js';
@@ -744,6 +747,68 @@ server.tool('deep_research_status', 'Progress of a deep research job. When statu
 server.tool('deep_research_resume', 'Resume an interrupted Feynman run from its durable checkpoint and first unfinished stage.', {
   run_id: z.string(),
 }, safe(deepResearchResume));
+
+// --- Hub parity: the same operations the REST routes expose, so an agent never has to shell out ----
+
+server.tool('keys', 'Manage the provider keys this service runs on (the one key store). Values are never returned: only configured/length/plan. action: list | status | set | remove.', {
+  action: z.enum(['list', 'status', 'set', 'remove']).default('list'),
+  key: z.string().optional().describe('Key name, e.g. TINYFISH_API_KEY_2'),
+  value: z.string().optional().describe('New value for action=set (write-only, never echoed back)'),
+}, safe(async (a: { action: string; key?: string; value?: string }) => {
+  if (a.action === 'list') return { keys: keyStatus() };
+  if (a.action === 'status') return keysOverview();
+  if (a.action === 'set') {
+    if (!a.key || !a.value) throw new Error('key and value are required for action=set');
+    const status = setKey(a.key, a.value);
+    return { saved: true, key: status.key, provider: status.provider, configured: status.configured, length: status.length };
+  }
+  if (!a.key) throw new Error('key is required for action=remove');
+  return { removed: removeKey(a.key) };
+}));
+
+server.tool('login_state', 'Per-site login state held by the persistent Chromium profile. action: list | save | delete | fetch. save exports the live cookies for a site; fetch reads a page through that login.', {
+  action: z.enum(['list', 'save', 'delete', 'fetch']).default('list'),
+  site: z.string().optional().describe('Site key as shown by action=list, e.g. github.com'),
+  url: z.string().optional().describe('Page to read for action=fetch'),
+  wait_ms: z.number().int().min(0).max(60000).optional(),
+}, safe(async (a: { action: string; site?: string; url?: string; wait_ms?: number }) => {
+  if (a.action === 'list') {
+    const { cdpAlive } = await import('../../providers/cdp.js');
+    return { jars: listJars(), browser: await cdpAlive() };
+  }
+  if (a.action === 'save') {
+    if (!a.site) throw new Error('site is required for action=save');
+    const { exportCookies } = await import('../../providers/cdp.js');
+    const jar = writeJar(a.site, await exportCookies(a.site));
+    return { saved: true, site: jar.site, cookies: jar.cookies.length, names: jar.cookies.map((c) => c.name).slice(0, 20) };
+  }
+  if (a.action === 'delete') {
+    if (!a.site) throw new Error('site is required for action=delete');
+    return { removed: deleteJar(a.site) };
+  }
+  if (!a.url) throw new Error('url is required for action=fetch');
+  return fetchWithProfile(a.url, { waitMs: a.wait_ms });
+}));
+
+server.tool('monitor', 'Watch a page for changes by content fingerprint. action: list | create | check.', {
+  action: z.enum(['list', 'create', 'check']).default('list'),
+  url: z.string().optional().describe('Page to watch, for action=create'),
+  selector: z.string().optional().describe('Optional CSS selector to narrow what is hashed'),
+  id: z.string().optional().describe('Monitor id, for action=check'),
+}, safe(async (a: { action: string; url?: string; selector?: string; id?: string }) => {
+  if (a.action === 'list') return { monitors: listMonitors() };
+  if (a.action === 'create') return createMonitor({ url: a.url, selector: a.selector });
+  if (!a.id) throw new Error('id is required for action=check');
+  return checkMonitor(a.id);
+}));
+
+server.tool('research_resume', 'Resume an interrupted or failed deep research job from its first unfinished Feynman stage. Use the job_id from deep_research_start.', {
+  job_id: z.string(),
+}, safe(async (a: { job_id: string }) => resumeDeepResearchJob(a.job_id)));
+
+server.tool('research_cancel', 'Stop a deep research job and the whole process tree it started. Aborts the Feynman run so it cannot be resumed by accident.', {
+  job_id: z.string(),
+}, safe(async (a: { job_id: string }) => cancelDeepResearchJob(a.job_id)));
 
 return server;
 }

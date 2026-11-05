@@ -11,9 +11,9 @@ import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from './provi
 import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
 import { setupDone } from './setup.js';
-import { keyStatus, removeKey, setKey } from './provider-keys.js';
+import { keyStatus, removeKey, setKey, keysOverview } from './provider-keys.js';
 import { checkMonitor, closeBrowserSession, createBrowserSession, createMonitor, listMonitors, parseDocument } from './providers/cookbook.js';
-import { deleteJar, jarForUrl, listJars, writeJar } from './providers/profiles.js';
+import { deleteJar, fetchWithProfile, listJars, writeJar } from './providers/profiles.js';
 import { scrape, shotsDir, SCRAPE_FORMATS } from './providers/scrape.js';
 import { searchBooks, downloadBook, type BookSource } from './providers/books.js';
 import { searchDeals } from './providers/ozbargain.js';
@@ -100,18 +100,7 @@ fastify.delete('/api/keys/:key', async (req, reply) => {
 
 // Which plan paid for the last TinyFish call is useful at the hub level too, so a caller can see
 // free-vs-paid without reading a bill.
-fastify.get('/api/keys/status', async () => {
-  const keys = keyStatus();
-  const tinyfish = keys.filter((k) => k.provider === 'tinyfish');
-  return {
-    keys: keys.filter((k) => k.provider !== 'tinyfish'),
-    tinyfish: {
-      plans: tinyfish.map((k) => ({ key: k.key, plan: k.plan, configured: k.configured })),
-      // Search spends the free plan first; a missing free key means paid credit is being spent.
-      search_plan: tinyfish.find((k) => k.plan === 'free' && k.configured) ? 'free' : 'paid',
-    },
-  };
-});
+fastify.get('/api/keys/status', async () => keysOverview());
 
 
 registerSearxngCompat(fastify);
@@ -629,27 +618,12 @@ fastify.delete('/api/profiles/:site', async (req) => ({ removed: deleteJar((req.
 fastify.post('/api/fetch-profile', async (req, reply) => {
   const body = (req.body ?? {}) as { url?: string; profile?: string; waitMs?: number };
   if (!body.url) return reply.code(400).send({ error: 'url is required' });
-  const jar = jarForUrl(body.url, body.profile ?? true);
-  if (!jar) {
-    return reply.code(404).send({
-      error: `no login jar for ${body.url}. Save one with POST /api/profiles/<site>/save after logging in in the browser.`,
-      known: listJars().map((j) => j.site),
-    });
-  }
   try {
-    const { fetchPage } = await import('./providers/cdp.js');
-    const page = await fetchPage(body.url, jar.cookies, { waitMs: body.waitMs });
-    return {
-      url: page.url,
-      title: page.title,
-      markdown: page.text,
-      length: page.text.length,
-      site: jar.site,
-      jar_saved_at: jar.saved_at,
-      cookies_seen: page.cookies.length,
-      provider_used: 'cdp-profile',
-    };
+    return await fetchWithProfile(body.url, { profile: body.profile, waitMs: body.waitMs });
   } catch (err) {
+    if ((err as { code?: string }).code === 'NO_JAR') {
+      return reply.code(404).send({ error: (err as Error).message, known: (err as { known?: string[] }).known });
+    }
     return reply.code(502).send({ error: err instanceof Error ? err.message : String(err) });
   }
 });

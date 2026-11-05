@@ -107,3 +107,28 @@ export function jarForUrl(url: string, profile?: boolean | string): LoginJar | n
   const site = siteForUrl(url);
   return site ? readJar(site) : null;
 }
+
+/** Fetch a page through the Chromium profile that holds the login for that site. */
+export async function fetchWithProfile(url: string, opts: { profile?: boolean | string; waitMs?: number } = {}) {
+  const jar = jarForUrl(url, opts.profile ?? true);
+  if (!jar) {
+    const err = new Error(
+      `no login jar for ${url}. Log in with the browser, then save one with POST /api/profiles/<site>/save or the login_state MCP tool (action save).`
+    ) as Error & { code?: string; known?: string[] };
+    err.code = 'NO_JAR';
+    err.known = listJars().map((j) => j.site);
+    throw err;
+  }
+  const { fetchPage } = await import('./cdp.js');
+  const page = await fetchPage(url, jar.cookies, { waitMs: opts.waitMs });
+  return {
+    url: page.url,
+    title: page.title,
+    markdown: page.text,
+    length: page.text.length,
+    site: jar.site,
+    jar_saved_at: jar.saved_at,
+    cookies_seen: page.cookies.length,
+    provider_used: 'cdp-profile',
+  };
+}

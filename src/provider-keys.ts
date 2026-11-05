@@ -133,3 +133,17 @@ export function removeKey(key: string, file = envFilePath()): boolean {
   delete process.env[key];
   return true;
 }
+
+/** Provider-key overview for callers: which plans are configured, and which plan search will spend. */
+export function keysOverview(file = envFilePath()) {
+  const keys = keyStatus(file);
+  const tinyfish = keys.filter((k) => k.provider === 'tinyfish');
+  return {
+    keys: keys.filter((k) => k.provider !== 'tinyfish'),
+    tinyfish: {
+      plans: tinyfish.map((k) => ({ key: k.key, plan: k.plan, configured: k.configured })),
+      // Search spends the free plan first; a missing free key means paid credit is being spent.
+      search_plan: tinyfish.find((k) => k.plan === 'free' && k.configured) ? 'free' : 'paid',
+    },
+  };
+}
