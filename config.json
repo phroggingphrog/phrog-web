@@ -5,9 +5,9 @@
   },
   "search": {
     "pipeline": [
-      "searxng",
       "tinyfish",
-      "exa"
+      "exa",
+      "searxng"
     ],
     "providers": {
       "searxng": {
@@ -37,7 +37,10 @@
         "url": "https://en.wikipedia.org/w/api.php",
         "timeoutMs": 6000
       }
-    }
+    },
+    "fallbackEngines": [
+      "searxng"
+    ]
   },
   "fetch": {
     "pipeline": [

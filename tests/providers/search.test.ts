@@ -115,10 +115,17 @@ test('webSearch preserves source engine attribution when filtering fused image r
     const result = await webSearch({ query: 'image attribution ' + Date.now(), categories: 'images' });
     assert.equal(result.results.some((item) => item.url === 'https://example.com/icon'), true);
     assert.deepEqual(result.results.find((item) => item.url.includes('/icon'))?.engines, ['tinyfish']);
-    assert.equal(result.results[0]?.url, 'https://example.com/photo');
+    // Both engines found /icon and only one found /photo, so RRF puts /icon first: two votes beat
+    // one. This used to expect /photo because SearXNG ran on every query; once it became the
+    // fallback tier the primary stopped outvoting the duplicate, and the ordering follows fusion.
+    assert.equal(result.results[0]?.url, 'https://example.com/icon');
     const fused = await executeSearch('provider attribution ' + Date.now(), { limit: 10 });
-    assert.deepEqual(fused.contributingEngines, ['searxng', 'tinyfish']);
-    assert.equal(fused.results.find((item) => item.url.includes('/icon'))?.engine, 'lucide,tinyfish');
+    // Compared as a set: the order now reports execution tiers (primary first, fallback after),
+    // not the declaration order in config.json.
+    assert.deepEqual([...(fused.contributingEngines ?? [])].sort(), ['searxng', 'tinyfish']);
+    // Attribution is a set; the join order follows execution tiers (primary first, fallback after)
+    // rather than config declaration order.
+    assert.deepEqual((fused.results.find((item) => item.url.includes('/icon'))?.engine ?? '').split(',').sort(), ['lucide', 'tinyfish']);
   } finally {
     globalThis.fetch = originalFetch;
     if (originalTinyfishKey === undefined) delete process.env.TINYFISH_API_KEY;

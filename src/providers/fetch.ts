@@ -1,5 +1,6 @@
 import { loadConfig } from '../config.js';
 import { documentKind, convertDocument, extractMain } from './document.js';
+import { runWithTinyfishKeys } from './tinyfish-keys.js';
 
 export interface FetchResult {
   url: string;
@@ -277,10 +278,11 @@ async function fetchCrawl4ai(url: string, options: FetchOptions, hops = 0): Prom
 }
 
 async function fetchTinyFish(url: string, options: FetchOptions): Promise<FetchResult> {
-  const apiKey = process.env['TINY' + 'FISH_API_KEY'];
-  if (!apiKey) {
-    throw new Error('TINYFISH_API_KEY is not configured in environment');
-  }
+  // Same key rotation as search: a fetch key that hits its quota must not fail the whole chain.
+  return runWithTinyfishKeys((apiKey) => fetchTinyFishWithKey(apiKey, url, options));
+}
+
+async function fetchTinyFishWithKey(apiKey: string, url: string, options: FetchOptions): Promise<FetchResult> {
 
   const config = loadConfig();
   const providerCfg = config.fetch.providers.tinyfish || {};

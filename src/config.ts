@@ -21,6 +21,8 @@ export interface AppConfig {
   };
   search: {
     pipeline: string[];
+    /** Engines consulted only when the primary tier comes back thin (see search.ts). */
+    fallbackEngines?: string[];
     providers: Record<string, ProviderConfig>;
   };
   fetch: {
@@ -81,7 +83,8 @@ export function loadConfig(): AppConfig {
     search: {
       // exa is keyless (anonymous MCP) and fast enough for the interactive path. anysearch is
       // registered but NOT in the default pipeline: 2.7-4.6 s per call and CJK-tuned results.
-      pipeline: ['searxng', 'tinyfish', 'exa'],
+      pipeline: ['tinyfish', 'exa', 'searxng'],
+      fallbackEngines: ['searxng'],
       providers: {
         searxng: { url: 'http://127.0.0.1:8888', timeoutMs: 4500, defaultCategories: ['general'] },
         tinyfish: { url: 'https://api.search.tinyfish.ai', timeoutMs: 5000 },

@@ -4,6 +4,7 @@ import { shapeQuery } from './query-shape.js';
 import { refineEnabled, refineQuery } from './query-llm.js';
 import { rerank, rerankEnabled, rerankMaxCandidates } from './rerank.js';
 import { searchAnySearch, searchExaMcp, searchFirecrawl, searchWikimedia } from './free-engines.js';
+import { runWithTinyfishKeys } from './tinyfish-keys.js';
 
 export interface SearchResult {
   title: string;
@@ -38,6 +39,8 @@ export interface SearchOptions {
 }
 
 export interface SearchResponse {
+  /** True when the primary index came back thin and the fallback tier was consulted. */
+  fellBackToFallback?: boolean;
   /** Present when engines were unresponsive or the candidate set is thin. */
   degraded?: { unresponsive_engines: string[]; thin: boolean };
   /** Present only when the cross-encoder stage ran or was attempted. */
@@ -120,11 +123,12 @@ async function searchSearxng(query: string, options: SearchOptions): Promise<{ r
 }
 
 async function searchTinyFish(query: string, options: SearchOptions): Promise<SearchResult[]> {
-  const p = globalThis.process;
-  const apiKey = p ? p.env.TINYFISH_API_KEY : undefined;
-  if (!apiKey) {
-    throw new Error('TINYFISH_API_KEY is not configured in environment');
-  }
+  // Two accounts = two 12,000/day allowances. Try the key that last worked, and move on when a
+  // key reports exhausted (401/402/403/429) instead of failing the whole search.
+  return runWithTinyfishKeys((apiKey) => searchTinyFishWithKey(apiKey, query, options));
+}
+
+async function searchTinyFishWithKey(apiKey: string, query: string, options: SearchOptions): Promise<SearchResult[]> {
 
   const config = loadConfig();
   const providerCfg = config.search.providers.tinyfish || {};
@@ -143,7 +147,9 @@ async function searchTinyFish(query: string, options: SearchOptions): Promise<Se
   });
 
   if (!res.ok) {
-    throw new Error(`TinyFish HTTP ${res.status}: ${res.statusText}`);
+    const error = new Error(`TinyFish HTTP ${res.status}: ${res.statusText}`) as Error & { status?: number };
+    error.status = res.status;
+    throw error;
   }
 
   const data = await res.json() as { results?: Array<{ title?: string; url?: string; snippet?: string; description?: string }> };
@@ -345,7 +351,7 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   const now = Date.now();
   const eligible = pipeline.filter((id) => !engineCooldowns.has(id) || (engineCooldowns.get(id) ?? 0) <= now);
   const engines = eligible.length ? eligible : pipeline;
-  const settled = await Promise.all(engines.map(async (engine) => {
+  const runEngine = async (engine: string) => {
     try {
       let results: SearchResult[] = [];
       let envelope: Record<string, unknown> | undefined;
@@ -371,7 +377,25 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
       engineCooldowns.set(engine, Date.now() + 60_000);
       return { engine, results: [] as SearchResult[], error: err instanceof Error ? err.message : String(err) };
     }
-  }));
+  };
+
+  // Tiered execution (owner preference 2026-11-05): TinyFish is the primary index and local
+  // SearXNG is the fallback. Running both every time spends the paid index AND burns the scraped
+  // engines on every query for no gain, so the fallback only runs when the primary comes back
+  // thin or dead. A "thin" primary is one that produced fewer unique URLs than the caller asked
+  // for, capped at 5: three good rows are not a reason to fan out, one row is.
+  const fallbackIds = new Set<string>(config.search.fallbackEngines ?? ['searxng']);
+  const primaryIds = engines.filter((id) => !fallbackIds.has(id));
+  const fallbackOnly = engines.filter((id) => fallbackIds.has(id));
+  let fellBack = false;
+  let settled = await Promise.all(primaryIds.map(runEngine));
+  const uniqueUrls = (rows: Array<{ results: SearchResult[] }>) =>
+    new Set(rows.flatMap((r) => r.results.map((x) => x.url))).size;
+  const primaryThin = uniqueUrls(settled.filter((r) => !('error' in r))) < Math.min(limit, 5);
+  if (fallbackOnly.length && (primaryThin || !settled.some((r) => !('error' in r)))) {
+    fellBack = true;
+    settled = settled.concat(await Promise.all(fallbackOnly.map(runEngine)));
+  }
 
   const failures = settled.flatMap((item) =>
     'error' in item && typeof item.error === 'string' ? [{ engine: item.engine, error: item.error }] : [],
@@ -423,7 +447,7 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   // A degraded search must SAY it is degraded: a thin result set caused by a rate-limited
   // engine is not the same as "the web has nothing".
   const degraded = unresponsive.length ? { unresponsive_engines: unresponsive, thin: rankedAll.length < 15 } : undefined;
-  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope, ...(degraded ? { degraded } : {}), ...(rerankInfo ? { rerank: rerankInfo } : {}) };
+  const response: SearchResponse = { query, results, fellBackToFallback: fellBack, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope, ...(degraded ? { degraded } : {}), ...(rerankInfo ? { rerank: rerankInfo } : {}) };
   if (searchCache.size >= CACHE_MAX_ENTRIES) searchCache.delete(searchCache.keys().next().value!);
   searchCache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, value: response });
   return response;
