@@ -23,7 +23,8 @@ export interface AgentResult {
   status: 'COMPLETED' | 'FAILED';
   result: any;
   steps: AgentStep[];
-  escalated_to: Exclude<AgentMode, 'auto'>;
+  /** The rung that answered. 'deep-search' = search+synthesis (query-only), 'deep' = A2A page agent. */
+  escalated_to: Exclude<AgentMode, 'auto'> | 'deep-search';
   sources: string[];
   error?: string;
 }
@@ -212,13 +213,13 @@ export async function runAgent(args: AgentArgs, emit: AgentEmit = () => {}): Pro
       const material = JSON.stringify((res.results ?? []).map((r) => ({ title: r.title, url: r.url, snippet: r.snippet })));
       const result = await shapeJson(material, goal, args.schema, left0());
       step('shape', 'search results to JSON', t1);
-      const out: AgentResult = { status: 'COMPLETED', result, steps, escalated_to: 'deep', sources: [...sources] };
+      const out: AgentResult = { status: 'COMPLETED', result, steps, escalated_to: 'deep-search', sources: [...sources] };
       emit({ type: 'COMPLETE', ...out });
       return out;
     } catch (e: any) {
       const err = e?.message ?? String(e);
       step('deep-search', `failed: ${err}`, t0);
-      const out: AgentResult = { status: 'FAILED', result: null, steps, escalated_to: 'deep', sources: [...sources], error: err };
+      const out: AgentResult = { status: 'FAILED', result: null, steps, escalated_to: 'deep-search', sources: [...sources], error: err };
       emit({ type: 'ERROR', ...out });
       return out;
     }

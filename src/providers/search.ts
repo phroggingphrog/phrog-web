@@ -436,7 +436,10 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   // Rerank is a DEEP-RESEARCH stage only (owner decision 2026-11-05): quick/live search must
   // stay single-second, and the cross-encoder's measured gain concentrates in multi-hop
   // research where precision on the head of the list compounds into the final answer.
-  const deepRequest = options.mode === 'deep' || isAcademic || options.provider === 'feynman' || options.provider === 'vane';
+  // Feynman and Vane are NOT search engines: Feynman is a local research engine run as a workflow
+  // (providers/research.ts), Vane is an HTTP research service. Listing them here implied they could
+  // be selected with `provider`, which would set the pipeline to a non-existent engine and fail.
+  const deepRequest = options.mode === 'deep' || isAcademic;
   if (rerankEnabled() && deepRequest && rankedAll.length > 1) {
     // The cap bounds the payload we send, it does not disqualify the query. With five providers
     // feeding RRF a deep search routinely exceeds 40 candidates, and the old
