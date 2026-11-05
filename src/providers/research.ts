@@ -3,6 +3,9 @@ import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadConfig } from '../config.js';
 import { feynmanRuntime } from './feynman-runtime.js';
+import { executeSearch } from './search.js';
+import { omnirouteKey } from './browse.js';
+import { llmBase } from './agent.js';
 
 export interface ResearchCitation {
   n: number;
@@ -21,9 +24,7 @@ export interface QuickResearchResponse {
 
 export interface QuickResearchOptions {
   domain?: 'web' | 'academic' | 'discussions' | 'all';
-  sources?: string[];
   instructions?: string;
-  optimizationMode?: 'speed' | 'balanced' | 'quality';
 }
 
 export interface ResearchJob {
@@ -45,64 +46,70 @@ export interface ResearchJob {
 // In-memory registry of active and completed jobs
 const jobs = new Map<string, ResearchJob>();
 
+/** Citations are the search hits themselves, so an answer can only cite what was actually retrieved. */
+export function buildCitations(results: { title?: string; url?: string }[], max = 8): ResearchCitation[] {
+  const seen = new Set<string>();
+  const out: ResearchCitation[] = [];
+  for (const r of results) {
+    if (!r.url || seen.has(r.url)) continue;
+    seen.add(r.url);
+    out.push({ n: out.length + 1, title: r.title || r.url, url: r.url });
+    if (out.length >= max) break;
+  }
+  return out;
+}
+
+/** One LLM pass over the retrieved snippets: it may only use what search returned, and it must cite. */
+async function answerFromMaterial(question: string, material: string, instructions: string, signal: AbortSignal): Promise<string> {
+  const { base, model } = llmBase();
+  const prompt =
+    `Question: ${question}\n` +
+    (instructions ? `Extra instructions: ${instructions}\n` : '') +
+    'Answer using ONLY the numbered sources below. Cite each claim with its bracket number, like [2]. ' +
+    'If they do not answer the question, say so plainly instead of guessing. Keep it to 2-6 sentences.\n\n' +
+    `SOURCES:\n${material}`;
+  const res = await fetch(`${base}/chat/completions`, {
+    method: 'POST',
+    signal,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${omnirouteKey()}` },
+    body: JSON.stringify({ model, messages: [{ role: 'user', content: prompt }] }),
+  });
+  if (!res.ok) throw new Error(`answer LLM HTTP ${res.status}`);
+  const reply: string = ((await res.json()) as any).choices?.[0]?.message?.content ?? '';
+  if (!reply.trim()) throw new Error('answer LLM returned an empty answer');
+  return reply.trim();
+}
+
+/**
+ * Quick research = our own search + one LLM pass. It used to be the Vane container, which took 44-59 s
+ * and cited worse than our own ranking: asked about Podman's pasta backend it returned an IPv6 article.
+ * Now the citations ARE the ranked search hits, so answer quality is bounded by the pipeline we measure.
+ */
 export async function executeQuickResearch(
   question: string,
   options: QuickResearchOptions = {}
 ): Promise<QuickResearchResponse> {
   const config = loadConfig();
-  const vaneUrl = config.research?.vane?.url || 'http://127.0.0.1:3000';
-  const timeoutMs = config.research?.vane?.timeoutMs || 120000;
+  const timeoutMs = config.research?.quick?.timeoutMs || 60000;
+  const limit = config.research?.quick?.limit || 10;
+  const mode = options.domain === 'academic' ? 'academic' : 'quick';
 
-  let sources = ['web'];
-  if (options.sources?.length) {
-    sources = options.sources;
-  } else if (options.domain === 'academic') {
-    sources = ['academic'];
-  } else if (options.domain === 'discussions') {
-    sources = ['discussions'];
-  } else if (options.domain === 'all') {
-    sources = ['web', 'academic', 'discussions'];
-  }
+  const search = await executeSearch(question, { mode, limit });
+  const citations = buildCitations(search.results, 8);
+  if (!citations.length) throw new Error('search returned no results to answer from');
 
-  const res = await fetch(`${vaneUrl}/api/search`, {
-    method: 'POST',
-    signal: AbortSignal.timeout(timeoutMs),
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chatModel: { providerId: 'omniroute', key: 'deepseek-flash' },
-      embeddingModel: { providerId: '15a56ef4-b6da-49c0-b2e4-8f865dac9d39', key: 'Xenova/all-MiniLM-L6-v2' },
-      optimizationMode: options.optimizationMode || 'balanced',
-      sources,
-      query: question,
-      history: [],
-      stream: false,
-      systemInstructions: options.instructions || '',
-    }),
-  });
+  const hits = new Map(search.results.filter(r => r.url).map(r => [r.url, r]));
+  const material = citations
+    .map(c => {
+      const hit = hits.get(c.url);
+      const snippet = (hit?.snippet || '').replace(/\s+/g, ' ').slice(0, 700);
+      return `[${c.n}] ${c.title}\n${c.url}\n${snippet || '(no snippet)'}`;
+    })
+    .join('\n\n');
 
-  if (!res.ok) {
-    throw new Error(`Vane HTTP ${res.status}: ${res.statusText}`);
-  }
+  const answer = await answerFromMaterial(question, material, options.instructions || '', AbortSignal.timeout(timeoutMs));
 
-  const data = await res.json() as any;
-  if (!data.message) {
-    throw new Error('Vane returned an empty answer');
-  }
-
-  const citations: ResearchCitation[] = (data.sources || []).map((s: any, i: number) => ({
-    n: i + 1,
-    title: s.metadata?.title || s.title || '',
-    url: s.metadata?.url || s.url || '',
-  }));
-
-  return {
-    mode: 'quick',
-    domain: options.domain || 'web',
-    question,
-    answer: data.message,
-    citations,
-    provider_used: 'vane',
-  };
+  return { mode: 'quick', domain: options.domain || 'web', question, answer, citations, provider_used: 'phrog-web-search' };
 }
 
 export function dispatchDeepResearch(

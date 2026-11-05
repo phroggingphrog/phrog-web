@@ -70,13 +70,13 @@
     }
   },
   "research": {
-    "vane": {
-      "url": "http://127.0.0.1:3000",
-      "timeoutMs": 120000
-    },
     "feynman": {
       "binPath": "engines/feynman/bin/feynman.js",
       "outputsDir": "outputs"
+    },
+    "quick": {
+      "timeoutMs": 60000,
+      "limit": 10
     }
   }
 }

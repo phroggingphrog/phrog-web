@@ -30,7 +30,7 @@ export interface AppConfig {
     providers: Record<string, ProviderConfig>;
   };
   research: {
-    vane: ProviderConfig;
+    quick: { timeoutMs?: number; limit?: number };
     feynman: ProviderConfig;
   };
 }
@@ -101,7 +101,7 @@ export function loadConfig(): AppConfig {
       },
     },
     research: {
-      vane: { url: 'http://127.0.0.1:3000', timeoutMs: 120000 },
+      quick: { timeoutMs: 60000, limit: 10 },
       feynman: { binPath: 'engines/feynman/bin/feynman.js', outputsDir: 'outputs' },
     },
   };

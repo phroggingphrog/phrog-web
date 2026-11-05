@@ -25,7 +25,7 @@
         ┌───────────────────┬─────────┴─────────┬───────────────────┐
         ▼                   ▼                   ▼                   ▼
   [SEARCH TIER]       [FETCH TIER]       [RESEARCH TIER]     [KNOWLEDGE TIER]
-  • Consensus API     • Trafilatura      • Vane (3-5s quick) • Plain Markdown
+  • Consensus API     • Trafilatura      • search + llm (~5s quick) • Plain Markdown
     (220M+ papers)      (Fast plain)       - Web / Academic    (Agnostic vault)
   • SearXNG Local     • Crawl4AI Headless• Feynman           • Node 22 SQLite
     (arXiv, GitHub)     (Local JS/DOM)     (Autonomous Pi)     (Built-in vector)

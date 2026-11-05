@@ -34,7 +34,7 @@ const INTERACTIVE = /\b(click|press|tap|type|fill|log ?in|sign ?in|submit|scroll
 const MULTIPAGE = /\b(all pages|every page|each page|across (the )?(site|pages)|crawl|compare .* (sites|pages)|multiple pages|research)\b/i;
 const LADDER: Exclude<AgentMode, 'auto'>[] = ['fetch', 'browse', 'deep', 'tinyfish'];
 
-function llmBase() {
+export function llmBase() {
   return { base: process.env.WEB_AGENT_LLM_BASE_URL || 'http://127.0.0.1:20128/v1', model: process.env.WEB_AGENT_LLM_MODEL || 'deepseek-flash' };
 }
 

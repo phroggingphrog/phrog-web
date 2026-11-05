@@ -41,11 +41,11 @@ node dist/adapters/mcp/server.js
   - `fetch.ts`: Plain Trafilatura + Crawl4AI + TinyFish Fetch.
   - `github.ts`: GitHub repo search (SearXNG + GitHub API fallback).
   - `deepwiki.ts`: DeepWiki streamable MCP HTTP client.
-  - `research.ts`: Vane quick research + Feynman background dispatcher.
+  - `research.ts`: quick research (search + one LLM pass) + Feynman background dispatcher.
 - `src/wiki/`: Karpathy Agnostic LLM Wiki with `node:sqlite` vector search.
 - `src/adapters/mcp/`: Stdio MCP Server.
 - `src/adapters/schemas/`: Hermes / OpenAI function-calling JSON schemas.
-- `engines/`: Cloned upstream engines (Feynman, Vane, Web Acquisition).
+- `engines/`: Cloned upstream engines (Feynman, Web Acquisition, scraper MCPs).
 - `wiki/`: Default local Markdown vault.
 
 ---

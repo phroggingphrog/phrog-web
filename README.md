@@ -32,7 +32,7 @@ curl -fsS http://127.0.0.1:8890/api/fetch \
 - **CLI:** `node dist/cli.js --help`.
 - **Function schemas:** `src/adapters/schemas/hermes-tools.json`.
 
-Search uses SearXNG and TinyFish. Fetch supports plain extraction, rendered pages and document conversion. Research supports Vane and Feynman. Additional providers cover repositories, media, books, social content and places; a provider being implemented does not establish that its credentials or upstream service work on a given deployment.
+Search uses SearXNG and TinyFish. Fetch supports plain extraction, rendered pages and document conversion. Research is search + one LLM pass for quick answers, and the Feynman engine for durable deep jobs. Additional providers cover repositories, media, books, social content and places; a provider being implemented does not establish that its credentials or upstream service work on a given deployment.
 
 ## Embedded research runtime
 
