@@ -1,14 +1,14 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
-  tinyfishKeys, tinyfishKeyOrder, isKeyExhaustedStatus,
+  tinyfishCredentials, tinyfishKeyOrder, isKeyExhaustedStatus,
   noteTinyfishKeySuccess, resetTinyfishKeyPreference, runWithTinyfishKeys,
 } from '../../src/providers/tinyfish-keys.js';
 
-function withKeys(a: string | undefined, b: string | undefined, fn: () => Promise<void>) {
+function withKeys(paid: string | undefined, free: string | undefined, fn: () => Promise<void>) {
   const saved = [process.env.TINYFISH_API_KEY, process.env.TINYFISH_API_KEY_2];
-  if (a === undefined) delete process.env.TINYFISH_API_KEY; else process.env.TINYFISH_API_KEY = a;
-  if (b === undefined) delete process.env.TINYFISH_API_KEY_2; else process.env.TINYFISH_API_KEY_2 = b;
+  if (paid === undefined) delete process.env.TINYFISH_API_KEY; else process.env.TINYFISH_API_KEY = paid;
+  if (free === undefined) delete process.env.TINYFISH_API_KEY_2; else process.env.TINYFISH_API_KEY_2 = free;
   resetTinyfishKeyPreference();
   return fn().finally(() => {
     if (saved[0] === undefined) delete process.env.TINYFISH_API_KEY; else process.env.TINYFISH_API_KEY = saved[0];
@@ -19,38 +19,63 @@ function withKeys(a: string | undefined, b: string | undefined, fn: () => Promis
 
 const exhausted = (status: number) => Object.assign(new Error(`HTTP ${status}`), { status });
 
-test('tinyfishKeys collects both keys and drops blanks', async () => {
-  await withKeys('key-one', '   ', async () => {
-    assert.deepEqual(tinyfishKeys(), ['key-one']);
-  });
-  await withKeys('key-one', 'key-two', async () => {
-    assert.deepEqual(tinyfishKeys(), ['key-one', 'key-two']);
+test('TINYFISH_API_KEY is the Builder plan and TINYFISH_API_KEY_2 is the free Hobby plan', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
+    assert.deepEqual(tinyfishCredentials(), [
+      { key: 'hobby-key', plan: 'free' },
+      { key: 'builder-key', plan: 'paid' },
+    ]);
   });
 });
 
-test('an exhausted key rotates to the next one and the working key sticks', async () => {
-  await withKeys('dead', 'alive', async () => {
-    const tried: string[] = [];
-    const out = await runWithTinyfishKeys(async (key) => {
-      tried.push(key);
-      if (key === 'dead') throw exhausted(429);
-      return 'ok';
+test('search spends the free allowance before the paid one', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
+    assert.deepEqual(tinyfishKeyOrder('search'), ['hobby-key', 'builder-key']);
+  });
+});
+
+test('agent and browser work prefers the paid plan', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
+    assert.deepEqual(tinyfishKeyOrder('agent'), ['builder-key', 'hobby-key']);
+  });
+});
+
+test('blank keys are dropped and a single key works for either role', async () => {
+  await withKeys('builder-key', '   ', async () => {
+    assert.deepEqual(tinyfishKeyOrder('search'), ['builder-key']);
+    assert.deepEqual(tinyfishKeyOrder('agent'), ['builder-key']);
+  });
+});
+
+test('an exhausted free key rotates to the paid key and reports which plan answered', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
+    const tried: Array<[string, string]> = [];
+    const out = await runWithTinyfishKeys(async (key, plan) => {
+      tried.push([key, plan]);
+      if (plan === 'free') throw exhausted(429);
+      return plan;
     });
-    assert.equal(out, 'ok');
-    assert.deepEqual(tried, ['dead', 'alive']);
-    // the key that worked is now preferred, so the dead one is not retried first
-    assert.deepEqual(tinyfishKeyOrder(), ['alive', 'dead']);
+    assert.equal(out, 'paid');
+    assert.deepEqual(tried, [['hobby-key', 'free'], ['builder-key', 'paid']]);
+  });
+});
+
+test('agent role tries the paid key first', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
+    const tried: string[] = [];
+    await runWithTinyfishKeys(async (key) => { tried.push(key); return 'ok'; }, 'agent');
+    assert.deepEqual(tried, ['builder-key']);
   });
 });
 
 test('a non-quota error does not silently switch accounts', async () => {
-  await withKeys('key-one', 'key-two', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
     const tried: string[] = [];
     await assert.rejects(() => runWithTinyfishKeys(async (key) => {
       tried.push(key);
       throw exhausted(500);
     }), /HTTP 500/);
-    assert.deepEqual(tried, ['key-one']);
+    assert.deepEqual(tried, ['hobby-key']);
   });
 });
 
@@ -72,8 +97,8 @@ test('isKeyExhaustedStatus covers quota and auth codes only', () => {
 });
 
 test('noteTinyfishKeySuccess ignores unknown keys', async () => {
-  await withKeys('a', 'b', async () => {
+  await withKeys('builder-key', 'hobby-key', async () => {
     noteTinyfishKeySuccess('not-a-key');
-    assert.deepEqual(tinyfishKeyOrder(), ['a', 'b']);
+    assert.deepEqual(tinyfishKeyOrder('search'), ['hobby-key', 'builder-key']);
   });
 });
