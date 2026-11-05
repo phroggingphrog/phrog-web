@@ -2,6 +2,7 @@ import { loadConfig } from '../config.js';
 import { canonicalKey, fuseEngineRanks, type EngineRankedRow } from './rank.js';
 import { shapeQuery } from './query-shape.js';
 import { refineEnabled, refineQuery } from './query-llm.js';
+import { rerank, rerankEnabled, rerankMaxCandidates } from './rerank.js';
 
 export interface SearchResult {
   title: string;
@@ -36,6 +37,8 @@ export interface SearchOptions {
 }
 
 export interface SearchResponse {
+  /** Present only when the cross-encoder stage ran or was attempted. */
+  rerank?: Record<string, unknown>;
   query: string;
   results: SearchResult[];
   provider_used: string;
@@ -377,8 +380,23 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
       fused.set(key, row);
     });
   }
-  const results = [...fused.values()].sort((a, b) => b.score - a.score).slice(0, limit).map(({ result, score, engines: contributing }) => ({ ...result, score, engine: [...contributing].join(',') }));
-  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope: successful.find(({ envelope }) => envelope)?.envelope };
+  const rankedAll = [...fused.values()].sort((a, b) => b.score - a.score)
+    .map(({ result, score, engines: contributing }) => ({ ...result, score, engine: [...contributing].join(',') }));
+
+  // Stage 3: cross-encoder precision over the head of the RRF order. Reranking can only
+  // reorder what RRF found, so a miss here means the engines failed, not the reranker.
+  let results = rankedAll.slice(0, limit);
+  let rerankInfo: Record<string, unknown> | undefined;
+  if (rerankEnabled() && rankedAll.length > 1 && rankedAll.length <= rerankMaxCandidates()) {
+    const head = rankedAll.slice(0, Math.max(limit, 20));
+    const outcome = await rerank(query, head.map((r) => ({ title: r.title, snippet: r.snippet, url: r.url })));
+    rerankInfo = { model: outcome.model, ms: outcome.ms, applied: outcome.order.length === head.length, ...(outcome.reason ? { reason: outcome.reason } : {}) };
+    if (outcome.order.length === head.length) {
+      results = outcome.order.map((i) => head[i]).slice(0, limit);
+    }
+  }
+
+  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope: successful.find(({ envelope }) => envelope)?.envelope, ...(rerankInfo ? { rerank: rerankInfo } : {}) };
   if (searchCache.size >= CACHE_MAX_ENTRIES) searchCache.delete(searchCache.keys().next().value!);
   searchCache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, value: response });
   return response;
