@@ -681,14 +681,25 @@ server.tool('web_crawl_status', 'Progress (and optionally results) of a backgrou
   job_id: z.string(), include_results: z.boolean().optional(), offset: z.number().int().optional(), limit: z.number().int().optional(),
 }, safe((a) => webCrawlStatus(a.job_id, a.include_results ?? false, a.offset ?? 0, a.limit ?? 10)));
 
-server.tool('browse', 'Goal-driven multi-step browsing via the external Jev runner.', {
+// DEPRECATED ALIAS: browse is agent mode=browse. Kept so existing clients keep working; it now
+// returns the agent envelope ({status,result,steps,escalated_to,sources}) instead of a page dump.
+server.tool('browse', 'Deprecated alias of `agent` with mode=browse (local Jev runner). Use `agent`.', {
   url: z.string(), goal: z.string(), max_seconds: z.number().int().optional(),
-}, safe(browse));
+}, safe((a) => runAgent({ url: a.url, goal: a.goal, mode: 'browse', timeout_s: a.max_seconds ?? 90 })));
 
-server.tool('web_agent_run', 'TinyFish-style agent: url + goal to JSON, escalating fetch -> browse -> deep agent -> TinyFish (when keyed). Returns {status,result,steps,escalated_to,sources}.', {
-  url: z.string(), goal: z.string(), schema: z.record(z.any()).optional(),
-  mode: z.enum(['auto', 'fetch', 'browse', 'deep', 'tinyfish']).optional(), max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
-}, safe((a) => runAgent(a)));
+// The one agent door. Give url+goal for a page-bound task, or query alone for multi-source
+// search + synthesis (what deep_search returns as links, this returns as an answer).
+const agentSchema = {
+  url: z.string().optional(), goal: z.string().optional(), query: z.string().optional(),
+  schema: z.record(z.any()).optional(),
+  mode: z.enum(['auto', 'fetch', 'browse', 'deep', 'tinyfish']).optional(),
+  max_steps: z.number().int().optional(), timeout_s: z.number().int().optional(),
+};
+const agentDesc = 'Single agent entry point. url+goal walks a page (fetch -> browse -> deep -> tinyfish, only the last billed); query alone runs deep multi-source search plus synthesis. Returns {status,result,steps,escalated_to,sources}.';
+server.tool('agent', agentDesc, agentSchema, safe((a) => runAgent(a as any)));
+
+// Kept as an alias of `agent` so existing callers do not break.
+server.tool('web_agent_run', 'Deprecated alias of `agent`. url+goal, or query alone.', agentSchema, safe((a) => runAgent(a as any)));
 
 server.tool('extract', 'Extract structured data from URLs into a JSON Schema; validated, null for unknowns.', {
   urls: z.array(z.string()), schema: z.record(z.any()), instructions: z.string().optional(),

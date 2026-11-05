@@ -535,7 +535,17 @@ fastify.post('/api/agent/stream', async (req, reply) => {
   reply.raw.end();
 });
 
-fastify.post('/api/browse', wrap(browse as any, ['url', 'goal']));
+// browse is only ever agent mode=browse, so it delegates rather than keeping a second code path.
+fastify.post('/api/browse', async (req, reply) => {
+  const body = (req.body ?? {}) as { url?: string; goal?: string; max_seconds?: number };
+  if (!body.url || !body.goal) return reply.code(400).send({ error: 'url and goal are required' });
+  try {
+    const r = await runAgent({ url: body.url, goal: body.goal, mode: 'browse', timeout_s: body.max_seconds ?? 90 });
+    return reply.code(r.status === 'COMPLETED' ? 200 : 502).send(r);
+  } catch (err) {
+    return reply.code(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
 fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
 
 // --- Cookbook surface: the Firecrawl/TinyFish capability set, with the gaps filled -----------

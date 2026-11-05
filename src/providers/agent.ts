@@ -4,11 +4,15 @@ import { join } from 'node:path';
 import { loadConfig } from '../config.js';
 import { extract, validate } from './extract.js';
 import { browse, omnirouteKey } from './browse.js';
+import { executeSearch } from './search.js';
 
 export type AgentMode = 'auto' | 'fetch' | 'browse' | 'deep' | 'tinyfish';
 export interface AgentArgs {
-  url: string;
-  goal: string;
+  /** Page-bound goal. Optional when `query` is given. */
+  url?: string;
+  goal?: string;
+  /** Query-only goal: multi-source search + synthesis, no page required. */
+  query?: string;
   schema?: Record<string, any>;
   mode?: AgentMode;
   max_steps?: number;
@@ -166,14 +170,18 @@ async function deepAsk(url: string, goal: string, signal: AbortSignal): Promise<
 
 export async function runAgent(args: AgentArgs, emit: AgentEmit = () => {}): Promise<AgentResult> {
   loadConfig();
-  const { url, goal } = args;
-  if (!/^https?:\/\//.test(url ?? '')) throw new Error('url must start with http:// or https://');
-  if (!goal?.trim() || goal.length > 2000) throw new Error('goal must be 1-2000 characters');
+  const url = (args.url ?? '').trim();
+  // `query` is the query-only spelling of `goal`: one door, two shapes.
+  const goal = (args.goal ?? args.query ?? '').trim();
+  if (!goal || goal.length > 2000) throw new Error('goal (or query) must be 1-2000 characters');
+  if (!url && !args.query) throw new Error('url is required unless query is given');
+  const pageBound = url.length > 0;
+  if (pageBound && !/^https?:\/\//.test(url)) throw new Error('url must start with http:// or https://');
   const mode = args.mode ?? 'auto';
   const maxSteps = Math.min(Math.max(args.max_steps ?? 4, 1), 4);
   const deadline = Date.now() + (args.timeout_s ?? 180) * 1000;
   const steps: AgentStep[] = [];
-  const sources = new Set<string>([url]);
+  const sources = new Set<string>(pageBound ? [url] : []);
   const step = (action: string, detail: string, t0: number) => {
     const s = { action, detail, ms: Date.now() - t0 };
     steps.push(s);
@@ -184,6 +192,37 @@ export async function runAgent(args: AgentArgs, emit: AgentEmit = () => {}): Pro
     if (ms <= 0) throw new Error('TIMEOUT');
     return AbortSignal.timeout(ms);
   };
+
+  const left0 = () => {
+    const ms = deadline - Date.now();
+    if (ms <= 0) throw new Error('TIMEOUT');
+    return AbortSignal.timeout(ms);
+  };
+
+  // Query-only: no page to walk, so the ladder collapses to deep search + synthesis.
+  if (!pageBound) {
+    if (mode === 'fetch' || mode === 'browse') throw new Error(`mode ${mode} needs a url; use deep, tinyfish or auto for a query`);
+    const t0 = Date.now();
+    emit({ type: 'STARTED', query: goal, mode, plan: ['deep-search'] });
+    try {
+      const res = await executeSearch(goal, { mode: 'deep', limit: 8 });
+      for (const r of res.results ?? []) if (r.url) sources.add(r.url);
+      step('search', `${res.results?.length ?? 0} results (${res.provider_used ?? 'pipeline'})`, t0);
+      const t1 = Date.now();
+      const material = JSON.stringify((res.results ?? []).map((r) => ({ title: r.title, url: r.url, snippet: r.snippet })));
+      const result = await shapeJson(material, goal, args.schema, left0());
+      step('shape', 'search results to JSON', t1);
+      const out: AgentResult = { status: 'COMPLETED', result, steps, escalated_to: 'deep', sources: [...sources] };
+      emit({ type: 'COMPLETE', ...out });
+      return out;
+    } catch (e: any) {
+      const err = e?.message ?? String(e);
+      step('deep-search', `failed: ${err}`, t0);
+      const out: AgentResult = { status: 'FAILED', result: null, steps, escalated_to: 'deep', sources: [...sources], error: err };
+      emit({ type: 'ERROR', ...out });
+      return out;
+    }
+  }
 
   // Ladder start: forced mode, else interactive goals skip straight to browse, multi-page goals to deep.
   let start = 0;
