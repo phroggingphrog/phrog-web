@@ -14,7 +14,7 @@ export interface FetchResult {
 export interface FetchAttempt {
   provider: string;
   status?: number;
-  outcome: 'ok' | 'blocked' | 'error';
+  outcome: 'ok' | 'blocked' | 'error' | 'thin';
   detail?: string;
 }
 
@@ -342,6 +342,16 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
       if (reason) {
         attempts.push({ provider, status: result.statusCode, outcome: 'blocked', detail: reason });
         continue;
+      }
+      // A JS-only page renders an empty shell to a plain fetch: it parses fine, returns 200 and
+      // carries no content. Treating that as success stops the pipeline exactly where the
+      // browser would have helped (measured on angular.io: 1,012 chars of nothing). Escalate.
+      if (provider === 'plain') {
+        const words = result.markdown.trim().split(/\s+/).filter(Boolean).length;
+        if (result.markdown.length < 400 && words < 60) {
+          attempts.push({ provider, status: result.statusCode, outcome: 'thin', detail: `only ${words} words, likely a client-rendered shell` });
+          continue;
+        }
       }
       attempts.push({ provider, status: result.statusCode, outcome: 'ok' });
       return { ...result, attempts };
