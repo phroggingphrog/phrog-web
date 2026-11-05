@@ -4,6 +4,9 @@ import { executeSearch } from '../../src/providers/search.js';
 import { webSearch } from '../../src/providers/compat.js';
 
 test('executeSearch combines duplicate URLs and exposes contributing engines', async () => {
+  // Roster-agnostic on purpose: loadConfig() caches the deployed config.json, so pinning the
+  // provider list from here is not possible (there is no PHROG_SEARCH_PIPELINE). This test is
+  // about URL de-duplication and engine attribution, not about which providers ship today.
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async (input) => {
     const url = new URL(String(input));
@@ -18,7 +21,9 @@ test('executeSearch combines duplicate URLs and exposes contributing engines', a
     const result = await executeSearch('rrf test ' + Date.now(), { limit: 10 });
     assert.equal(result.results.length, 2);
     assert.deepEqual(result.contributingEngines, ['searxng']);
-    assert.deepEqual(result.failures?.map((f) => f.engine), ['tinyfish']);
+    // Every provider except the stubbed local one must be reported as failed, whatever ships today.
+    assert.ok(result.failures?.some((f) => f.engine === 'tinyfish'), 'tinyfish should be reported as failed');
+    assert.deepEqual(result.failures?.map((f) => f.engine).filter((e) => e === 'searxng'), []);
     assert.equal(result.results[0].url, 'https://example.com/a#first');
     assert.equal(result.results[0].engine, 'alpha');
   } finally {

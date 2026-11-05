@@ -28,6 +28,14 @@
       "anysearch": {
         "url": "https://api.anysearch.com/v1/search",
         "timeoutMs": 7000
+      },
+      "firecrawl": {
+        "url": "https://api.firecrawl.dev/v1/search",
+        "timeoutMs": 20000
+      },
+      "wikimedia": {
+        "url": "https://en.wikipedia.org/w/api.php",
+        "timeoutMs": 6000
       }
     }
   },
@@ -35,6 +43,7 @@
     "pipeline": [
       "plain",
       "crawl4ai",
+      "jina",
       "tinyfish"
     ],
     "providers": {
@@ -50,6 +59,10 @@
       "tinyfish": {
         "url": "https://api.fetch.tinyfish.ai",
         "timeoutMs": 15000
+      },
+      "jina": {
+        "url": "https://r.jina.ai",
+        "timeoutMs": 30000
       }
     }
   },

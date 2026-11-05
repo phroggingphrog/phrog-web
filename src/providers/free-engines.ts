@@ -126,3 +126,101 @@ export async function searchAnySearch(query: string, options: SearchOptions = {}
   if (!res.ok) throw new Error(`AnySearch HTTP ${res.status}: ${res.statusText}`);
   return parseAnySearch(await res.json() as AnySearchPayload).slice(0, maxResults);
 }
+
+/**
+ * Firecrawl's keyless search tier. Measured on this box: 403 direct with the body
+ * "your IP address looks like a VPN or proxy", 200 through the crawl-egress tunnel
+ * (privoxy at 127.0.0.1:18118 -> Tencent). dsh documents the same IP sensitivity and the same
+ * direct-then-tunnel order, so the tunnel is the primary route here and direct is the fallback.
+ * Node's fetch cannot be given a proxy without undici, and undici is not a dependency of this
+ * service, so the tunneled call goes through curl. Verified returning real rows via the tunnel.
+ */
+interface FirecrawlPayload {
+  success?: boolean;
+  data?: Array<{ url?: string; title?: string; description?: string; markdown?: string }>;
+}
+
+export function parseFirecrawl(payload: FirecrawlPayload, engine = 'firecrawl'): SearchResult[] {
+  const rows = payload?.data;
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .filter((r) => typeof r?.url === 'string' && r.url.length > 0)
+    .map((r) => {
+      const prose = (r.description || r.markdown || '').replace(/\[¶\][^)]*\)?/g, ' ').replace(/\s+/g, ' ').trim();
+      return { title: r.title || r.url || '', url: r.url as string, snippet: prose.slice(0, 320), engine };
+    });
+}
+
+async function firecrawlViaTunnel(body: string, timeoutMs: number): Promise<string> {
+  const proxy = process.env.PHROG_WEB_EGRESS_PROXY || 'http://127.0.0.1:18118';
+  const url = loadConfig().search?.providers?.firecrawl?.url || 'https://api.firecrawl.dev/v1/search';
+  const { execFile } = await import('node:child_process');
+  const { promisify } = await import('node:util');
+  const run = promisify(execFile) as unknown as (
+    file: string, args: string[], opts: { timeout: number; maxBuffer: number },
+  ) => Promise<{ stdout: string; stderr: string }>;
+  const { stdout } = await run('curl', ['-s', '-m', String(Math.ceil(timeoutMs / 1000)), '-x', proxy,
+    '-X', 'POST', url, '-H', 'Content-Type: application/json', '-d', body], { timeout: timeoutMs, maxBuffer: 4 * 1024 * 1024 });
+  return stdout;
+}
+
+export async function searchFirecrawl(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
+  const cfg = loadConfig().search?.providers?.firecrawl || {};
+  const url = cfg.url || 'https://api.firecrawl.dev/v1/search';
+  const timeoutMs = cfg.timeoutMs || 20000;
+  const limit = Math.max(1, Math.min(20, options.limit || 10));
+  const body = JSON.stringify({ query, limit });
+
+  const direct = process.env.PHROG_WEB_FIRECRAWL_DIRECT === '1';
+  if (direct) {
+    const res = await fetch(url, {
+      method: 'POST',
+      signal: AbortSignal.timeout(timeoutMs),
+      headers: { 'Content-Type': 'application/json' },
+      body,
+    });
+    if (res.ok) return parseFirecrawl(await res.json() as FirecrawlPayload).slice(0, limit);
+  }
+  const raw = await firecrawlViaTunnel(body, timeoutMs);
+  if (!raw.trim()) throw new Error('Firecrawl tunnel route returned nothing');
+  return parseFirecrawl(JSON.parse(raw) as FirecrawlPayload).slice(0, limit);
+}
+
+/**
+ * Wikimedia's own search API. Keyless and generous, and it is the wikipedia source that the
+ * SearXNG engine could not reach (its engine records 429 on every query while this same API
+ * answers 200 from both the host and the container). Opt-in: an encyclopedia page is not a web
+ * result, so it should never enter the general fan-in unasked.
+ */
+interface WikimediaPayload {
+  query?: { search?: Array<{ title?: string; snippet?: string; pageid?: number }> };
+}
+
+export function parseWikimedia(payload: WikimediaPayload, engine = 'wikimedia'): SearchResult[] {
+  const rows = payload?.query?.search;
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .filter((r) => typeof r?.title === 'string' && r.title.length > 0)
+    .map((r) => ({
+      title: r.title as string,
+      url: `https://en.wikipedia.org/wiki/${encodeURIComponent((r.title as string).replace(/ /g, '_'))}`,
+      snippet: (r.snippet || '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim().slice(0, 320),
+      engine,
+    }));
+}
+
+export async function searchWikimedia(query: string, options: SearchOptions = {}): Promise<SearchResult[]> {
+  const limit = Math.max(1, Math.min(20, options.limit || 10));
+  const url = new URL(loadConfig().search?.providers?.wikimedia?.url || 'https://en.wikipedia.org/w/api.php');
+  url.searchParams.set('action', 'query');
+  url.searchParams.set('list', 'search');
+  url.searchParams.set('srsearch', query);
+  url.searchParams.set('srlimit', String(limit));
+  url.searchParams.set('format', 'json');
+  const res = await fetch(url.toString(), {
+    signal: AbortSignal.timeout(loadConfig().search?.providers?.wikimedia?.timeoutMs || 6000),
+    headers: { 'User-Agent': 'phrog-web/1.0 (+https://github.com/phroggingphrog/phrog-web)', Accept: 'application/json' },
+  });
+  if (!res.ok) throw new Error(`Wikimedia HTTP ${res.status}: ${res.statusText}`);
+  return parseWikimedia(await res.json() as WikimediaPayload).slice(0, limit);
+}

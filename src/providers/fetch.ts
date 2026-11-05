@@ -320,6 +320,30 @@ async function fetchTinyFish(url: string, options: FetchOptions): Promise<FetchR
   };
 }
 
+/**
+ * Jina's reader (r.jina.ai) is keyless for basic use — its SEARCH endpoint now returns 401
+ * without an API key, so only the reader is usable here. Measured 0.5-4.5 s, returns clean
+ * Markdown, and sits between the browser and the paid fallback: it rescues pages that a bot-wall
+ * blocks and a container-rendered crawl still cannot read, without spending tinyfish quota.
+ */
+async function fetchJina(url: string, options: FetchOptions = {}): Promise<FetchResult> {
+  const cfg = loadConfig().fetch.providers?.jina || {};
+  const timeoutMs = cfg.timeoutMs || 30000;
+  const endpoint = `${cfg.url || 'https://r.jina.ai'}/${url}`;
+  const res = await fetch(endpoint, {
+    signal: AbortSignal.timeout(timeoutMs),
+    headers: { 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) phrog-web/1.0', Accept: 'text/plain' },
+  });
+  if (!res.ok) throw new Error(`Jina reader HTTP ${res.status}: ${res.statusText}`);
+  const raw = await res.text();
+  // The reader prefixes a "Title:/URL Source:/Markdown Content:" block; keep the body, the title.
+  const title = /^Title:\s*(.+)$/m.exec(raw)?.[1]?.trim() || '';
+  const body = raw.split(/^Markdown Content:\s*$/m)[1] ?? raw;
+  const maxChars = loadConfig().fetch.providers?.plain?.maxChars ?? 60000;
+  const truncated = body.trim().slice(0, maxChars);
+  return { url, title, markdown: truncated, length: truncated.length, provider_used: 'jina', statusCode: res.status };
+}
+
 export async function executeFetch(url: string, options: FetchOptions = {}): Promise<FetchResult> {
   const config = loadConfig();
   const pipeline = options.provider ? [options.provider] : config.fetch.pipeline;
@@ -334,6 +358,8 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
         result = await fetchCrawl4ai(url, options);
       } else if (provider === 'tinyfish') {
         result = await fetchTinyFish(url, options);
+      } else if (provider === 'jina') {
+        result = await fetchJina(url, options);
       } else {
         throw new Error(`Unknown fetch provider: ${provider}`);
       }

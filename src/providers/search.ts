@@ -3,7 +3,7 @@ import { canonicalKey, fuseEngineRanks, type EngineRankedRow } from './rank.js';
 import { shapeQuery } from './query-shape.js';
 import { refineEnabled, refineQuery } from './query-llm.js';
 import { rerank, rerankEnabled, rerankMaxCandidates } from './rerank.js';
-import { searchAnySearch, searchExaMcp } from './free-engines.js';
+import { searchAnySearch, searchExaMcp, searchFirecrawl, searchWikimedia } from './free-engines.js';
 
 export interface SearchResult {
   title: string;
@@ -332,7 +332,9 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   }
   // Deep research can afford AnySearch's 2.7-4.6 s and benefits from a CJK-capable index;
   // interactive searches never pay that cost (measured, see free-engines.ts).
-  if (options.mode === 'deep' && !pipeline.includes('anysearch')) pipeline.push('anysearch');
+  if (options.mode === 'deep') {
+    for (const extra of ['anysearch', 'firecrawl']) if (!pipeline.includes(extra)) pipeline.push(extra);
+  }
 
   const limit = Math.max(1, Math.min(50, Number.isFinite(options.limit) ? Math.floor(options.limit!) : 15));
   const cacheKey = JSON.stringify([query.trim(), { ...options, limit, provider: pipeline.join(',') }]);
@@ -360,6 +362,8 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
       else if (engine === 'consensus') results = await searchConsensus(query, { ...options, limit: Math.max(limit, 30) });
       else if (engine === 'exa') results = await searchExaMcp(query, { ...options, limit: Math.max(limit, 10) });
       else if (engine === 'anysearch') results = await searchAnySearch(query, { ...options, limit: Math.max(limit, 10) });
+      else if (engine === 'firecrawl') results = await searchFirecrawl(query, { ...options, limit: Math.max(limit, 10) });
+      else if (engine === 'wikimedia') results = await searchWikimedia(query, { ...options, limit: Math.max(limit, 10) });
       else throw new Error(`Unknown search provider: ${engine}`);
       engineCooldowns.delete(engine);
       return { engine, results, envelope };

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseAnySearch, parseExaText } from '../../src/providers/free-engines.js';
+import { parseAnySearch, parseExaText, parseFirecrawl, parseWikimedia } from '../../src/providers/free-engines.js';
 
 test('parseExaText reads the repeated Title/URL/Highlights blocks', () => {
   const text = [
@@ -55,4 +55,38 @@ test('parseAnySearch maps the envelope and drops rows without a url', () => {
 test('parseAnySearch tolerates a malformed or empty payload', () => {
   assert.deepEqual(parseAnySearch({}), []);
   assert.deepEqual(parseAnySearch({ data: {} }), []);
+});
+
+test('parseFirecrawl maps the envelope and strips the extraction markers', () => {
+  const rows = parseFirecrawl({ success: true, data: [
+    { url: 'https://docs.podman.io/en/latest/markdown/podman-systemd.unit.5.html', title: 'podman-systemd.unit',
+      description: '# DESCRIPTION [¶](https://x/#description)\nall users sessions execute the Quadlet' },
+    { title: 'no url' },
+  ] });
+  assert.equal(rows.length, 1);
+  assert.equal(rows[0].engine, 'firecrawl');
+  assert.doesNotMatch(rows[0].snippet, /¶|\[/);
+  assert.match(rows[0].snippet, /^# DESCRIPTION/);
+});
+
+test('parseFirecrawl tolerates a failed envelope', () => {
+  assert.deepEqual(parseFirecrawl({ success: false }), []);
+  assert.deepEqual(parseFirecrawl({}), []);
+});
+
+test('parseWikimedia builds article URLs and strips HTML from snippets', () => {
+  const rows = parseWikimedia({ query: { search: [
+    { title: 'Podman', snippet: '<span class="searchmatch">Podman</span> is a container engine' },
+    { title: 'Container Linux' },
+  ] } });
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0].url, 'https://en.wikipedia.org/wiki/Podman');
+  assert.equal(rows[0].snippet, 'Podman is a container engine');
+  assert.equal(rows[1].url, 'https://en.wikipedia.org/wiki/Container_Linux');
+  assert.equal(rows[1].engine, 'wikimedia');
+});
+
+test('parseWikimedia tolerates an empty query block', () => {
+  assert.deepEqual(parseWikimedia({}), []);
+  assert.deepEqual(parseWikimedia({ query: {} }), []);
 });
