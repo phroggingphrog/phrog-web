@@ -595,6 +595,8 @@ fastify.get('/api/cookbook', async () => ({
     { capability: 'monitor_check', path: '/api/monitor/:id/check', method: 'POST', params: ['id'], backed_by: ['content hash'], cost: 'free' },
     { capability: 'browser', path: '/api/browser', method: 'POST', params: ['url', 'profile=lite|stealth'], backed_by: ['tinyfish browser (Builder)'], cost: '$0.002/min' },
     { capability: 'browser_close', path: '/api/browser/:sessionId', method: 'DELETE', params: ['sessionId'], backed_by: ['tinyfish browser'], cost: 'closes the meter' },
+    { capability: 'research_resume', path: '/api/research/:jobId/resume', method: 'POST', params: ['jobId'], backed_by: ['feynman research run resume'], cost: 'local + llm' },
+    { capability: 'research_cancel', path: '/api/research/:jobId/cancel', method: 'POST', params: ['jobId'], backed_by: ['process tree by run id', 'feynman research run set-status aborted'], cost: 'free' },
     { capability: 'research', path: '/api/research', method: 'POST', params: ['question|topic', 'mode=quick|deep', 'domain'], backed_by: ['search + llm (quick)', 'feynman (deep, local engine)'], cost: 'local + llm' },
     { capability: 'keys', path: '/api/keys', method: 'GET|POST|DELETE', params: ['key', 'value'], backed_by: ['hub store'], cost: 'free' },
   ],
