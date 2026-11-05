@@ -77,3 +77,34 @@ GET /api/search?mode=deep -> provider_used: tinyfish,exa,anysearch,firecrawl, 3 
 | an answer about one page | `POST /api/agent {url, goal}` |
 | an answer from the web, no page in mind | `POST /api/agent {query}` |
 | a long sourced report you can resume | `deep_research_start` |
+
+## Deep jobs now survive a restart (as records, not as processes)
+
+`GET /api/research/:jobId` used to read an in-memory `Map`, so a service restart erased every job and
+the id you were polling became a 404. Each job is now written to
+`~/.local/state/phrog-web/research-jobs/<jobId>.json` (atomic temp+rename) at creation, when the PID is
+assigned, and again when it settles, and lookups read through to disk.
+
+The Feynman child process is still a child of the service, so a restart kills the *work* even though the
+record survives. Those jobs are reconciled on boot and reported as **`interrupted`** with an explicit
+message rather than `running` forever:
+
+```
+{"status":"interrupted","error":"The service restarted while this run was in progress; the Feynman child
+  did not survive. Re-run, or use `feynman research run` for a durable run."}
+```
+
+Verified: a job dispatched and completed before `systemctl --user restart phrog-web` is still readable
+afterwards with its 10,072-character deliverable and `exitCode: 0`; an orphaned `running` record becomes
+`interrupted` on the next boot; a genuinely completed record is left alone.
+
+Feynman itself already has durable runs (`feynman research run` — create/observe/checkpoint/resume).
+Wiring the deep branch onto those subcommands instead of a bare spawn is the remaining step, and is what
+would make a deep job actually resumable rather than merely recorded.
+
+## Is quick research worth delegating to Feynman? No.
+
+Feynman exposes no single-pass mode. Its workflows are `audit`, `autoresearch`, `compare`,
+`deepresearch`, `draft`, `lit`, `recipe`, `replicate`, `review`, `summarize` — every one a multi-step
+agent loop on `omni/openai/sol`. Delegating quick research to it would make quick cost the same as deep,
+against the 4.7 s the search + one-LLM-pass path takes.

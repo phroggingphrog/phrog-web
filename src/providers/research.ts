@@ -1,4 +1,7 @@
 import { spawn } from 'node:child_process';
+import { readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 import { mkdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadConfig } from '../config.js';
@@ -33,7 +36,7 @@ export interface ResearchJob {
   topic: string;
   domain?: string;
   pid?: number;
-  status: 'running' | 'completed' | 'failed';
+  status: 'running' | 'completed' | 'failed' | 'interrupted';
   startedAt: string;
   finishedAt?: string;
   exitCode?: number | null;
@@ -43,8 +46,67 @@ export interface ResearchJob {
   callbackUrl?: string;
 }
 
-// In-memory registry of active and completed jobs
+// In-memory registry, backed by one JSON file per job so /api/research/:jobId survives a restart.
 const jobs = new Map<string, ResearchJob>();
+const JOB_ID = /^fey_\d+_[a-z0-9]{5}$/;
+
+function jobsDir(): string {
+  return process.env.PHROG_WEB_RESEARCH_JOBS_DIR || join(homedir(), '.local', 'state', 'phrog-web', 'research-jobs');
+}
+
+/** Atomic write: a half-written job file must never be readable. */
+function persistJob(job: ResearchJob): void {
+  try {
+    mkdirSync(jobsDir(), { recursive: true });
+    const target = join(jobsDir(), `${job.jobId}.json`);
+    const tmp = `${target}.tmp-${process.pid}`;
+    writeFileSync(tmp, JSON.stringify(job, null, 2));
+    renameSync(tmp, target);
+  } catch (err) {
+    console.error(`Failed to persist research job ${job.jobId}:`, err);
+  }
+}
+
+function readJobFile(jobId: string): ResearchJob | undefined {
+  if (!JOB_ID.test(jobId)) return undefined;   // no path traversal, ever
+  try {
+    return JSON.parse(readFileSync(join(jobsDir(), `${jobId}.json`), 'utf8')) as ResearchJob;
+  } catch {
+    return undefined;
+  }
+}
+
+function alive(pid?: number): boolean {
+  if (!pid) return false;
+  try { process.kill(pid, 0); return true; } catch { return false; }
+}
+
+/**
+ * A Feynman child is spawned by this process, so a service restart kills the work while the job file
+ * still says 'running'. Mark those honestly instead of reporting a run that no longer exists; Feynman's
+ * own `feynman research run` subcommands are the durable path for anything that must outlive us.
+ */
+let reconciled = false;
+export function reconcileResearchJobs(): number {
+  reconciled = true;
+  let changed = 0;
+  try {
+    for (const name of readdirSync(jobsDir())) {
+      if (!name.endsWith('.json')) continue;
+      const jobId = name.slice(0, -5);
+      const job = readJobFile(jobId);
+      if (!job || job.status !== 'running') continue;
+      if (alive(job.pid)) continue;
+      job.status = 'interrupted';
+      job.finishedAt = job.finishedAt || new Date().toISOString();
+      job.error = job.error || 'The service restarted while this run was in progress; the Feynman child did not survive. Re-run, or use `feynman research run` for a durable run.';
+      jobs.set(jobId, job);
+      persistJob(job);
+      changed++;
+    }
+  } catch { /* no jobs dir yet */ }
+  return changed;
+}
 
 /** Citations are the search hits themselves, so an answer can only cite what was actually retrieved. */
 export function buildCitations(results: { title?: string; url?: string }[], max = 8): ResearchCitation[] {
@@ -132,6 +194,7 @@ export function dispatchDeepResearch(
   };
 
   jobs.set(jobId, job);
+  persistJob(job);
 
   const outputsDir = resolve(runtime.root, 'outputs');
   mkdirSync(outputsDir, { recursive: true });
@@ -145,6 +208,7 @@ export function dispatchDeepResearch(
     });
 
     job.pid = child.pid;
+    persistJob(job);
 
     let stdout = '';
     let stderr = '';
@@ -165,6 +229,8 @@ export function dispatchDeepResearch(
         job.status = 'failed';
         job.error = spawnError?.message || stderr || `Process exited with code ${exitCode}`;
       }
+
+      persistJob(job);
 
       if (job.callbackUrl) {
         try {
@@ -189,11 +255,17 @@ export function dispatchDeepResearch(
     job.status = 'failed';
     job.error = err instanceof Error ? err.message : String(err);
     job.finishedAt = new Date().toISOString();
+    persistJob(job);
   }
 
   return job;
 }
 
 export function getResearchJob(jobId: string): ResearchJob | undefined {
-  return jobs.get(jobId);
+  if (!reconciled) reconcileResearchJobs();
+  const inMemory = jobs.get(jobId);
+  if (inMemory) return inMemory;
+  const onDisk = readJobFile(jobId);
+  if (onDisk) jobs.set(jobId, onDisk);
+  return onDisk;
 }
