@@ -2,6 +2,8 @@ import { loadConfig } from '../config.js';
 import { documentKind, convertDocument, extractMain } from './document.js';
 import { runWithTinyfishKeys } from './tinyfish-keys.js';
 
+import { cacheGet, cacheSet, cacheKeyFetch } from '../cache.js';
+
 export interface FetchResult {
   url: string;
   title: string;
@@ -10,6 +12,9 @@ export interface FetchResult {
   provider_used: string;
   statusCode?: number;
   attempts?: FetchAttempt[];
+  /** True when this body came from the cache instead of a provider. */
+  cached?: boolean;
+  cache_age_s?: number;
 }
 
 export interface FetchAttempt {
@@ -55,6 +60,8 @@ export interface FetchOptions {
   maxChars?: number;
   actions?: Array<Record<string, any>>;
   stealth?: boolean;
+  /** Set false to bypass the page cache (a caller that needs a live read). */
+  cache?: boolean;
 }
 
 export function cleanHtmlToMarkdown(html: string): { title: string; markdown: string } {
@@ -351,6 +358,22 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
   const pipeline = options.provider ? [options.provider] : config.fetch.pipeline;
   const attempts: FetchAttempt[] = [];
 
+  // Repeat reads of the same URL are the common case; a rendered browser fetch is not cached because
+  // the whole point of asking for it is to see the current state of a client-rendered page.
+  const cacheable = options.cache !== false && !options.provider && options.mode !== 'browser';
+  const cacheId = cacheKeyFetch(url, options);
+  if (cacheable) {
+    const hit = cacheGet<FetchResult>(cacheId);
+    if (hit) {
+      return {
+        ...hit.value,
+        attempts: [{ provider: 'cache', outcome: 'ok', detail: `body cached ${hit.ageSeconds}s ago` }],
+        cached: true,
+        cache_age_s: hit.ageSeconds,
+      };
+    }
+  }
+
   for (const provider of pipeline) {
     try {
       let result: FetchResult;
@@ -382,7 +405,10 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
         }
       }
       attempts.push({ provider, status: result.statusCode, outcome: 'ok' });
-      return { ...result, attempts };
+      const out: FetchResult = { ...result, attempts, cached: false };
+      // Do not cache a thin body: it is exactly what the next caller would want to retry.
+      if (cacheable && out.markdown.length >= 200) cacheSet(cacheId, out);
+      return out;
     } catch (err) {
       const e = err instanceof ProviderError ? err : null;
       const detail = err instanceof Error ? err.message : String(err);

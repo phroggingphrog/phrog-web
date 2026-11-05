@@ -204,10 +204,11 @@ server.tool(
     url: z.string().url().describe('Target web URL to fetch and convert to Markdown'),
     mode: z.enum(['plain', 'browser', 'auto']).default('auto').describe('Fetching strategy'),
     max_chars: z.number().optional().describe('Maximum character length'),
+    cache: z.boolean().default(true).describe('Reuse a recently fetched body; false forces a live read'),
   },
-  async ({ url, mode, max_chars }) => {
+  async ({ url, mode, max_chars, cache }) => {
     try {
-      const res = await executeFetch(url, { mode, maxChars: max_chars });
+      const res = await executeFetch(url, { mode, maxChars: max_chars, cache });
       return text(res);
     } catch (err) {
       return { isError: true, content: [{ type: 'text', text: err instanceof Error ? err.message : String(err) }] };
@@ -803,7 +804,7 @@ server.tool('monitor', 'Watch a page for changes by content fingerprint. action:
   return checkMonitor(a.id);
 }));
 
-server.tool('research_resume', 'Resume an interrupted or failed deep research job from its first unfinished Feynman stage. Use the job_id from deep_research_start.', {
+server.tool('research_resume', 'Resume an interrupted or failed deep research job. Checkpointed deepresearch jobs continue from their first unfinished Feynman stage; named workflows (lit, compare, audit...) have no checkpoint and restart from the beginning — the response says which via resumed_mode. Use the job_id from deep_research_start.', {
   job_id: z.string(),
 }, safe(async (a: { job_id: string }) => resumeDeepResearchJob(a.job_id)));
 

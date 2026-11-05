@@ -31,12 +31,15 @@ test('a finished or unknown stage map yields no resume point', () => {
   assert.equal(resumeStepOf(null), undefined);
 });
 
-test('only interrupted or failed jobs with a run id are resumable', () => {
+test('interrupted or failed jobs are resumable, with or without a run id', () => {
   const base = { jobId: 'fey_1_abcde', workflow: 'deepresearch', topic: 't', startedAt: 'now' } as ResearchJob;
   assert.equal(canResume({ ...base, status: 'interrupted', feynmanRunId: 'run-1' }), true);
   assert.equal(canResume({ ...base, status: 'failed', feynmanRunId: 'run-1' }), true);
   assert.equal(canResume({ ...base, status: 'completed', feynmanRunId: 'run-1' }), false);
-  assert.equal(canResume({ ...base, status: 'interrupted' }), false);
+  // Without a manifest a named workflow restarts instead of continuing, but it is still resumable:
+  // refusing outright left lit/compare/audit jobs unrecoverable after a restart.
+  assert.equal(canResume({ ...base, status: 'interrupted' }), true);
+  assert.equal(canResume({ ...base, status: 'cancelled', feynmanRunId: 'run-1' }), false);
   assert.equal(canResume(undefined), false);
 });
 

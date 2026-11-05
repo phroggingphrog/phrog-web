@@ -31,6 +31,7 @@ import { runAgent } from './providers/agent.js';
 import { CAPABILITIES } from './capabilities.js';
 import { buildOpenApi, renderDocsHtml } from './openapi.js';
 import { readRunLog, summarizeRuns } from './usage.js';
+import { cacheStats, cacheClear } from './cache.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
@@ -161,6 +162,7 @@ fastify.post('/api/fetch', async (req, reply) => {
     mode?: 'plain' | 'browser' | 'auto';
     provider?: string;
     max_chars?: number;
+    cache?: boolean;
   };
 
   const targetUrl = body.url || (Array.isArray(body.urls) ? body.urls[0] : undefined);
@@ -172,6 +174,7 @@ fastify.post('/api/fetch', async (req, reply) => {
     mode: body.mode,
     provider: body.provider,
     maxChars: body.max_chars,
+    cache: body.cache,
   };
 
   try {
@@ -210,10 +213,16 @@ fastify.post('/api/research', async (req, reply) => {
       return reply.status(502).send({ error: err instanceof Error ? err.message : String(err) });
     }
   } else {
-    const job = dispatchDeepResearch(prompt, {
-      workflow: body.workflow,
-      callbackUrl: body.callback_url,
-    });
+    let job;
+    try {
+      job = dispatchDeepResearch(prompt, {
+        workflow: body.workflow,
+        callbackUrl: body.callback_url,
+      });
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      return reply.status(message.startsWith('Unknown workflow') ? 400 : 502).send({ error: message });
+    }
     return reply.status(202).send({
       message: 'Deep research task dispatched to autonomous Feynman agent',
       job,
@@ -249,7 +258,15 @@ fastify.post('/api/research/:jobId/resume', async (req, reply) => {
   const { jobId } = req.params as { jobId: string };
   try {
     const job = await resumeDeepResearchJob(jobId);
-    return reply.status(202).send({ message: 'Deep research resumed from its first unfinished stage', job });
+    // A named workflow has no Feynman manifest, so it restarts: the message must not claim a checkpoint.
+    const restarted = job.resumed_mode === 'restart';
+    return reply.status(202).send({
+      message: restarted
+        ? `Workflow "${job.workflow}" has no checkpoint, so it restarts from the beginning`
+        : 'Deep research resumed from its first unfinished stage',
+      resumed_mode: job.resumed_mode,
+      job,
+    });
   } catch (err) {
     const code = (err as { code?: string }).code;
     if (code === 'NOT_FOUND') return reply.status(404).send({ error: (err as Error).message });
@@ -592,6 +609,10 @@ fastify.get('/api/usage', async (req) => {
   return summarizeRuns(readRunLog(), { days: Number.isFinite(parsed) ? parsed : 7 });
 });
 fastify.get('/docs', async (_req, reply) => reply.type('text/html; charset=utf-8').send(renderDocsHtml()));
+
+// --- Page cache: what repeat reads cost, and how to clear it ---------------------------------
+fastify.get('/api/cache', async () => cacheStats());
+fastify.delete('/api/cache', async () => ({ cleared: cacheClear() }));
 
 // --- Login state: per-site cookie jars exported from the persistent Chromium profile ---------
 // crawl4ai's API refuses storage_state/user_data_dir/use_persistent_context per request, so a

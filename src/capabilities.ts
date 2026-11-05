@@ -12,9 +12,10 @@ export interface Capability {
 
 export const CAPABILITIES: Capability[] = [
     { capability: 'search', path: '/api/search', method: 'GET', params: ['q', 'limit', 'mode=quick|deep', 'categories'], backed_by: ['tinyfish', 'exa', 'searxng (fallback)', 'firecrawl (deep)'], cost: 'tinyfish free tier first' },
-    { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
+    { capability: 'scrape', path: '/api/fetch', method: 'POST', params: ['url', 'urls', 'mode=plain|browser|auto', 'cache'], backed_by: ['plain', 'crawl4ai', 'jina', 'tinyfish'], cost: 'free unless it escalates' },
     { capability: 'interact', path: '/api/browse', method: 'POST', params: ['url', 'goal'], backed_by: ['jev runner'], cost: 'local' },
     { capability: 'scrape_formats', path: '/api/scrape', method: 'POST', params: ['url', 'formats[]: ' + SCRAPE_FORMATS.join('|'), 'jsonSchema', 'fullPage', 'screenshotInline'], backed_by: ['plain + crawl4ai + CDP render'], cost: 'free' },
+    { capability: 'cache', path: '/api/cache', method: 'GET|DELETE', params: ['ttl_s', 'max_entries'], backed_by: ['process memory (TTL + LRU)'], cost: 'free' },
     { capability: 'profiles', path: '/api/profiles', method: 'GET|POST|DELETE', params: ['site'], backed_by: ['per-site cookie jars', 'Chromium persistent profile'], cost: 'free' },
     { capability: 'fetch_with_login', path: '/api/fetch-profile', method: 'POST', params: ['url', 'profile', 'waitMs'], backed_by: ['CDP + jar'], cost: 'free' },
     { capability: 'parse', path: '/api/parse', method: 'POST', params: ['url | base64+filename', 'maxChars'], backed_by: ['pdftotext', 'markitdown'], cost: 'free' },

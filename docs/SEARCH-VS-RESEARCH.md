@@ -109,7 +109,10 @@ A `mode:"deep"` job is bound to a Feynman manifest from the moment it starts:
 3. If the engine refuses to create a manifest, dispatch falls back to the old bare
    `feynman <workflow> <topic>` spawn — deep research is never blocked by bookkeeping.
 4. Named workflows (`lit`, `compare`, `audit`, ...) still spawn directly; only `deepresearch` has a
-   manifest, so only it can be resumed.
+   manifest, so only it has a checkpoint.
+3. Named workflows (`lit`, `compare`, `audit`, `review`, `summarize`) have no manifest. They are still
+   resumable, but honestly: the job restarts from the beginning and the response says `resumed_mode:
+   "restart"` rather than pretending to continue.
 
 `GET /api/research/:jobId` now reports Feynman's own state (`runStatus`, `resumeFrom`) instead of our
 guess, and marks a `running` record whose pid is gone as `interrupted` even when the service did not
@@ -117,7 +120,8 @@ restart.
 
 | need | call |
 |---|---|
-| continue an interrupted or failed run | `POST /api/research/:jobId/resume` → 202 |
+| continue an interrupted or failed run | `POST /api/research/:jobId/resume` → 202 (`resumed_mode: checkpoint`) |
+| restart a named workflow that has no checkpoint | the same call answers `resumed_mode: restart`, and the message says it starts over |
 | stop a run | `POST /api/research/:jobId/cancel` → 202 |
 | wrong job id | 404 |
 | resuming something finished, cancelling twice | 409 |

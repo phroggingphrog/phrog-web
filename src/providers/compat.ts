@@ -59,6 +59,7 @@ function statusView(job: ResearchJob, includeResult: boolean) {
     run_status: job.runStatus,
     resume_from: job.resumeFrom,
     resumable: job.resumable ?? false,
+    resumed_mode: job.resumed_mode,
   };
   if (job.status === 'queued' || job.status === 'running') {
     // Feynman runs take 5-60+ min and only one runs at a time; do not poll in a tight loop.

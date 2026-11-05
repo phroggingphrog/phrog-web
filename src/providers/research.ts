@@ -30,6 +30,12 @@ export interface QuickResearchOptions {
   instructions?: string;
 }
 
+/**
+ * The workflows Feynman actually implements. Anything else is refused at dispatch: an unknown name used
+ * to be spawned anyway, and the CLI exited 0 having done nothing, so the job reported success.
+ */
+export const RESEARCH_WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'help'] as const;
+
 export interface ResearchJob {
   jobId: string;
   workflow: string;
@@ -52,6 +58,8 @@ export interface ResearchJob {
   resumeFrom?: string;
   resumable?: boolean;
   resumedAt?: string;
+  /** 'checkpoint' continues Feynman's manifest; 'restart' re-runs a named workflow from the start. */
+  resumed_mode?: 'checkpoint' | 'restart';
 }
 
 // In-memory registry, backed by one JSON file per job so /api/research/:jobId survives a restart.
@@ -368,6 +376,9 @@ export function dispatchDeepResearch(
 ): ResearchJob {
   const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const workflow = options.workflow || 'deepresearch';
+  if (!(RESEARCH_WORKFLOWS as readonly string[]).includes(workflow)) {
+    throw new Error(`Unknown workflow "${workflow}"; expected one of: ${RESEARCH_WORKFLOWS.join(', ')}`);
+  }
 
   const job: ResearchJob = {
     jobId,
@@ -401,10 +412,19 @@ export function dispatchDeepResearch(
   return job;
 }
 
-/** Can this job be picked up again where Feynman left it? */
+/**
+ * A deepresearch job resumes from its manifest. Named workflows (lit, compare, audit...) have no
+ * manifest — Feynman's durable run store only describes deepresearch — so they restart instead. Saying
+ * "cannot be resumed" for those was true but useless: the honest answer is "it will start over".
+ */
 export function canResume(job: ResearchJob | undefined): boolean {
-  if (!job || !job.feynmanRunId) return false;
-  return job.status === 'interrupted' || job.status === 'failed';
+  if (!job) return false;
+  if (job.status !== 'interrupted' && job.status !== 'failed') return false;
+  return true;
+}
+
+export function resumeMode(job: ResearchJob): 'checkpoint' | 'restart' {
+  return job.feynmanRunId ? 'checkpoint' : 'restart';
 }
 
 /** Re-enter Feynman's durable run from its first unfinished stage. */
@@ -416,17 +436,22 @@ export async function resumeDeepResearchJob(jobId: string): Promise<ResearchJob>
     throw err;
   }
   if (!canResume(job)) {
-    throw new Error(
-      job.feynmanRunId
-        ? `Job "${jobId}" is ${job.status} and cannot be resumed; only interrupted or failed runs can`
-        : `Job "${jobId}" has no Feynman run id, so there is no checkpoint to resume from`
-    );
+    throw new Error(`Job "${jobId}" is ${job.status} and cannot be resumed; only interrupted or failed runs can`);
   }
 
   job.resumedAt = new Date().toISOString();
   job.resumable = true;
+  job.resumed_mode = resumeMode(job);
+  delete job.error;
+  delete job.finishedAt;
+  delete job.exitCode;
   jobs.set(jobId, job);
-  enqueue(job, async () => ['research', 'run', 'resume', job.feynmanRunId!]);
+  if (job.feynmanRunId) {
+    enqueue(job, async () => ['research', 'run', 'resume', job.feynmanRunId!]);
+  } else {
+    // No manifest: re-run the same workflow from the start, and say so.
+    enqueue(job, async () => [job.workflow, job.topic]);
+  }
   return job;
 }
 
