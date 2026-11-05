@@ -14,7 +14,7 @@ const paths = (): Record<ImportSource, string> => ({
   social: join(dir, 'social.sqlite'), music: join(dir, 'music.sqlite'), activity: join(dir, 'activity.sqlite'), media: join(dir, 'media.sqlite'),
 });
 const opts = {
-  accountMap: new Map([['instagram:ig-account1', 'alice'], ['instagram:ig-account2', 'phroggingphrog']]),
+  accountMap: new Map([['instagram:ig-account1', 'alice'], ['instagram:ig-account2', 'bob']]),
   learnActions: new Set(['like', 'save', 'comment', 'share', 'play']),
 };
 const all = [...SOURCES];
@@ -218,7 +218,7 @@ test('account map is applied; unmapped labels keep their label', async () => {
   await run(['social', 'music']);
   const handles = q("SELECT provider, handle, label FROM source_accounts ORDER BY provider, handle").map((r) => `${r.provider}:${r.handle}`);
   assert.ok(handles.includes('instagram:alice'));
-  assert.ok(handles.includes('instagram:phroggingphrog'));
+  assert.ok(handles.includes('instagram:bob'));
   assert.ok(!handles.some((h) => h.includes('ig-account')));
   assert.ok(handles.includes('spotify:spotify-old'));
 });

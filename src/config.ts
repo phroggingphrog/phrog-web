@@ -131,7 +131,7 @@ export function rssConfig(): { rsshubUrl: string | null; timeoutMs: number } {
 export function importConfig(): { paths: Record<'social' | 'music' | 'activity' | 'media', string | null>; accountMap: Map<string, string>; learnActions: Set<string> } {
   const e = process.env;
   const map = new Map<string, string>();
-  // "instagram:ig-account1=alice,instagram:ig-account2=phroggingphrog"
+  // "instagram:ig-account1=alice,instagram:ig-account2=bob"
   for (const part of (e.PHROG_IMPORT_ACCOUNT_MAP || '').split(',')) {
     const i = part.indexOf('=');
     if (i > 0) map.set(part.slice(0, i).trim(), part.slice(i + 1).trim());
