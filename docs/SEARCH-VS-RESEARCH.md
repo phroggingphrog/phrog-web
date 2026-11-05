@@ -98,9 +98,43 @@ Verified: a job dispatched and completed before `systemctl --user restart phrog-
 afterwards with its 10,072-character deliverable and `exitCode: 0`; an orphaned `running` record becomes
 `interrupted` on the next boot; a genuinely completed record is left alone.
 
-Feynman itself already has durable runs (`feynman research run` — create/observe/checkpoint/resume).
-Wiring the deep branch onto those subcommands instead of a bare spawn is the remaining step, and is what
-would make a deep job actually resumable rather than merely recorded.
+## Deep jobs are now genuinely resumable
+
+A `mode:"deep"` job is bound to a Feynman manifest from the moment it starts:
+
+1. `feynman research run init "<topic>" --profile full --tier pending --json` creates the durable
+   manifest, and its id becomes `feynmanRunId` on the job.
+2. Execution then runs `feynman research run resume <feynmanRunId>`, so the agent's checkpoints land in
+   that manifest rather than in an anonymous subprocess.
+3. If the engine refuses to create a manifest, dispatch falls back to the old bare
+   `feynman <workflow> <topic>` spawn — deep research is never blocked by bookkeeping.
+4. Named workflows (`lit`, `compare`, `audit`, ...) still spawn directly; only `deepresearch` has a
+   manifest, so only it can be resumed.
+
+`GET /api/research/:jobId` now reports Feynman's own state (`runStatus`, `resumeFrom`) instead of our
+guess, and marks a `running` record whose pid is gone as `interrupted` even when the service did not
+restart.
+
+| need | call |
+|---|---|
+| continue an interrupted or failed run | `POST /api/research/:jobId/resume` → 202 |
+| stop a run | `POST /api/research/:jobId/cancel` → 202 |
+| wrong job id | 404 |
+| resuming something finished, cancelling twice | 409 |
+
+Verified live: a job bound itself to `one-paragraph-note-on-podman-78687f` within 3 s; a restart turned
+it into `interrupted` with `resumable: true` and `resumeFrom: 1`; resume returned 202 with a new pid and
+the run continued; cancel reported *"3 processes stopped"*, left zero workers and `aborted` the manifest.
+
+### Two traps worth remembering
+
+**Killing the recorded pid does not stop the work.** `research run resume` starts a supervisor that
+spawns the real `deepresearch` worker, so the pid we track is the supervisor. Cancel therefore matches
+processes by the run id in their command line and kills the tree. I found this by killing the pid and
+watching the worker keep running and billing.
+
+**Steps are objects, not strings.** Manifests store `steps: {"1": {"status": "done", ...}}`. Code that
+treats a step as a bare status string still "works" while every unfinished step happens to be first.
 
 ## Is quick research worth delegating to Feynman? No.
 

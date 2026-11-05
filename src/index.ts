@@ -6,7 +6,7 @@ import { loadConfig } from './config.js';
 import { executeSearch, SearchOptions } from './providers/search.js';
 import { registerSearchRoute } from './providers/search-route.js';
 import { executeFetch, FetchOptions } from './providers/fetch.js';
-import { executeQuickResearch, dispatchDeepResearch, getResearchJob } from './providers/research.js';
+import { executeQuickResearch, dispatchDeepResearch, getResearchJob, resumeDeepResearchJob, enrichResearchJob, cancelDeepResearchJob } from './providers/research.js';
 import { searchGithubRepos, downloadGithubRepo, fetchGithubPatch } from './providers/github.js';
 import { askDeepWiki, getDeepWikiStructure, readDeepWikiContents } from './providers/deepwiki.js';
 import { searchMedia, MediaType } from './providers/media.js';
@@ -228,7 +228,34 @@ fastify.get('/api/research/:jobId', async (req, reply) => {
   if (!job) {
     return reply.status(404).send({ error: `Research job "${jobId}" not found` });
   }
-  return job;
+  // Report Feynman's own run state when we have a run id, so progress is not our guess.
+  return enrichResearchJob(job);
+});
+
+// Stop a run and record who stopped it; killing the recorded pid alone leaves the worker alive.
+fastify.post('/api/research/:jobId/cancel', async (req, reply) => {
+  const { jobId } = req.params as { jobId: string };
+  try {
+    const job = await cancelDeepResearchJob(jobId);
+    return reply.status(202).send({ message: 'Deep research cancelled', job });
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+    if (code === 'NOT_FOUND') return reply.status(404).send({ error: (err as Error).message });
+    return reply.status(409).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// Resume a run from Feynman's durable checkpoint (first unfinished stage), after a restart or failure.
+fastify.post('/api/research/:jobId/resume', async (req, reply) => {
+  const { jobId } = req.params as { jobId: string };
+  try {
+    const job = await resumeDeepResearchJob(jobId);
+    return reply.status(202).send({ message: 'Deep research resumed from its first unfinished stage', job });
+  } catch (err) {
+    const code = (err as { code?: string }).code;
+    if (code === 'NOT_FOUND') return reply.status(404).send({ error: (err as Error).message });
+    return reply.status(409).send({ error: err instanceof Error ? err.message : String(err) });
+  }
 });
 
 fastify.get('/api/github/search', async (req, reply) => {

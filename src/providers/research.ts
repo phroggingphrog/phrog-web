@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, renameSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -36,7 +36,7 @@ export interface ResearchJob {
   topic: string;
   domain?: string;
   pid?: number;
-  status: 'running' | 'completed' | 'failed' | 'interrupted';
+  status: 'running' | 'completed' | 'failed' | 'interrupted' | 'cancelled';
   startedAt: string;
   finishedAt?: string;
   exitCode?: number | null;
@@ -44,6 +44,14 @@ export interface ResearchJob {
   provenance?: string;
   error?: string;
   callbackUrl?: string;
+  /** Feynman's own durable run id (feynman research run init). Absent when bookkeeping failed. */
+  feynmanRunId?: string;
+  /** Live manifest status read back from Feynman, not from our record. */
+  runStatus?: string;
+  /** First unfinished stage, as Feynman reports it. */
+  resumeFrom?: string;
+  resumable?: boolean;
+  resumedAt?: string;
 }
 
 // In-memory registry, backed by one JSON file per job so /api/research/:jobId survives a restart.
@@ -74,6 +82,76 @@ function readJobFile(jobId: string): ResearchJob | undefined {
   } catch {
     return undefined;
   }
+}
+
+/** The engine prints an ASCII banner before JSON and may trail text after it. */
+export function parseFeynmanJson(output: string): any {
+  const start = output.indexOf('{');
+  if (start < 0) throw new Error('no JSON object in Feynman output');
+  let depth = 0, inString = false, escaped = false;
+  for (let i = start; i < output.length; i++) {
+    const ch = output[i];
+    if (inString) {
+      if (escaped) escaped = false;
+      else if (ch === '\\') escaped = true;
+      else if (ch === '"') inString = false;
+      continue;
+    }
+    if (ch === '"') inString = true;
+    else if (ch === '{') depth++;
+    else if (ch === '}') {
+      depth--;
+      if (depth === 0) return JSON.parse(output.slice(start, i + 1));
+    }
+  }
+  throw new Error('unterminated JSON object in Feynman output');
+}
+
+/** One engine invocation, stdout+stderr collected, killed if it overruns. */
+function runFeynman(args: string[], timeoutMs = 60000): Promise<{ stdout: string; stderr: string; code: number | null }> {
+  const rt = feynmanRuntime();
+  return new Promise((resolvePromise) => {
+    const child = spawn(rt.node, [rt.engine, ...args], { cwd: rt.root, env: rt.env, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '', stderr = '';
+    child.stdout?.on('data', (d) => { stdout += d.toString(); });
+    child.stderr?.on('data', (d) => { stderr += d.toString(); });
+    const timer = setTimeout(() => child.kill('SIGKILL'), timeoutMs);
+    child.on('close', (code) => { clearTimeout(timer); resolvePromise({ stdout, stderr, code }); });
+    child.on('error', (err) => { clearTimeout(timer); resolvePromise({ stdout, stderr: stderr + String(err), code: null }); });
+  });
+}
+
+/** Create the durable manifest in Feynman's own store. Returns undefined if the engine refuses. */
+async function initFeynmanRun(topic: string): Promise<string | undefined> {
+  try {
+    const out = await runFeynman(['research', 'run', 'init', topic, '--profile', 'full', '--tier', 'pending', '--json'], 90000);
+    const manifest = parseFeynmanJson(out.stdout);
+    return typeof manifest?.id === 'string' ? manifest.id : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Read the authoritative run state back from Feynman rather than trusting our own record. */
+export async function feynmanRunStatus(runId: string): Promise<{ runStatus?: string; resumeFrom?: string; steps?: unknown }> {
+  const out = await runFeynman(['research', 'run', 'status', runId, '--json'], 30000);
+  if (out.code !== 0) throw new Error(`feynman research run status exited ${out.code}: ${out.stderr.trim().slice(0, 200)}`);
+  const manifest = parseFeynmanJson(out.stdout);
+  return { runStatus: manifest?.status, steps: manifest?.steps, resumeFrom: resumeStepOf(manifest) };
+}
+
+/** Feynman stores steps as {id: status}; the first one not done is where a resume starts. */
+export function resumeStepOf(manifest: any): string | undefined {
+  const steps = manifest?.steps;
+  if (!steps || typeof steps !== 'object') return undefined;
+  const order: string[] = Array.isArray(manifest.stepOrder) ? manifest.stepOrder : Object.keys(steps);
+  for (const id of order) {
+    const step = steps[id];
+    // Feynman writes {status, startedAt, message} per step; older manifests wrote a bare string.
+    const status = typeof step === 'string' ? step : step?.status;
+    if (status !== 'done' && status !== 'completed' && status !== 'skipped') return id;
+  }
+  return undefined;
 }
 
 function alive(pid?: number): boolean {
@@ -174,33 +252,13 @@ export async function executeQuickResearch(
   return { mode: 'quick', domain: options.domain || 'web', question, answer, citations, provider_used: 'phrog-web-search' };
 }
 
-export function dispatchDeepResearch(
-  topic: string,
-  options: { workflow?: string; domain?: string; callbackUrl?: string } = {}
-): ResearchJob {
-  const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-  const workflow = options.workflow || 'deepresearch';
+/** Spawn the engine for a job and keep the record in step with the process. */
+function startFeynman(job: ResearchJob, args: string[]): void {
   const runtime = feynmanRuntime();
-  const feynmanBin = runtime.engine;
-
-  const job: ResearchJob = {
-    jobId,
-    workflow,
-    topic,
-    domain: options.domain,
-    status: 'running',
-    startedAt: new Date().toISOString(),
-    callbackUrl: options.callbackUrl,
-  };
-
-  jobs.set(jobId, job);
-  persistJob(job);
-
-  const outputsDir = resolve(runtime.root, 'outputs');
-  mkdirSync(outputsDir, { recursive: true });
+  mkdirSync(resolve(runtime.root, 'outputs'), { recursive: true });
 
   try {
-    const child = spawn(runtime.node, [feynmanBin, workflow, topic], {
+    const child = spawn(runtime.node, [runtime.engine, ...args], {
       cwd: runtime.root,
       env: { ...runtime.env, CI: 'true', NONINTERACTIVE: 'true' },
       detached: false,
@@ -208,6 +266,10 @@ export function dispatchDeepResearch(
     });
 
     job.pid = child.pid;
+    job.status = 'running';
+    delete job.error;
+    delete job.finishedAt;
+    delete job.exitCode;
     persistJob(job);
 
     let stdout = '';
@@ -225,9 +287,11 @@ export function dispatchDeepResearch(
       if (exitCode === 0 && !spawnError) {
         job.status = 'completed';
         job.deliverable = stdout;
+        job.resumable = false;
       } else {
         job.status = 'failed';
         job.error = spawnError?.message || stderr || `Process exited with code ${exitCode}`;
+        job.resumable = Boolean(job.feynmanRunId);
       }
 
       persistJob(job);
@@ -239,25 +303,162 @@ export function dispatchDeepResearch(
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               event: 'research_completed',
-              jobId,
+              jobId: job.jobId,
               status: job.status,
               deliverable: job.deliverable,
               error: job.error,
+              feynman_run_id: job.feynmanRunId,
             }),
           });
         } catch (cbErr) {
-          console.error(`Failed to deliver webhook for job ${jobId}:`, cbErr);
+          console.error(`Failed to deliver webhook for job ${job.jobId}:`, cbErr);
         }
       }
     });
-
   } catch (err) {
     job.status = 'failed';
     job.error = err instanceof Error ? err.message : String(err);
     job.finishedAt = new Date().toISOString();
     persistJob(job);
   }
+}
 
+export function dispatchDeepResearch(
+  topic: string,
+  options: { workflow?: string; domain?: string; callbackUrl?: string } = {}
+): ResearchJob {
+  const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+  const workflow = options.workflow || 'deepresearch';
+
+  const job: ResearchJob = {
+    jobId,
+    workflow,
+    topic,
+    domain: options.domain,
+    status: 'running',
+    startedAt: new Date().toISOString(),
+    callbackUrl: options.callbackUrl,
+  };
+
+  jobs.set(jobId, job);
+  persistJob(job);
+
+  // The durable manifest is created first so the run id exists from the start: that is what makes
+  // `POST /api/research/:jobId/resume` possible after a restart. Only the default workflow has a
+  // manifest; named workflows (lit, compare, audit...) are spawned directly as before.
+  void (async () => {
+    if (workflow === 'deepresearch') {
+      const runId = await initFeynmanRun(topic);
+      if (runId) {
+        job.feynmanRunId = runId;
+        job.resumable = true;
+        persistJob(job);
+        startFeynman(job, ['research', 'run', 'resume', runId]);
+        return;
+      }
+    }
+    startFeynman(job, [workflow, topic]);
+  })();
+
+  return job;
+}
+
+/** Can this job be picked up again where Feynman left it? */
+export function canResume(job: ResearchJob | undefined): boolean {
+  if (!job || !job.feynmanRunId) return false;
+  return job.status === 'interrupted' || job.status === 'failed';
+}
+
+/** Re-enter Feynman's durable run from its first unfinished stage. */
+export async function resumeDeepResearchJob(jobId: string): Promise<ResearchJob> {
+  const job = getResearchJob(jobId);
+  if (!job) {
+    const err = new Error(`Research job "${jobId}" not found`) as Error & { code?: string };
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  if (!canResume(job)) {
+    throw new Error(
+      job.feynmanRunId
+        ? `Job "${jobId}" is ${job.status} and cannot be resumed; only interrupted or failed runs can`
+        : `Job "${jobId}" has no Feynman run id, so there is no checkpoint to resume from`
+    );
+  }
+
+  job.resumedAt = new Date().toISOString();
+  job.resumable = true;
+  jobs.set(jobId, job);
+  startFeynman(job, ['research', 'run', 'resume', job.feynmanRunId!]);
+  return job;
+}
+
+/** A 'running' record whose process is gone is lying, whether or not the service restarted. */
+export function isOrphaned(job: ResearchJob | undefined): boolean {
+  return Boolean(job && job.status === 'running' && !alive(job.pid));
+}
+
+/**
+ * Stop a run. Killing the recorded pid is not enough: `research run resume` starts a supervisor that
+ * spawns the actual deepresearch worker, so the tree is matched by the run id in its command line.
+ */
+export async function cancelDeepResearchJob(jobId: string): Promise<ResearchJob> {
+  const job = getResearchJob(jobId);
+  if (!job) {
+    const err = new Error(`Research job "${jobId}" not found`) as Error & { code?: string };
+    err.code = 'NOT_FOUND';
+    throw err;
+  }
+  if (job.status === 'completed' || job.status === 'cancelled') {
+    throw new Error(`Job "${jobId}" is already ${job.status}`);
+  }
+
+  const markers = [job.feynmanRunId, job.jobId].filter(Boolean) as string[];
+  let killed = 0;
+  const listing = spawnSync('pgrep', ['-af', 'feynman'], { encoding: 'utf8', timeout: 5000 });
+  for (const line of (listing.stdout || '').split('\n')) {
+    if (!line.trim()) continue;
+    if (markers.some(marker => line.includes(marker))) {
+      const pid = Number(line.trim().split(/\s+/)[0]);
+      if (Number.isFinite(pid) && pid !== process.pid) {
+        try { process.kill(pid, 'SIGKILL'); killed++; } catch { /* already gone */ }
+      }
+    }
+  }
+  if (alive(job.pid)) { try { process.kill(job.pid!, 'SIGKILL'); killed++; } catch { /* gone */ } }
+
+  if (job.feynmanRunId) {
+    await runFeynman(['research', 'run', 'set-status', job.feynmanRunId, '--status', 'aborted', '--json'], 30000).catch(() => undefined);
+    job.runStatus = 'aborted';
+  }
+  job.status = 'cancelled';
+  job.finishedAt = new Date().toISOString();
+  job.resumable = false;
+  job.error = `Cancelled on request (${killed} process${killed === 1 ? '' : 'es'} stopped)`;
+  persistJob(job);
+  return job;
+}
+
+/** Report the run's real state from Feynman instead of trusting our own record. */
+export async function enrichResearchJob(job: ResearchJob): Promise<ResearchJob> {
+  if (isOrphaned(job)) {
+    job.status = 'interrupted';
+    job.finishedAt = job.finishedAt || new Date().toISOString();
+    job.error = job.error || 'No process is running this job any more. It was interrupted; resume it to continue from its first unfinished stage.';
+    job.resumable = Boolean(job.feynmanRunId);
+    persistJob(job);
+  }
+  if (!job.feynmanRunId) return job;
+  try {
+    const live = await feynmanRunStatus(job.feynmanRunId);
+    if (live.runStatus && live.runStatus !== job.runStatus) {
+      job.runStatus = live.runStatus;
+      persistJob(job);
+    }
+    job.resumeFrom = live.resumeFrom;
+    job.resumable = canResume(job) && !['done', 'aborted'].includes(live.runStatus || '');
+  } catch {
+    // A status probe is best-effort: never fail a job lookup because Feynman would not answer.
+  }
   return job;
 }
 
