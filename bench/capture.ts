@@ -30,7 +30,9 @@ for (const entry of queries) {
       positions: r.positions || [],
       publishedDate: r.publishedDate ?? null,
     }));
-    writeFileSync(out, JSON.stringify({ corpus: corpusName, query: entry.q, expect: entry.expect, rows }, null, 1));
+    const contributing = [...new Set(rows.flatMap((r: any) => r.engines || []))].sort();
+    const unresponsive = (data.unresponsive_engines || []).map((u: any) => (Array.isArray(u) ? u[0] : u));
+    writeFileSync(out, JSON.stringify({ corpus: corpusName, query: entry.q, expect: entry.expect, engines_contributing: contributing, engines_unresponsive: unresponsive, rows }, null, 1));
     console.log('captured ' + slug + ' (' + rows.length + ' rows)');
   } catch (err: any) {
     console.error('FAILED ' + slug + ': ' + err.message);

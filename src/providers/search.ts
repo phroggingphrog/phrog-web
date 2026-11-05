@@ -1,5 +1,7 @@
 import { loadConfig } from '../config.js';
 import { canonicalKey, fuseEngineRanks, type EngineRankedRow } from './rank.js';
+import { shapeQuery } from './query-shape.js';
+import { refineEnabled, refineQuery } from './query-llm.js';
 
 export interface SearchResult {
   title: string;
@@ -252,6 +254,59 @@ function rerankEngineLevel(results: SearchResult[], query: string): SearchResult
     .filter((r): r is SearchResult => Boolean(r));
 }
 
+/**
+ * Multi-query search: run the raw query and its shaped variants in parallel, then fuse the
+ * lists with engine-level RRF. This is the case RRF was built for — several ranked lists of
+ * the same intent, where agreement between variants is evidence.
+ *
+ * Rows are tagged with synthetic engines `q0..qn` so fuseEngineRanks treats each variant as
+ * its own voter; q0 keeps a weight premium because it is what the caller actually asked for.
+ */
+async function searchSearxngShaped(query: string, options: SearchOptions): Promise<{ results: SearchResult[]; envelope?: Record<string, unknown> }> {
+  const shaped = shapeQuery(query);
+  const variants = [query, ...(shaped.shaped ? shaped.variants.slice(0, 2) : [])];
+  if (refineEnabled()) {
+    const refined = await refineQuery(query);
+    if (refined.query && !variants.includes(refined.query)) variants.push(refined.query);
+  }
+  if (variants.length < 2) return searchSearxng(query, options);
+
+  const lists = await Promise.all(variants.map(async (v, i) => {
+    try {
+      const r = await searchSearxng(v, { ...options, limit: Math.max(options.limit || 15, 20) });
+      return { i, results: r.results, envelope: r.envelope };
+    } catch {
+      return { i, results: [] as SearchResult[], envelope: undefined as Record<string, unknown> | undefined };
+    }
+  }));
+
+  const weights: Record<string, number> = { q0: 1.5 };
+  const rows: EngineRankedRow[] = [];
+  const byKey = new Map<string, SearchResult>();
+  for (const { i, results } of lists) {
+    results.forEach((r, idx) => {
+      const key = canonicalKey(r.url);
+      if (!byKey.has(key)) byKey.set(key, r);
+      rows.push({
+        url: r.url,
+        engines: [`q${i}`],
+        positions: [idx + 1],
+        publishedDate: typeof (r.raw as Record<string, unknown> | undefined)?.publishedDate === 'string'
+          ? ((r.raw as Record<string, unknown>).publishedDate as string) : null,
+      });
+    });
+  }
+  if (!rows.length) return { results: [], envelope: lists[0]?.envelope };
+
+  const fused: SearchResult[] = [];
+  for (const f of fuseEngineRanks(rows, {}, { ...weights }, query)) {
+    const hit = byKey.get(canonicalKey(f.url));
+    if (hit) fused.push({ ...hit, engine: f.engines.join(',') || hit.engine, score: f.score });
+  }
+
+  return { results: fused, envelope: lists[0]?.envelope };
+}
+
 export async function executeSearch(query: string, options: SearchOptions = {}): Promise<SearchResponse> {
   const config = loadConfig();
 
@@ -284,7 +339,12 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
       let results: SearchResult[] = [];
       let envelope: Record<string, unknown> | undefined;
       if (engine === 'searxng') {
-        ({ results, envelope } = await searchSearxng(query, { ...options, limit: Math.max(limit, 30) }));
+        // Default OFF: measured neutral on the history corpus (+2.5% recall, -0.3% MRR, both CIs
+        // spanning zero) while costing two extra SearXNG calls. Enable with PHROG_WEB_QUERY_SHAPING=1.
+        const shaping = process.env.PHROG_WEB_QUERY_SHAPING === '1';
+        ({ results, envelope } = shaping
+          ? await searchSearxngShaped(query, { ...options, limit: Math.max(limit, 30) })
+          : await searchSearxng(query, { ...options, limit: Math.max(limit, 30) }));
         results = results.map((item) => ({ ...item, engine: item.engine || engine }));
       }
       else if (engine === 'tinyfish') results = await searchTinyFish(query, { ...options, limit: Math.max(limit, 30) });
