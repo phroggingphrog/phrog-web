@@ -37,6 +37,8 @@ export interface SearchOptions {
 }
 
 export interface SearchResponse {
+  /** Present when engines were unresponsive or the candidate set is thin. */
+  degraded?: { unresponsive_engines: string[]; thin: boolean };
   /** Present only when the cross-encoder stage ran or was attempted. */
   rerank?: Record<string, unknown>;
   query: string;
@@ -387,7 +389,11 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
   // reorder what RRF found, so a miss here means the engines failed, not the reranker.
   let results = rankedAll.slice(0, limit);
   let rerankInfo: Record<string, unknown> | undefined;
-  if (rerankEnabled() && rankedAll.length > 1 && rankedAll.length <= rerankMaxCandidates()) {
+  // Rerank is a DEEP-RESEARCH stage only (owner decision 2026-11-05): quick/live search must
+  // stay single-second, and the cross-encoder's measured gain concentrates in multi-hop
+  // research where precision on the head of the list compounds into the final answer.
+  const deepRequest = options.mode === 'deep' || isAcademic || options.provider === 'feynman' || options.provider === 'vane';
+  if (rerankEnabled() && deepRequest && rankedAll.length > 1 && rankedAll.length <= rerankMaxCandidates()) {
     const head = rankedAll.slice(0, Math.max(limit, 20));
     const outcome = await rerank(query, head.map((r) => ({ title: r.title, snippet: r.snippet, url: r.url })));
     rerankInfo = { model: outcome.model, ms: outcome.ms, applied: outcome.order.length === head.length, ...(outcome.reason ? { reason: outcome.reason } : {}) };
@@ -396,7 +402,14 @@ export async function executeSearch(query: string, options: SearchOptions = {}):
     }
   }
 
-  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope: successful.find(({ envelope }) => envelope)?.envelope, ...(rerankInfo ? { rerank: rerankInfo } : {}) };
+  const envelope = successful.find(({ envelope }) => envelope)?.envelope as Record<string, unknown> | undefined;
+  const unresponsive = Array.isArray(envelope?.unresponsive_engines)
+    ? (envelope!.unresponsive_engines as unknown[]).map((u) => (Array.isArray(u) ? String(u[0]) : String(u)))
+    : [];
+  // A degraded search must SAY it is degraded: a thin result set caused by a rate-limited
+  // engine is not the same as "the web has nothing".
+  const degraded = unresponsive.length ? { unresponsive_engines: unresponsive, thin: rankedAll.length < 15 } : undefined;
+  const response: SearchResponse = { query, results, provider_used: successful.map(({ engine }) => engine).join(','), total: results.length, contributingEngines: successful.map(({ engine }) => engine), failures, envelope, ...(degraded ? { degraded } : {}), ...(rerankInfo ? { rerank: rerankInfo } : {}) };
   if (searchCache.size >= CACHE_MAX_ENTRIES) searchCache.delete(searchCache.keys().next().value!);
   searchCache.set(cacheKey, { expires: Date.now() + CACHE_TTL_MS, value: response });
   return response;

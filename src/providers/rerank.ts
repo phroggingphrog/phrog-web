@@ -50,8 +50,11 @@ export function rerankEnabled(): boolean {
  * mean this is overfitting — re-measure before trusting the number.
  */
 export function rerankMaxCandidates(): number {
-  const n = Number(process.env.PHROG_WEB_RERANK_MAX_CANDIDATES || 16);
-  return Number.isFinite(n) && n > 0 ? n : 16;
+  // Deep-research requests legitimately carry 20-40 candidates (SearXNG + TinyFish merged),
+  // so the cap is a payload guard, not a starvation heuristic: the gate that decides WHETHER
+  // to rerank is the request mode in search.ts.
+  const n = Number(process.env.PHROG_WEB_RERANK_MAX_CANDIDATES || 40);
+  return Number.isFinite(n) && n > 0 ? n : 40;
 }
 
 export async function rerank(query: string, docs: RerankDoc[], budgetMs = 1800): Promise<RerankOutcome> {
