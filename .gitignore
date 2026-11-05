@@ -40,3 +40,13 @@ data/
 # agent-isolated worktrees
 .claude/worktrees/
 /node_modules
+
+# local agent/tool scaffolding, never part of the service
+.claude/
+.opencode/
+.omp/
+.pi/
+.hermes/
+.dsh/
+.agents/
+config.json.bak-*
