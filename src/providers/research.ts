@@ -147,9 +147,9 @@ function runFeynman(args: string[], timeoutMs = 60000): Promise<{ stdout: string
 }
 
 /** Create the durable manifest in Feynman's own store. Returns undefined if the engine refuses. */
-async function initFeynmanRun(topic: string): Promise<string | undefined> {
+async function initFeynmanRun(topic: string, profile = 'full', tier = 'pending'): Promise<string | undefined> {
   try {
-    const out = await runFeynman(['research', 'run', 'init', topic, '--profile', 'full', '--tier', 'pending', '--json'], 90000);
+    const out = await runFeynman(['research', 'run', 'init', topic, '--profile', profile, '--tier', tier, '--json'], 90000);
     const manifest = parseFeynmanJson(out.stdout);
     return typeof manifest?.id === 'string' ? manifest.id : undefined;
   } catch {
@@ -420,7 +420,7 @@ function startFeynman(job: ResearchJob, args: string[]): void {
 
 export function dispatchDeepResearch(
   topic: string,
-  options: { workflow?: string; domain?: string; callbackUrl?: string } = {}
+  options: { workflow?: string; domain?: string; callbackUrl?: string; profile?: string; tier?: string } = {}
 ): ResearchJob {
   const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const workflow = options.workflow || 'deepresearch';
@@ -447,7 +447,7 @@ export function dispatchDeepResearch(
   // manifest; named workflows (lit, compare, audit...) are spawned directly.
   enqueue(job, async () => {
     if (workflow === 'deepresearch') {
-      const runId = await initFeynmanRun(topic);
+      const runId = await initFeynmanRun(topic, options.profile, options.tier);
       if (runId) {
         job.feynmanRunId = runId;
         job.resumable = true;

@@ -88,10 +88,21 @@ export function deepResearchStart(a: { topic: string; workflow?: string; profile
   if (a.inference_depth != null && !['surface', 'standard', 'deep'].includes(a.inference_depth)) throw new Error('inference_depth must be surface, standard, or deep');
   if (a.domain_notes != null && a.domain_notes.length > 2000) throw new Error('domain_notes must be at most 2000 characters');
 
-  const job = dispatchDeepResearch(a.topic.trim(), { workflow });
+  // Feynman's durable runner takes profile and tier at init, so those are forwarded. It has no flag for
+  // the rest: accepting them and running with defaults silently ignored the caller's spend ceiling, so
+  // they are refused instead.
+  const unsupported = Object.entries({
+    budget_usd: a.budget_usd, register: a.register,
+    inference_depth: a.inference_depth, domain_notes: a.domain_notes,
+  }).filter(([, v]) => v != null).map(([k]) => k);
+  if (unsupported.length) {
+    throw new Error(`deep_research_start does not support ${unsupported.join(', ')}: the durable Feynman runner takes only topic, workflow, profile and tier. Drop the option rather than have it silently ignored.`);
+  }
+
+  const job = dispatchDeepResearch(a.topic.trim(), { workflow, profile, tier });
   return {
     job_id: job.jobId,
-    status: 'running',
+    status: job.status,
     kind: 'deep',
     workflow: job.workflow,
     runs_in: 'the phrog-web service: survives a client disconnect, and resumable with research_resume after a restart',
