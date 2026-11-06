@@ -24,7 +24,7 @@ import { searchSecondhand, secondhandListing, searchAliexpress, aliexpressProduc
 import { searchSocial } from './providers/social.js';
 import { getTranscript } from './providers/transcript.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
-import { createMcpServer } from './adapters/mcp/server.js';
+import { createMcpServer, getMcpToolCatalogue } from './adapters/mcp/server.js';
 import { webCrawl, webMap, webBatchStart, webCrawlStatus, webCrawlStart } from './providers/crawl.js';
 import { extract } from './providers/extract.js';
 import { runAgent } from './providers/agent.js';
@@ -599,6 +599,7 @@ fastify.post('/api/extract', wrap(extract as any, ['urls', 'schema']));
 fastify.get('/api/cookbook', async () => ({
   service: 'phrog-web',
   capabilities: CAPABILITIES,
+  mcp_tools: getMcpToolCatalogue(),
 }));
 
 

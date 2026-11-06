@@ -3,6 +3,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { fileURLToPath } from 'node:url';
 import { realpathSync } from 'node:fs';
 import { z } from 'zod';
+import { buildToolCatalogue, CATALOGUE_URI, toolDocumentation } from '../../tool-domains.js';
 import { loadConfig } from '../../config.js';
 import { executeSearch } from '../../providers/search.js';
 import { executeFetch } from '../../providers/fetch.js';
@@ -115,13 +116,17 @@ export function buildFeedToolResult(feed: { items?: any[]; [k: string]: unknown 
 
 export interface McpContext { personalAuthorized?: boolean }
 
-export function createMcpServer(_ctx: McpContext = {}): McpServer {
+export function createMcpServer(_ctx: McpContext = {}) {
 loadConfig();
 const server = new McpServer({ name: 'phrog-web', version: '0.1.0' });
 // Log every tool call: wrap the handler (always the last argument) of each server.tool registration.
 const origTool = server.tool.bind(server) as (...a: any[]) => unknown;
+const registered: { name: string; description: string }[] = [];
 (server as any).tool = (...args: any[]) => {
   const name = args[0] as string;
+  // Retain provider details and caveats while adding domain, behavior and return contract.
+  args[1] = `${toolDocumentation(name)} ${args[1]}`;
+  registered.push({ name, description: args[1] });
   const last = args.length - 1;
   if (typeof args[last] === 'function') args[last] = logged(name, args[last]);
   return origTool(...args);
@@ -816,7 +821,20 @@ server.tool('usage', 'What this service can account for over a window: calls, er
   days: z.number().int().min(1).max(365).default(7),
 }, safe(async (a: { days?: number }) => summarizeRuns(readRunLog(), { days: a.days ?? 7 })));
 
-return server;
+const toolCatalogue = buildToolCatalogue(registered);
+server.registerResource('tool-domains', CATALOGUE_URI, {
+  title: 'Phrog Web tools by domain',
+  description: 'Complete MCP tool catalogue: domain purposes, selection guidance, tool behavior and return values. Also available at GET /api/cookbook under mcp_tools.',
+  mimeType: 'application/json',
+}, async () => ({ contents: [{ uri: CATALOGUE_URI, mimeType: 'application/json', text: JSON.stringify(toolCatalogue, null, 2) }] }));
+return Object.assign(server, { toolCatalogue });
+}
+
+export function getMcpToolCatalogue() {
+  const server = createMcpServer();
+  const catalogue = server.toolCatalogue;
+  void server.close();
+  return catalogue;
 }
 
 // Stdio entry: `node dist/adapters/mcp/server.js`
