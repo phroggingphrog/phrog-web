@@ -2,6 +2,7 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, statSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { dirname, join } from 'node:path';
+import { currentClient } from './context.js';
 
 const MAX_BYTES = 10 * 1024 * 1024;
 const KEEP = 3;
@@ -29,10 +30,12 @@ const rotate = (file: string) => {
 
 export function writeRun(rec: Record<string, unknown>): void {
   try {
+    // Who asked. Set per request by the auth hook; absent for boot-time work.
+    const client = rec.client ?? currentClient();
     const file = runLogPath();
     mkdirSync(dirname(file), { recursive: true });
     rotate(file);
-    appendFileSync(file, JSON.stringify({ ts: new Date().toISOString(), ...rec }) + '\n');
+    appendFileSync(file, JSON.stringify({ ts: new Date().toISOString(), ...rec, ...(client ? { client } : {}) }) + '\n');
   } catch { /* logging must never break a call */ }
 }
 

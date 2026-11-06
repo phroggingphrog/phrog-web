@@ -32,6 +32,8 @@ import { CAPABILITIES } from './capabilities.js';
 import { buildOpenApi, renderDocsHtml } from './openapi.js';
 import { readRunLog, summarizeRuns } from './usage.js';
 import { cacheStats, cacheClear } from './cache.js';
+import { authMode, createClient, listClients, resolveToken, revokeClient, tokenFromHeaders } from './clients.js';
+import { enterClient } from './context.js';
 import { researchVault } from './providers/vault.js';
 import { saveToWiki, searchWiki } from './wiki/vault.js';
 import { writeRun, recentRuns, summarize, resultInfo, shortError } from './runlog.js';
@@ -610,6 +612,23 @@ fastify.get('/api/usage', async (req) => {
 });
 fastify.get('/docs', async (_req, reply) => reply.type('text/html; charset=utf-8').send(renderDocsHtml()));
 
+// --- Client identity ---------------------------------------------------------------------------
+// Which callers exist, and which doors they must pass. Management is loopback REST only: a token holder
+// must not be able to mint more tokens, so this is deliberately NOT an MCP tool.
+fastify.get('/api/clients', async () => ({ mode: authMode(), clients: listClients() }));
+fastify.post('/api/clients', async (req, reply) => {
+  try {
+    // The token is in this response and nowhere else, ever.
+    return createClient((req.body as { name?: string })?.name ?? '');
+  } catch (err) {
+    return reply.status(400).send({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+fastify.delete('/api/clients/:name', async (req, reply) => {
+  const name = (req.params as { name: string }).name;
+  return revokeClient(name) ? { revoked: name } : reply.status(404).send({ error: `No such client "${name}"` });
+});
+
 // --- Page cache: what repeat reads cost, and how to clear it ---------------------------------
 fastify.get('/api/cache', async () => cacheStats());
 fastify.delete('/api/cache', async () => ({ cleared: cacheClear() }));
@@ -714,6 +733,40 @@ fastify.post('/api/browser', async (req, reply) => {
 
 fastify.post('/api/vault', wrap(researchVault as any, ['action']));
 
+// Doors that cost money or open a session require a client token. Free endpoints (search, fetch, scrape)
+// do not: gating them would tax every harness for nothing.
+const GUARDED = [/^\/mcp(\/|$)/, /^\/api\/agent/, /^\/api\/browse/, /^\/api\/browser/, /^\/api\/crawl/, /^\/api\/batch/, /^\/api\/research/];
+
+// Identity is resolved for every route, so a free call still lands in the usage report under its client.
+// Only the metered doors refuse anonymous callers.
+const UNMETERED_ADMIN = [/^\/api\/clients/, /^\/health/, /^\/docs/, /^\/openapi\.json/, /^\/shots\//];
+
+fastify.addHook('onRequest', (req, reply, done) => {
+  const path = (req.raw.url || '').split('?')[0];
+  if (UNMETERED_ADMIN.some((re) => re.test(path))) return done();
+
+  const guarded = GUARDED.some((re) => re.test(path));
+  const name = resolveToken(tokenFromHeaders(req.headers as Record<string, unknown>));
+
+  if (name) {
+    (req as any).client = name;
+    enterClient(name);
+    return done();
+  }
+
+  // Anonymous: recorded as such, so the usage report shows how much traffic has no identity instead of
+  // implying every caller is known. In warn mode it is allowed through even on a metered door.
+  (req as any).client = 'anonymous';
+  enterClient('anonymous');
+  if (guarded && authMode() === 'enforce') {
+    return reply.status(401).send({
+      error: 'A client token is required for this endpoint',
+      hint: 'Create one with POST /api/clients {"name":"my-client"}, then send "Authorization: Bearer <token>"',
+    });
+  }
+  return done();
+});
+
 // Streamable HTTP MCP (stateless: one server+transport per request, like the Python web MCP)
 const mcpHandler = async (req: any, reply: any) => {
   const t0 = Date.now();
@@ -726,6 +779,7 @@ const mcpHandler = async (req: any, reply: any) => {
   const server = createMcpServer();
   const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
   reply.hijack();
+  req.log.info({ client: req.client ?? 'anonymous' }, 'mcp request');
   reply.raw.on('close', () => { transport.close(); server.close(); });
   try {
     await server.connect(transport);

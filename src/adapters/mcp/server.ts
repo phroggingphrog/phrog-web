@@ -812,7 +812,7 @@ server.tool('research_cancel', 'Stop a deep research job and the whole process t
   job_id: z.string(),
 }, safe(async (a: { job_id: string }) => cancelDeepResearchJob(a.job_id)));
 
-server.tool('usage', 'What this service can account for over a window: calls, error rate, p50/p95 latency, busiest endpoints and metered browser sessions. Per endpoint, not per client.', {
+server.tool('usage', 'What this service can account for over a window: calls, error rate, p50/p95 latency, busiest tools, metered browser sessions, and by_client attribution (anonymous = a call that carried no token; unknown = a record from before client tokens existed).', {
   days: z.number().int().min(1).max(365).default(7),
 }, safe(async (a: { days?: number }) => summarizeRuns(readRunLog(), { days: a.days ?? 7 })));
 

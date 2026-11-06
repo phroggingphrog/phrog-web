@@ -7,6 +7,8 @@ export interface RunRecord {
   ts?: string;
   kind?: string;
   tool?: string;
+  /** Which client token made the call; 'anonymous' when the request carried none. */
+  client?: string;
   ok?: boolean;
   status?: number;
   duration_ms?: number;
@@ -54,6 +56,7 @@ export function summarizeRuns(records: RunRecord[], opts: { days?: number; now?:
   const failuresByStatus: Record<string, number> = {};
   let transportFailures = 0;
   const byDay: Record<string, number> = {};
+  const byClient: Record<string, { calls: number; errors: number; metered_sessions: number }> = {};
   const durations: number[] = [];
   let ok = 0;
   let failed = 0;
@@ -79,6 +82,13 @@ export function summarizeRuns(records: RunRecord[], opts: { days?: number; now?:
 
     if (typeof rec.duration_ms === 'number') durations.push(rec.duration_ms);
     if (rec.kind === 'browser.session.open') browserSessions += 1;
+
+    // Attribution. 'anonymous' is the honest bucket for a call that carried no usable token.
+    const client = typeof rec.client === 'string' && rec.client ? rec.client : 'unknown';
+    const bucket = (byClient[client] ??= { calls: 0, errors: 0, metered_sessions: 0 });
+    bucket.calls += 1;
+    if (rec.ok === false) bucket.errors += 1;
+    if (rec.kind === 'browser.session.open') bucket.metered_sessions += 1;
   }
 
   durations.sort((a, b) => a - b);
@@ -98,6 +108,10 @@ export function summarizeRuns(records: RunRecord[], opts: { days?: number; now?:
     // The only metered thing the log can count on its own; spend on search/fetch lives in the provider.
     metered: { browser_sessions_opened: browserSessions },
     by_day: byDay,
+    // Who spent it. A call with no identity lands in 'anonymous', which is the number to watch.
+    by_client: Object.entries(byClient)
+      .sort((a, b) => b[1].calls - a[1].calls)
+      .map(([client, v]) => ({ client, ...v })),
     top_tools: Object.entries(byTool)
       .sort((a, b) => b[1].calls - a[1].calls)
       .slice(0, 15)
