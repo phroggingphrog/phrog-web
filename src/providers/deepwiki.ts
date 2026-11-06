@@ -54,7 +54,6 @@ async function callDeepWiki(toolName: string, args: Record<string, unknown>): Pr
 
   // DeepWiki answers 200 with the failure as text ("Error fetching wiki for repo ..."). Passing that
   // back as a successful structure or contents read is worse than failing: the caller cannot tell.
-  const isUpstreamError = (text: string) => /^error\b/i.test(text.trim()) && text.trim().length < 400;
 
   const raw = await res.text();
 

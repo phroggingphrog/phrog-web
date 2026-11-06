@@ -34,7 +34,24 @@ export interface QuickResearchOptions {
  * The workflows Feynman actually implements. Anything else is refused at dispatch: an unknown name used
  * to be spawned anyway, and the CLI exited 0 having done nothing, so the job reported success.
  */
-export const RESEARCH_WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'help'] as const;
+// Read from the engine so the allow-list cannot drift from what Feynman can actually run: the old
+// hand-written list refused real workflows (draft, recipe, replicate, autoresearch) and accepted `help`,
+// which is not a workflow — `feynman help <topic>` exits 0 and would have reported a finished "research".
+const FALLBACK_WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize'];
+
+function feynmanPromptsDir(): string {
+  // <engine>/bin/feynman.js -> <engine>/prompts, the same engine the runtime launches.
+  try { return resolve(feynmanRuntime().engine, '..', '..', 'prompts'); } catch { return resolve(process.cwd(), 'engines/feynman/prompts'); }
+}
+export function researchWorkflows(): readonly string[] {
+  try {
+    const dir = join(feynmanPromptsDir());
+    const names = readdirSync(dir).filter((n) => n.endsWith('.md')).map((n) => n.slice(0, -3));
+    return names.length ? names.sort() : FALLBACK_WORKFLOWS;
+  } catch {
+    return FALLBACK_WORKFLOWS;
+  }
+}
 
 export interface ResearchJob {
   jobId: string;
@@ -181,7 +198,18 @@ export function reconcileResearchJobs(): number {
       if (!name.endsWith('.json')) continue;
       const jobId = name.slice(0, -5);
       const job = readJobFile(jobId);
-      if (!job || job.status !== 'running') continue;
+      if (!job) continue;
+      // `waiting[]` lives only in memory, so a job that was queued at exit would stay queued forever.
+      if (job.status === 'queued') {
+        job.status = 'interrupted';
+        job.error = job.error || 'The service restarted while this job was waiting in the queue. Resume it to run it again.';
+        job.resumable = true;
+        jobs.set(jobId, job);
+        persistJob(job);
+        changed++;
+        continue;
+      }
+      if (job.status !== 'running') continue;
       if (alive(job.pid)) continue;
       job.status = 'interrupted';
       job.finishedAt = job.finishedAt || new Date().toISOString();
@@ -283,7 +311,14 @@ function enqueue(job: ResearchJob, start: () => Promise<string[]>): void {
     return;
   }
   activeJob = job.jobId;
-  void start().then((args) => startFeynman(job, args)).catch((err) => failJob(job, err));
+  void start()
+    .then((args) => {
+      // Cancelling during manifest creation finds no process to kill, so the job would otherwise start
+      // anyway and flip back to running after the user cancelled it.
+      if (job.status === 'cancelled' || job.status === 'failed') { activeJob = undefined; drainQueue(); return; }
+      startFeynman(job, args);
+    })
+    .catch((err) => failJob(job, err));
 }
 
 function drainQueue(): void {
@@ -292,7 +327,12 @@ function drainQueue(): void {
     const next = waiting.shift()!;
     if (next.job.status !== 'queued') continue;
     activeJob = next.job.jobId;
-    void next.start().then((args) => startFeynman(next.job, args)).catch((err) => failJob(next.job, err));
+    void next.start()
+      .then((args) => {
+        if (next.job.status === 'cancelled' || next.job.status === 'failed') { activeJob = undefined; drainQueue(); return; }
+        startFeynman(next.job, args);
+      })
+      .catch((err) => failJob(next.job, err));
     return;
   }
 }
@@ -328,6 +368,14 @@ function startFeynman(job: ResearchJob, args: string[]): void {
     child.on('close', async (exitCode) => {
       job.exitCode = exitCode;
       job.finishedAt = new Date().toISOString();
+
+      // A cancelled job was SIGKILLed by us: its exit code says nothing, and reporting `failed` made the
+      // job resumable again, so a cancelled run could be restarted by accident.
+      if (job.status === 'cancelled') {
+        persistJob(job);
+        if (activeJob === job.jobId) { activeJob = undefined; drainQueue(); }
+        return;
+      }
 
       if (exitCode === 0 && !spawnError) {
         job.status = 'completed';
@@ -376,8 +424,9 @@ export function dispatchDeepResearch(
 ): ResearchJob {
   const jobId = `fey_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
   const workflow = options.workflow || 'deepresearch';
-  if (!(RESEARCH_WORKFLOWS as readonly string[]).includes(workflow)) {
-    throw new Error(`Unknown workflow "${workflow}"; expected one of: ${RESEARCH_WORKFLOWS.join(', ')}`);
+  const allowed = researchWorkflows();
+  if (!allowed.includes(workflow)) {
+    throw new Error(`Unknown workflow "${workflow}"; expected one of: ${allowed.join(', ')}`);
   }
 
   const job: ResearchJob = {
@@ -491,7 +540,11 @@ export async function cancelDeepResearchJob(jobId: string): Promise<ResearchJob>
       }
     }
   }
-  if (alive(job.pid)) { try { process.kill(job.pid!, 'SIGKILL'); killed++; } catch { /* gone */ } }
+  // Only a pid from a live run may be killed: a resumed or queued job can still carry the pid of a
+  // process that exited long ago, and that number may by now belong to something unrelated.
+  if (job.status === 'running' && activeJob === job.jobId && alive(job.pid)) {
+    try { process.kill(job.pid!, 'SIGKILL'); killed++; } catch { /* gone */ }
+  }
 
   if (job.feynmanRunId) {
     await runFeynman(['research', 'run', 'set-status', job.feynmanRunId, '--status', 'aborted', '--json'], 30000).catch(() => undefined);

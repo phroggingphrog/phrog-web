@@ -32,6 +32,7 @@ import { CAPABILITIES } from './capabilities.js';
 import { buildOpenApi, renderDocsHtml } from './openapi.js';
 import { readRunLog, summarizeRuns } from './usage.js';
 import { cacheStats, cacheClear } from './cache.js';
+import { decodePath, isAdminOnly, isMetered, pathOf, sameSecret } from './auth-policy.js';
 import { authMode, createClient, listClients, resolveToken, revokeClient, tokenFromHeaders } from './clients.js';
 import { enterClient } from './context.js';
 import { researchVault } from './providers/vault.js';
@@ -50,7 +51,8 @@ fastify.addHook('onRoute', (route) => {
   for (const method of methods) registeredRoutes.push({ method, url: route.url });
 });
 
-await fastify.register(cors, { origin: true });
+// A local API consumed by CLIs and by this box's own docs page: no reason to let any web origin read it.
+await fastify.register(cors, { origin: [/^https?:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/] });
 
 // Run log: one JSON-lines record per /api/* call (payload captured in onSend for size/provider info).
 fastify.addHook('onSend', async (req: any, reply, payload) => {
@@ -735,17 +737,37 @@ fastify.post('/api/vault', wrap(researchVault as any, ['action']));
 
 // Doors that cost money or open a session require a client token. Free endpoints (search, fetch, scrape)
 // do not: gating them would tax every harness for nothing.
-const GUARDED = [/^\/mcp(\/|$)/, /^\/api\/agent/, /^\/api\/browse/, /^\/api\/browser/, /^\/api\/crawl/, /^\/api\/batch/, /^\/api\/research/];
 
 // Identity is resolved for every route, so a free call still lands in the usage report under its client.
 // Only the metered doors refuse anonymous callers.
-const UNMETERED_ADMIN = [/^\/api\/clients/, /^\/health/, /^\/docs/, /^\/openapi\.json/, /^\/shots\//];
-
 fastify.addHook('onRequest', (req, reply, done) => {
-  const path = (req.raw.url || '').split('?')[0];
-  if (UNMETERED_ADMIN.some((re) => re.test(path))) return done();
+  const method = (req.raw.method || 'GET').toUpperCase();
+  const rawPath = pathOf(req.raw.url || '');
+  const decoded = decodePath(rawPath);
 
-  const guarded = GUARDED.some((re) => re.test(path));
+  // Management: admin token only, and never from a client token. The bridge in front of this port is a
+  // socat relay, so every remote caller arrives as 127.0.0.1 — a loopback check would prove nothing.
+  if (isAdminOnly(rawPath, decoded)) {
+    if (method === 'GET' || method === 'HEAD') return done(); // listing carries names and counters, no secrets
+    const expected = process.env.PHROG_WEB_ADMIN_TOKEN;
+    const given = String((req.headers['x-phrog-admin'] as string) || '');
+    if (!expected) {
+      writeRun({ kind: 'auth', tool: `${method} ${rawPath}`, ok: false, status: 403, error: 'client management is disabled: PHROG_WEB_ADMIN_TOKEN is not set' });
+      return reply.status(403).send({
+        error: 'Client management is disabled because PHROG_WEB_ADMIN_TOKEN is not set on this service',
+        hint: 'Add PHROG_WEB_ADMIN_TOKEN=<random> to ~/.config/phrog-web.env and restart, then send it as "x-phrog-admin"',
+      });
+    }
+    if (!sameSecret(given, expected)) {
+      writeRun({ kind: 'auth', tool: `${method} ${rawPath}`, ok: false, status: 401, error: 'admin token required for client management' });
+      return reply.status(401).send({ error: 'Client management requires the admin token', hint: 'Send "x-phrog-admin: <PHROG_WEB_ADMIN_TOKEN>"' });
+    }
+    (req as any).client = 'admin';
+    enterClient('admin');
+    return done();
+  }
+
+  const guarded = isMetered(rawPath, decoded, method);
   const name = resolveToken(tokenFromHeaders(req.headers as Record<string, unknown>));
 
   if (name) {
@@ -759,9 +781,11 @@ fastify.addHook('onRequest', (req, reply, done) => {
   (req as any).client = 'anonymous';
   enterClient('anonymous');
   if (guarded && authMode() === 'enforce') {
+    // Log the refusal: a blocked attempt used to leave no trace at all.
+    writeRun({ kind: 'auth', tool: `${method} ${rawPath}`, ok: false, status: 401, error: 'no client token on a metered door' });
     return reply.status(401).send({
       error: 'A client token is required for this endpoint',
-      hint: 'Create one with POST /api/clients {"name":"my-client"}, then send "Authorization: Bearer <token>"',
+      hint: 'Ask the owner for a client token, then send "Authorization: Bearer <token>"',
     });
   }
   return done();

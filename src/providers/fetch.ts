@@ -407,7 +407,8 @@ export async function executeFetch(url: string, options: FetchOptions = {}): Pro
       attempts.push({ provider, status: result.statusCode, outcome: 'ok' });
       const out: FetchResult = { ...result, attempts, cached: false };
       // Do not cache a thin body: it is exactly what the next caller would want to retry.
-      if (cacheable && out.markdown.length >= 200) cacheSet(cacheId, out);
+      // Store a copy: a caller that mutates its result must not rewrite what the next caller receives.
+      if (cacheable && out.markdown.length >= 200) cacheSet(cacheId, { ...out });
       return out;
     } catch (err) {
       const e = err instanceof ProviderError ? err : null;

@@ -6,6 +6,7 @@ import {
   enrichResearchJob,
   resumeDeepResearchJob,
   adoptFeynmanRun,
+  researchWorkflows,
 } from './research.js';
 import type { ResearchJob } from './research.js';
 
@@ -31,7 +32,8 @@ export async function webSearch(a: { query: string; limit?: number; time_range?:
 // Deep research has exactly one implementation: providers/research.ts. These compat entry points keep
 // the old job shapes for existing clients but no longer own a second, in-memory job registry — that
 // registry could not be polled by research_status, cancelled, or resumed after a restart.
-const WORKFLOWS = ['deepresearch', 'lit', 'compare', 'review', 'audit', 'summarize', 'recipe', 'draft'];
+// Same source as dispatch: Feynman's own prompt files, so a client cannot ask for a workflow that does not exist.
+const WORKFLOWS = researchWorkflows() as string[];
 
 /** Old clients read `status`; ours is the same vocabulary plus queued/interrupted/cancelled. */
 function compatStatus(job: ResearchJob): string {
@@ -103,7 +105,14 @@ export async function deepResearchResume(a: { run_id: string }) {
   // Accepts either one of our job ids or a raw Feynman run id, so older callers keep working.
   if (/^fey_\d+_[a-z0-9]{5}$/.test(id)) {
     const job = await resumeDeepResearchJob(id);
-    return { job_id: job.jobId, status: 'running', note: 'resumed from the first unfinished stage' };
+    return {
+      job_id: job.jobId,
+      status: job.status,
+      resumed_mode: job.resumed_mode,
+      note: job.resumed_mode === 'restart'
+        ? 'this workflow has no checkpoint, so it restarts from the beginning'
+        : 'resumed from the first unfinished stage',
+    };
   }
   const job = await adoptFeynmanRun(id);
   return { job_id: job.jobId, status: 'queued', note: `adopted Feynman run ${id}; resumes from its first unfinished stage` };

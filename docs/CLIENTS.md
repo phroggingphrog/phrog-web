@@ -12,11 +12,22 @@ say who did it. Each caller now gets a token, which both gates the metered doors
 | `POST /api/agent`, `/api/browse`, `/api/browser` | required |
 | `/api/research*`, `/api/crawl*`, `/api/batch*` | required |
 | `/api/search`, `/api/fetch`, `/api/scrape`, `/api/parse`, `/api/profiles` | not required |
-| `/api/clients`, `/health`, `/docs`, `/openapi.json` | not required |
+| `POST`/`DELETE` `/api/clients` | **admin token** (`x-phrog-admin`), never a client token |
+| `GET /api/clients`, `/health`, `/docs`, `/openapi.json` | not required |
+| `POST`/`DELETE` `/api/keys`, `POST /api/extract` | required (they change credentials or spend an LLM call) |
 
-Free endpoints stay open on purpose: gating search and fetch would tax every harness and buy nothing, since
-neither spends credit. They still **record** identity when a token is present, so a report can say who the
+Free endpoints (search, fetch, scrape, parse, profiles) stay open on purpose: gating them would tax every
+harness and buy nothing. They still **record** identity when a token is present, so a report can say who the
 traffic belongs to.
+
+**The door is matched on the normalised path, not the raw URL.** find-my-way percent-decodes and strips an
+absolute-form prefix before routing, so an earlier version that tested `req.raw.url` let `/api/%72esearch/…`
+and `GET /%6Dcp` through with no token. `src/auth-policy.ts` now tests every candidate form and treats an
+undecodable path as metered; `tests/providers/auth-policy.test.ts` pins those exact strings.
+
+**There is no loopback check and there cannot be one.** `ss -ltnp` shows a `socat` relay on
+`192.168.122.1:8890` forwarding to `127.0.0.1:8890`, so every bridge caller arrives as `127.0.0.1`. Identity
+is the only boundary that means anything here.
 
 ## Auth modes
 
@@ -43,8 +54,11 @@ Tokens are 24 random bytes, base64url. The registry at `~/.config/phrog-web/clie
 their SHA-256 — the plaintext is returned by `POST` and never again. Re-creating an existing name **rotates**
 it and invalidates the old token.
 
-Client management is deliberately **not** an MCP tool: an agent holding a token must not be able to mint
-more tokens. It is loopback REST only, which means local shell access is the bar for issuing one.
+Client management is deliberately **not** an MCP tool, and not open REST either: `POST`/`DELETE` require the
+service's admin token in `x-phrog-admin`, which is `PHROG_WEB_ADMIN_TOKEN` from
+`~/.config/phrog-web.env` (0600). If that variable is unset, management answers 403 rather than falling open.
+Reading the token from the file is the bar for minting a client — an agent holding a client token is
+explicitly not enough.
 
 ## Wiring a harness
 
@@ -69,5 +83,13 @@ Every run record now carries `client`. `GET /api/usage` reports:
 by_client: [{client:"hermes",calls:2,errors:0,metered_sessions:0}, ...]
 ```
 
-Two buckets are not names: `anonymous` (a call that carried no token) and `unknown` (a record written before
-identity existed — it will age out of any window).
+Three buckets are not names: `anonymous` (a call that carried no token), `admin` (a management call) and
+`unknown` (a record written before identity existed, plus any route that skips `enterClient` — `/api/clients`
+and the static pages — so it never fully ages out).
+
+Refusals are recorded too (`kind: "auth"`), so a blocked attempt is visible. They used to leave no trace: the
+run log only instrumented `/api/*`, and a 401 on `/mcp` was invisible.
+
+`PHROG_WEB_MCP_AUTH` defaults to `warn`, which means running the service by hand
+(`node dist/index.js`, as `CLAUDE.md` suggests) leaves the metered doors open. Only the systemd unit sets
+`enforce`.

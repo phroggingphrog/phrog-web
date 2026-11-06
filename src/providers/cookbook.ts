@@ -97,7 +97,7 @@ function fingerprint(selector: string | undefined, body: string): string {
 /** Firecrawl "Monitor": register a page; check later and get told whether it moved. */
 export async function createMonitor(input: { url?: string; selector?: string }): Promise<Monitor> {
   if (!input.url) throw new Error('url is required');
-  const page = await executeFetch(input.url);
+  const page = await executeFetch(input.url, { cache: false });
   const hash = fingerprint(input.selector, page.markdown);
   const all = readMonitors();
   const id = createHash('sha256').update(`${input.url}|${input.selector ?? ''}`).digest('hex').slice(0, 16);
@@ -114,7 +114,7 @@ export async function checkMonitor(id: string): Promise<{ monitor: Monitor; chan
   const all = readMonitors();
   const monitor = all[id];
   if (!monitor) throw new Error(`unknown monitor: ${id}`);
-  const page = await executeFetch(monitor.url);
+  const page = await executeFetch(monitor.url, { cache: false });
   const hash = fingerprint(monitor.selector, page.markdown);
   const changed = hash !== monitor.hash;
   const previousHash = monitor.hash;
